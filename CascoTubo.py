@@ -3,12 +3,12 @@ import math
 
 class CascoTubo:
     def __init__(self):       
-        self.ent_Tq = None
-        self.sai_Tq =  None
-        self.sai_Tf =  None
-        self.ent_Tf =  None
-        self.v_frio =  None
-        self.v_quente =  None
+        self.T1 = None
+        self.T2 =  None
+        self.t2 =  None
+        self.t1 =  None
+        self.wf =  None
+        self.wq =  None
         self.tipo_quente =  None
         self.tipo_frio =  None
         self.num_casco = None
@@ -36,12 +36,12 @@ class CascoTubo:
                                     'material_casco': None,
                                 }):
         
-        self.ent_Tq = propriedades['temp_ent_fluido_quente']
-        self.sai_Tq = propriedades['temp_sai_fluido_quente']
-        self.sai_Tf = propriedades['temp_sai_fluido_frio']
-        self.ent_Tf = propriedades['temp_ent_fluido_frio']
-        self.v_frio = propriedades['vazao_fluido_frio']
-        self.v_quente = propriedades['vazao_fluido_quente']
+        self.T1 = propriedades['temp_ent_fluido_quente']
+        self.T2 = propriedades['temp_sai_fluido_quente']
+        self.t2 = propriedades['temp_sai_fluido_frio']
+        self.t1 = propriedades['temp_ent_fluido_frio']
+        self.wf = propriedades['vazao_fluido_frio']
+        self.wq = propriedades['vazao_fluido_quente']
         self.tipo_quente = propriedades['tipo_fluido_quente']
         self.tipo_frio = propriedades['tipo_fluido_frio']
         self.num_casco = propriedades['Num_passagens_casco'] 
@@ -59,26 +59,26 @@ class CascoTubo:
     def balaco_de_energia(self):
         self.propriedades_termodinamicas()
 
-        if None in (self.ent_Tq, self.sai_Tq, self.v_quente):
-            self.q = self.v_frio * self.cp_frio * (self.sai_Tf - self.ent_Tf)
-            if self.ent_Tq is None:
-                self.ent_Tq = self.ent_Tq + self.q/(self.v_quente * self.cp_quente)
-            elif self.sai_Tq is None:
-                self.sai_Tq = self.sai_Tq - self.q/(self.v_quente * self.cp_quente)
+        if None in (self.T1, self.T2, self.wq):
+            self.q = self.wf * self.cp_frio * (self.t2 - self.t1)
+            if self.T1 is None:
+                self.T1 = self.T1 + self.q/(self.wq * self.cp_quente)
+            elif self.T2 is None:
+                self.T2 = self.T2 - self.q/(self.wq * self.cp_quente)
             else:
-                self.v_quente = self.q/(self.cp_quente * (self.ent_Tq - self.sai_Tq ))
+                self.wq = self.q/(self.cp_quente * (self.T1 - self.T2 ))
 
-        elif None in (self.ent_Tf, self.sai_Tf, self.v_quente):
-            self.q = self.v_frio * self.cp_frio * (self.ent_Tq - self.sai_Tq)
-            if self.ent_Tf is None:
-                self.ent_Tf = self.sai_Tf - self.q/(self.v_frio * self.cp_frio)
-            elif self.sai_Tf is None:
-                self.sai_Tf = self.ent_Tf + self.q/(self.v_frio * self.cp_frio)
+        elif None in (self.t1, self.t2, self.wq):
+            self.q = self.wf * self.cp_frio * (self.T1 - self.T2)
+            if self.t1 is None:
+                self.t1 = self.t2 - self.q/(self.wf * self.cp_frio)
+            elif self.t2 is None:
+                self.t2 = self.t1 + self.q/(self.wf * self.cp_frio)
             else:
-                self.v_frio = self.q/(self.cp_frio * (self.sai_Tf - self.ent_Tf ))
+                self.wf = self.q/(self.cp_frio * (self.t2 - self.t1 ))
         
         else:
-            self.q = self.v_frio * self.cp_frio * (self.sai_Tf - self.ent_Tf)
+            self.q = self.wf * self.cp_frio * (self.t2 - self.t1)
 
     def diferenca_temp_deltaT(self):
         calculo_diferenca_log_MLDT()
@@ -88,13 +88,13 @@ class CascoTubo:
         self.deltaT = self.mldt*self.F
 
         def calculo_diferenca_log_MLDT():
-            num = ((self.ent_Tq - self.sai_Tf)-(self.sai_Tq - self.ent_Tf))
-            den = math.log(((self.ent_Tq - self.sai_Tf)/(self.sai_Tq - self.ent_Tf)))
+            num = ((self.T1 - self.t2)-(self.T2 - self.t1))
+            den = math.log(((self.T1 - self.t2)/(self.T2 - self.t1)))
             self.mldt = num / den
         
         def calculo_R_S():
-            self.R = (self.ent_Tq - self.sai_Tq)/(self.sai_Tf - self.ent_Tf)
-            self.S = (self.sai_Tf - self.ent_Tf)/(self.ent_Tq - self.ent_Tf)   
+            self.R = (self.T1 - self.T2)/(self.t2 - self.t1)
+            self.S = (self.t2 - self.t1)/(self.T1 - self.t1)   
 
         def calculo_F():
             if self.num_casco  == 1 and self.R != 1:
@@ -124,7 +124,7 @@ class CascoTubo:
                 self.F = num/((1 - self.S)*math.log(a/b))
     
     def n_tubos(self):
-        
+        pass
 
 
     def calcular_perda_de_carga():
