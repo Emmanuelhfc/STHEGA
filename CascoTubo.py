@@ -1,24 +1,8 @@
+
 import thermo
 import math
-
 class CascoTubo:
-    def __init__(self):       
-        self.T1 = None
-        self.T2 =  None
-        self.t2 =  None
-        self.t1 =  None
-        self.wf =  None
-        self.wq =  None
-        self.tipo_quente =  None
-        self.tipo_frio =  None
-        self.num_casco = None
-
-        self.comprimento_max =  None
-        self.diametro_max =  None
-        self.material_tubos =  None
-        self.material_casco =  None
-  
-    def add_dados_iniciais(self,propriedades = {
+    def __init__(self,propriedades = {
                                     'temp_ent_fluido_quente': None,
                                     'temp_sai_fluido_quente': None,
                                     'temp_sai_fluido_frio': None,
@@ -27,15 +11,22 @@ class CascoTubo:
                                     'vazao_fluido_quente': None,
                                     'tipo_fluido_quente': None,
                                     'tipo_fluido_frio': None,
-                                    'Num_passagens_casco': None
+                                    'Num_passagens_casco': None,
+                                    'L':None,
+                                    'Num_passagens_tubo': None,
+                                    'd_tubo': None,
+                                    'arranjo_tubos': None,
+                                    'diametro_interno_casco': None
                                 },
                                 limitacoes = {
-                                    'comprimento_max': None,
-                                    'diametro_max': None,
+                                    'L_max': None,
+                                    'd_max_casco': None,
+                                    'd_max_tubos': None,
                                     'material_tubos': None,
                                     'material_casco': None,
                                 }):
         
+        # Propriedades termodinâmicas
         self.T1 = propriedades['temp_ent_fluido_quente']
         self.T2 = propriedades['temp_sai_fluido_quente']
         self.t2 = propriedades['temp_sai_fluido_frio']
@@ -44,12 +35,22 @@ class CascoTubo:
         self.wq = propriedades['vazao_fluido_quente']
         self.tipo_quente = propriedades['tipo_fluido_quente']
         self.tipo_frio = propriedades['tipo_fluido_frio']
-        self.num_casco = propriedades['Num_passagens_casco'] 
 
-        self.comprimento_max = limitacoes['comprimento_max']
-        self.diametro_max = limitacoes['diametro_max']
+        # Propriedades mecânicas
+        self.num_casco = propriedades['Num_passagens_casco'] 
+        self.L = propriedades['L'] 
+        self.nump_tubos = propriedades['Num_passagens_tubo']
+        self.d = propriedades['d_tubo']
+        self.a_tubos = propriedades['arranjo_tubos']
+        self.d_casco = propriedades['diametro_interno_casco']
+
+        # Limitações
+        self.L_max = limitacoes['L_max']
+        self.d_max_casco = limitacoes['d_max_casco']
         self.material_tubos = limitacoes['material_tubos']
         self.material_casco = limitacoes['material_casco']
+        self.d_max_tubo = limitacoes['d_max_tubos']
+
 
     def propriedades_termodinamicas(self):
         self.cp_frio = 1
@@ -59,7 +60,10 @@ class CascoTubo:
     def balaco_de_energia(self):
         self.propriedades_termodinamicas()
 
-        if None in (self.T1, self.T2, self.wq):
+        if None in (self.t1, self.t2, self.wq) and  None in (self.T1, self.T2, self.wq):
+            print("Não tem nenhum valor.")
+
+        elif None in (self.T1, self.T2, self.wq):
             self.q = self.wf * self.cp_frio * (self.t2 - self.t1)
             if self.T1 is None:
                 self.T1 = self.T1 + self.q/(self.wq * self.cp_quente)
@@ -77,14 +81,15 @@ class CascoTubo:
             else:
                 self.wf = self.q/(self.cp_frio * (self.t2 - self.t1 ))
         
-        else:
-            self.q = self.wf * self.cp_frio * (self.t2 - self.t1)
+        else: # Se tiver todos os parâmetros
+            self.q = self.wf * self.cp_frio * (self.t2 - self.t1) 
+
+            
 
     def diferenca_temp_deltaT(self):
         calculo_diferenca_log_MLDT()
         calculo_R_S()
         calculo_F()
-
         self.deltaT = self.mldt*self.F
 
         def calculo_diferenca_log_MLDT():
@@ -122,14 +127,24 @@ class CascoTubo:
                 a = (2 - self.S*(2 - 2**0.5))
                 b = (2 - self.S*(2 + 2**0.5))
                 self.F = num/((1 - self.S)*math.log(a/b))
-    
+
     def n_tubos(self):
-        pass
+            """
+            Busca no banco de dados o número de tubos e diâmetro do feixe  
+            """
+
+            self.L
+            self.nump_tubos
+            self.d 
+            self.a_tubos
+            self.d_casco 
+    
+            
+            pass
+
+if __name__ == "__main__":
+
+    a = CascoTubo()
+    a.balaco_de_energia()
 
 
-    def calcular_perda_de_carga():
-        pass
-    def calcular_efetividade_termica():
-        pass
-    def calcular_dimensoes():
-        pass
