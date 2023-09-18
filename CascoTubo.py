@@ -14,7 +14,7 @@ class CascoTubo:
                                     'Num_passagens_casco': None,
                                     'L':None,
                                     'Num_passagens_tubo': None,
-                                    'd_tubo': None,
+                                    'd_int_tubo': None,
                                     'arranjo_tubos': None,
                                     'diametro_interno_casco': None
                                 },
@@ -40,7 +40,7 @@ class CascoTubo:
         self.num_casco = propriedades['Num_passagens_casco'] 
         self.L = propriedades['L'] 
         self.nump_tubos = propriedades['Num_passagens_tubo']
-        self.d = propriedades['d_tubo']
+        self.d = propriedades['d_int_tubo']
         self.a_tubos = propriedades['arranjo_tubos']
         self.d_casco = propriedades['diametro_interno_casco']
 
@@ -135,12 +135,74 @@ class CascoTubo:
 
             self.L
             self.nump_tubos
-            self.d 
+            self.d # [m]
             self.a_tubos
-            self.d_casco 
+            self.d_casco # [m]
+            self.Nt # número de tubos
     
             
             pass
+    # Passo 4 -- Lado do Tubo
+    
+    def fluido_tubo(self):
+        """
+        Função para determinar qual o fluido do lado do tubo e qual do lado do casco
+        """
+
+    def conveccao_tubo(self, w_tubo: float, mi_t:float, rho_t: float,  fluido_t: str, t2_t: float, de:float, t1_t: float, cp_t: float, k_t:float, tw:float = None, miw_t = None):
+        d = self.d
+        n = self.nump_tubos
+        Nt = self.Nt
+        w = w_tubo       # Vazão mássica fluído do lado do tubo 
+        mi = mi_t
+        rho = rho_t
+        tipo_fluido = fluido_t
+        cp = cp_t
+        k = k_t
+        miw = miw_t
+        L_t = self.L
+        de = de #   Diâmetro externo do tubo
+
+        at_ = math.pi*(d^2)/4   #   área escoamento tubo -- unidade
+        at = Nt*at_/n           #   área de escoamento tubo
+        Gt = w/at               #   vazão mássica por unidade de área
+        Re_t = Gt*d/mi          #   Nº de Re
+        v_t = Gt/rho            #   Velocidade escoamento lado do tubo
+
+        if tipo_fluido == "water":
+            #   Como a água é um fluido normalmente incrustante não se utilizam velocidades de escoamento inferiores a 1 m/s. Sugere-se ler a parte referente a “Trocadores usando água” , p. 115, do Kern.
+            t = (t2_t - t1_t)/2 #   Temperatura média do fluído
+            hi = 105 * (1.352 + 0.0198 * t) * v_t^0.8 / d^0.2   #   (3.24b)
+
+        elif Re_t > 10000:
+
+            if tw == None: # Caso não tenha a temperatura da parede
+                a = 1
+            else:
+                a = (mi/miw) ^ 0.14
+
+            Nu = 0.027 * (d*Gt/mi)^0.8 * (cp*mi/k)^(1/3) * a
+            hi = Nu * k/d
+        
+        elif Re_t < 2100:
+            hi = 3.66*k/d
+
+        elif 2100 <= Re_t <=10000:
+            a = 0.1 *((d * Gt / mi) ^ (2 / 3) - 125) * (cp * mi / k) ^ 0.495
+            b = math.exp(-0.0225 * (math.log(cp * mi / k)) ^ 2)
+            
+            if tw == None: # Caso não tenha a temperatura da parede
+                a_ = 1
+            else:
+                a_ = (mi/miw) ^ 0.14
+
+            c = a_ * (1 + d/L_t) ^ (2/3)  #   Verificar esse L
+
+            Nu = a * b * c
+            hi = Nu * k / d
+        
+        hio = hi * d / de
+
 
 if __name__ == "__main__":
 
