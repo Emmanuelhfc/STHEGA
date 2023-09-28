@@ -1,6 +1,7 @@
 
 import thermo
 import math
+POL2M = 0.0254
 class CascoTubo:
     def __init__(self,propriedades = {
                                     'temp_ent_fluido_quente': None,
@@ -203,13 +204,15 @@ class CascoTubo:
         
         hio = hi * d / de
 
-    def conveccao_casco(self, k_c:float, cp_c:float, mi_c:float, w_c:float, de, Nt, Dotl, Ds, a_tubos, miw_c = None):
+    def conveccao_casco(self, k_c:float, cp_c:float, mi_c:float, w_c:float, de, Nt, Dotl, Ds, a_tubos,L_t, miw_c = None):
         k = k_c     #   Condutividade térmica do fluído
         cp = cp_c   #   Calor específico
         mi = mi_c   #   Viscosidade do fluído
         w = w_c     #   vazão mássica do fluido
         miw = miw_c #   Viscosidade do fluido avaliada na temperatura da parede
+        L_t = L_t     #   Comprimento dos tubos 
         a_tubos = a_tubos
+
         if miw == None: # Caso não tenha a temperatura da parede
             a_ = 1
         else:
@@ -254,6 +257,25 @@ class CascoTubo:
                     -pp: passo dos tubos paralelo ao escoamento
                     -pn: passo dos tubos perpendicular ao escoamento
             """
+        def diametroBocal(Ds):
+            """ ## Descrição:
+                Cálculo o diâmetro do casco e filtra da tabela diâmetro do Bocal
+                ## Args:
+                    - Ds: diâmetro interno do casco
+                ## Return:
+                    - d_bocal: diâmetro do bocal [m]
+                    - Dc:   diâmetro do casco    [m]
+            """
+        def li_lo_tabela(Dc):
+            """ ## Descrição:
+                Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
+                ## Args:
+                    - Ds: diâmetro do casco
+                ## Return:
+                    - li: [m]
+                    - lo: [m]
+            """
+
 
         #================= Cálculo para feixe de tubos ideal =====================
         ls, lc = caract_chicana()
@@ -290,22 +312,104 @@ class CascoTubo:
 
         #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
         
+        
+        
+        Fbp = (Ds - Dotl) * ls / Sm
+
+        Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
+
         if Re_s <= 100:
             Cbh = 1.35
         else:
             Cbh = 1.25
         
         Nc = Ds * (1 - 2 * (lc / Ds)) / pp   #   N° de fileiras de tubos cruzados pelo escoamento numa seção de escoamento cruzado
+
+        Nc = Nc // 1        #   Nº Inteiro
+        
+        folga = (Ds - Dotl)
+        if  folga > 1.5 * POL2M or (folga > 0.5 and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
+            Nss = Nc // 5       #   Nº de pares de tiras selantes. Costuma-se utilizar umq par de tiras selantes para cada 5 a 7 filas de tubos na seção de escoamento cruzado.
         
         jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** 1/3))
 
+        #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
+        
+        jr_ = 1.51 / (Nc ** 0.18)
+        
+        if Re_s > 100:
+            jr = 1
+        elif Re_s <= 20:
+            jr = jr_
+        elif 20<= Re_s <100:
+            jr = jr_ + ((20 - Re_s) / 80) * (jr_ - 1)
+        
+        #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
+        d_bocal, Dc = diametroBocal(Ds)
+        li, lo = li_lo_tabela(Dc)
+
+        lsi = li + d_bocal
+        lso = lo + d_bocal
+
+        if Re_s > 100:
+            n = 0.6
+        elif Re_s <= 100:
+            n = 1/3
+        
+        lsi_ = lsi / ls
+        lso_ = lso / ls
+
+        Nb = (L_t - lsi - lso) / ls + 1
+
+        num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
+        den = (Nb - 1) + (lsi_) + (lso_)
+
+        js = num / den
+
         #   Cálculo coeficiente de transmissão de calor para o lado do casco
         hs = h_ideal * jc * jl * jb * jr * js
+    
+    def calculo_temp_parede(self, Tmed, tmed, hs, hio, mi_t, mi_c, fluido_frio:bool):
+        """ ## Descrição:
+            Cálcula a temperatura da parede, busca valor de miw e correige valores dos coeficientes de transmissão de calor 
+            ## Args
+                - Tmed: Temperatura calórica ou média do fluído quente 
+                - tmed: Temperatura calórica ou média do fluído frio
+                - hs: coeficiente de transmissão de calor por convecção lado do casco
+                - hio: coeficientes de transmissão de calor por convecção lado do tubo
+                - fluido_frio:bool Se o fluído frio estiver no interior do tubo - True
+                - mi_t: Viscosidade do fluido do tubo
+                - mi_c: Viscosidade do fluido do casco
+            ## Return:
+                - tw: temperatura da parede 
+                - miw: Viscosidade do fluido avaliada na temperatura da parede
+        """
+        Tc = Tmed    
+        tc = tmed 
 
+        if fluido_frio:
+            tw = tc + hs/ (hio + hs) * (Tc - tc) 
+        else:
+            tw = tc + hio/(hio + hs) * (Tc - tc)
 
+        miw = self.propriedades_termodinamicas()
 
+        termo_correcao_tubo = (mi_t / miw) ** 0.14
+        termo_correcao_casco= (mi_c / miw) ** 0.14
+        
+        hs = hs * termo_correcao_casco
+        hio = hio * termo_correcao_tubo
+
+    def coef_global_limpo(self, hio, hs):
+        """Descrição:
+            Cálcula o coeficiente global limpo com base nos cefientes de transmissão de calor cálculados  
+        """
+
+        Uc = hio * hs / (hio + hs)
+    
 
     
+
 
 if __name__ == "__main__":
     a = CascoTubo()
