@@ -406,10 +406,6 @@ class CascoTubo:
         """
 
         Uc = hio * hs / (hio + hs)
-    
-
-    
-
 
 if __name__ == "__main__":
     a = CascoTubo()
