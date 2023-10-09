@@ -314,7 +314,7 @@ class CascoTubo:
         
         
         
-        Fbp = (Ds - Dotl) * ls / Sm
+        Fbp = (Ds - Dotl) * ls / Sm     #   Fração da área de escoamento cruzado em que pode ocorrer a corrente C
 
         Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
 
@@ -371,7 +371,8 @@ class CascoTubo:
     
     def calculo_temp_parede(self, Tmed, tmed, hs, hio, mi_t, mi_c, fluido_frio:bool):
         """ ## Descrição:
-            Cálcula a temperatura da parede, busca valor de miw e correige valores dos coeficientes de transmissão de calor 
+            Cálcula a temperatura da parede, busca valor de miw e correige valores dos coeficientes de transmissão de calor multiplicando-os
+            pelo fator phi_t. 
             ## Args
                 - Tmed: Temperatura calórica ou média do fluído quente 
                 - tmed: Temperatura calórica ou média do fluído frio
@@ -383,6 +384,8 @@ class CascoTubo:
             ## Return:
                 - tw: temperatura da parede 
                 - miw: Viscosidade do fluido avaliada na temperatura da parede
+                - phi_t_tubo: valor do termo (mi / miw) ^ 0.14 para o tubo
+                - phi_t_casco: valor do termo (mi / miw) ^ 0.14 para o casco
         """
         Tc = Tmed    
         tc = tmed 
@@ -394,11 +397,11 @@ class CascoTubo:
 
         miw = self.propriedades_termodinamicas()
 
-        termo_correcao_tubo = (mi_t / miw) ** 0.14
-        termo_correcao_casco= (mi_c / miw) ** 0.14
+        phi_t_tubo = (mi_t / miw) ** 0.14
+        phi_t_casco= (mi_c / miw) ** 0.14
         
-        hs = hs * termo_correcao_casco
-        hio = hio * termo_correcao_tubo
+        hs = hs * phi_t_casco
+        hio = hio * phi_t_tubo
 
     def coef_global_limpo(self, hio, hs):
         """Descrição:
@@ -406,6 +409,156 @@ class CascoTubo:
         """
 
         Uc = hio * hs / (hio + hs)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def perda_carga_tubo(self, Re_t, rho, di, phi_t, G_t, L, n, v):
+        """ ## Descrição:
+            - Cálculo da perda de carga do lado do tubo.
+            ## Args:
+                - Re_t: número de Re do lado do tubo;
+                - rho: densidade do fluido lado do tubo
+                - di: diâmetro interno do tubo
+                - phi_t: termo (mi/miw) ^ 0.14 para lado do tubo
+                - Gt: vazão mássica por unidade de área do tubo
+                - L: comprimento d tubo
+                - v: velocidade do escoamento
+                - n: nº de passes do tubos
+            ## Return
+                - delta_PT: perda de carga do lado do tubo.  
+        """
+        
+
+        delta_Pr = (4 * n * rho * v ** 2) / 2       #   Perda de carga de retorno 
+
+        f = (1.58 * math.log(Re_t) - 3.28) ** -2    #   Fator de atrito de Fanning
+
+        delta_Pt = (4 * f * G_t ** 2 * L * n) / (di * 2 * rho * phi_t) 
+
+        delta_PT = delta_Pt + delta_Pr
+
+    def perda_carga_casco(self, Nb, mi, miw, de, Res, W, rho, Nc, Stb, Ssb, Sm, Nss, Fbp, p, pp, lc, Ds, Fc, Nt, ls, lsi_, lso_):
+        """ ## Descrição:
+            - Cálculo da perda de carga do lado do caso.
+            ## Args:
+                - Nb: nº de chicanas
+                - mi: viscosidade do fluido lado do casco
+                - miw: viscosidade do fluido avaliada na temperatura da parede
+                - de: diâmetro externo do tubo
+                - Res: Nº de Re lado do casco
+                - W: vazão mássica do fluido do casco
+                - Nc: Nº de fileiras de tubos cruzados pelo escoamento numa seção de escoamento 
+                - rho: densidade do fluido do lado do casco
+                - Stb: Área da seção de vazamento tubo-chicana
+                - Ssb: Área de seção de vazamento casco chicana
+                - Sm: Área da seção de escoamento cruzado, na ou próxima à linha de centro
+                - Nss: Nº de pares de tiras selantes.
+                - Fbp: Fração da área de escoamento cruzado em que pode ocorrer a corrente C
+                - p: passo dos tubos
+                - pp: passo dos tubos perpendicular ao escoamento
+                - lc: corte das chicanas
+                - Ds: diâmetro interno do casco
+                - Fc: Nº tubos seção de escoamento cruzado
+                - Nt: Nº de tubos
+                - ls: espaçamento das chicanas
+                - lsi_: razão entre espaçamento da chicana de entrada e espaçamento das chicanas
+                - lso_: razão entre espaçamento da chicana de saída e espaçamento das chicanas
+            ## Return
+                - delta_Ps: perda de carga do lado do casco   
+        """
+        def constantes_b():
+            ...
+        #================ Perda de carga na seção de escoamento cruzado ======================
+        if Res <= 100:
+            Cbp = 4.5
+        elif Res > 100:
+            Cbp = 3.7
+
+        Rb_a = (1 - (2 * Nss / Nc) ** (1/3))
+        Rb = math.exp(-Cbp * Fbp * Rb_a)        #   Fator de correção para efeito do contorno do feixe    
+
+        m = 0.15 * (1 + Ssb / (Stb + Ssb)) + 0.8
+        Rl_b = ((Stb + Ssb) / Sm) ** m 
+        Rl_a = (1 + Ssb / (Stb + Ssb)) * -1.33
+
+        Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
+        
+        b1, b2, b3, b4 = constantes_b
+        b = b3 / (1 + 0.14 * Res ** b4)
+        fi = b1 * (1.33 / (p * de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
+        delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) )* (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
+        delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
+
+        #================= Perda de carga nas janelas ==============================================
+        
+        if Res >= 100:      #   Escoamento turbulento
+            
+            Swg_a = 1 - 2 * lc / Ds 
+            Swg_b = (1-Swg_a ** 2) ** (1/2)
+            Swg = Ds ** 2 / 4 (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
+
+            Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
+
+            Sw = Swg - Swt      #   Área da seção de escoamento da janela
+
+            Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
+            Ncw = Ncw // 1
+            delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
+        
+        elif Res < 100:     #   Escoamento laminar
+            theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
+            Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
+
+            delta_Pwi_a = 26 * mi * W / (rho * (Sm * Sw) ** (1/2))
+            delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
+            delta_Pwi_c = 2 * W ** 2 / (2 * Sm * Sw * rho)
+            delta_Pwi = delta_Pwi_a * delta_Pwi_b + delta_Pwi_c
+                
+        delta_Pw = Nb * delta_Pwi * Rl
+
+        #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
+
+        if Res <= 100:
+            n = 1
+        elif Res > 100:
+            n = 0.2
+        Rs = 1 / 2 * (lsi_ ** (n - 2) + lso_ ** (n-2))      #   Fator de correção devido o espaçamento desigual das chicanas
+        delta_Pe = 2 * delta_Pbi * (1 + Ncw / Nc) * Rb * Rs
+
+        
+        #================ Perda de carga do lado do casco ===============================================
+        delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
+
 
 if __name__ == "__main__":
     a = CascoTubo()
