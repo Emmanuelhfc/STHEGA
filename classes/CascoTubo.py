@@ -312,8 +312,6 @@ class CascoTubo:
 
         #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
         
-        
-        
         Fbp = (Ds - Dotl) * ls / Sm
 
         Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
@@ -401,11 +399,34 @@ class CascoTubo:
         hio = hio * termo_correcao_tubo
 
     def coef_global_limpo(self, hio, hs):
-        """Descrição:
+        """## Descrição:
             Cálcula o coeficiente global limpo com base nos cefientes de transmissão de calor cálculados  
         """
 
         Uc = hio * hs / (hio + hs)
+    
+    def fator_incrustacao(self, Uc, Ud, Rd_verd):
+        """## Descrição:
+            Cálcula do fator de inscrustação e excesso da área de troca
+        ## Args:
+            - Rd_verd: fator de incrsutação verdadeiro
+        
+        ## Return:
+            - Rd: fator de incrustação calculado
+            - Ea: excesso de área de troca [%]
+        """
+        #   Rd calculados deve ser maior que verdadeiro
+        Rd = (Uc - Ud) / (Uc * Ud)
+        
+        Ud_ = 1 / (1 / Uc + Rd + Rd_verd)
+        A_nec = Q / (Ud_ * delta_t)
+        Ea = (A_proj - A_nec)/A_nec * 100
+
+    
+
+
+
+        
 
 if __name__ == "__main__":
     a = CascoTubo()
