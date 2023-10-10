@@ -1,6 +1,10 @@
 
 import thermo
 import math
+import sqlite3
+from dataBase.constants import*
+from dataBase.comandos_sql import filtro_sqlite as filtro
+from dataBase.comandos_sql import conect_sqlite as conn
 POL2M = 0.0254
 class CascoTubo:
     def __init__(self,propriedades = {
@@ -40,7 +44,7 @@ class CascoTubo:
         # Propriedades mecânicas
         self.num_casco = propriedades['Num_passagens_casco'] 
         self.L = propriedades['L'] 
-        self.nump_tubos = propriedades['Num_passagens_tubo']
+        self.n = propriedades['Num_passagens_tubo']
         self.d = propriedades['d_int_tubo']
         self.a_tubos = propriedades['arranjo_tubos']
         self.d_casco = propriedades['diametro_interno_casco']
@@ -129,20 +133,40 @@ class CascoTubo:
                 b = (2 - self.S*(2 + 2**0.5))
                 self.F = num/((1 - self.S)*math.log(a/b))
 
-    def n_tubos(self):
+    def filtro_tubos(self, n, Ds, de, a_tubos):
+            """ ## Descrição:
+                    - Filtra da tabela de nº de tubos de fabricantes o valor diâmetro do feixe, nº de passagens no tubo e nº de tubos
+                ## Args:
+                    - n: número de passes no tubos
+                    - Ds: diâmetro interno do casco 
+                    - de: diâmetro externo do tubo
+                    - a_tubos: arranjo dos tubos
+                ## Return
+                    - Nt: nº de tubos
+                    - Dotl: diâmetor do feixe
             """
-            Busca no banco de dados o número de tubos e diâmetro do feixe  
-            """
+            npt = ""
+            if n == 1:
+                npt = "Np_1"
+            elif n == 2:
+                npt = "Np_2"
+            elif n == 4:
+                npt = "Np_4"
+            elif n == 6:
+                npt = "Np_6"
+            elif n == 8:
+                npt = "Np_8"
 
-            self.L
-            self.nump_tubos
-            self.d # [m]
-            self.a_tubos
-            self.d_casco # [m]
-            self.Nt # número de tubos
+            cursor = conn(DB_CONSTANTS_CASCO_TUBO)
+            sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+            sql_Dotl = f"SELECT Dotl_m FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+
+            Nt = filtro(cursor, sql_NT)
+            Dotl = filtro(cursor, sql_Dotl)
     
-            
-            pass
+            print(Nt)
+            print(Dotl)
+
     # Passo 4 -- Lado do Tubo
     
     def fluido_tubo(self):
@@ -425,43 +449,6 @@ class CascoTubo:
         A_nec = Q / (Ud_ * delta_t)
         Ea = (A_proj - A_nec)/A_nec * 100
 
-    
-
-
-
-        
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def perda_carga_tubo(self, Re_t, rho, di, phi_t, G_t, L, n, v):
         """ ## Descrição:
@@ -546,7 +533,7 @@ class CascoTubo:
             
             Swg_a = 1 - 2 * lc / Ds 
             Swg_b = (1-Swg_a ** 2) ** (1/2)
-            Swg = Ds ** 2 / 4 (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
+            Swg = Ds ** 2 / 4 * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
 
             Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
 
@@ -583,4 +570,4 @@ class CascoTubo:
 
 if __name__ == "__main__":
     a = CascoTubo()
-    a.balaco_de_energia()
+    a.filtro_tubos(4, 0.254, 0.01905, "quadrado 1 1/4 pol")

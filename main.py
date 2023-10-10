@@ -1,4 +1,4 @@
-from classes.CascoTubo import*
+from CascoTubo import*
 
 trocador1 = CascoTubo()
 
