@@ -1,2 +1,5 @@
+from pathlib import Path
 
-DB_CONSTANTS_CASCO_TUBO = r"C:\Users\carvalhoe\Documents\GITHUB\HeatExGA\dataBase\caco_tubo_costants.sqlite"
+DATA_BASE_DIR = Path(__file__).parent
+DB_CONSTANTS_DIR = DATA_BASE_DIR / "casco_tubo_constants.sqlite"
+

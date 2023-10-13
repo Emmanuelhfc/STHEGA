@@ -3,8 +3,7 @@ import thermo
 import math
 import sqlite3
 from dataBase.constants import*
-from dataBase.comandos_sql import filtro_sqlite as filtro
-from dataBase.comandos_sql import conect_sqlite as conn
+from dataBase.comandos_sql import*
 POL2M = 0.0254
 class CascoTubo:
     def __init__(self,propriedades = {
@@ -57,6 +56,25 @@ class CascoTubo:
         self.d_max_tubo = limitacoes['d_max_tubos']
 
 
+    """ ## Anotações:
+            ## Variáveis de controle (Genes)
+                - Temperaturas de entrada e saída:
+                - vazão:
+                - L
+                - Ds -> de
+                - a_tubos
+                - fluido do lado do casco e fluido do lado do tubo
+                - lc: corte da chicana
+                - ls: espaçamento das chicanas
+                - Npt: nº de passagens no casco
+            
+            ## Por enquanto o programa não tem a lógica da troca de fase 
+
+        TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
+        TODO -> Update - arredondar valores das tabelas
+
+    """
+    
     def propriedades_termodinamicas(self):
         self.cp_frio = 1
         self.cp_quente = 1
@@ -157,15 +175,19 @@ class CascoTubo:
             elif n == 8:
                 npt = "Np_8"
 
-            cursor = conn(DB_CONSTANTS_CASCO_TUBO)
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
             sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
             sql_Dotl = f"SELECT Dotl_m FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
 
-            Nt = filtro(cursor, sql_NT)
-            Dotl = filtro(cursor, sql_Dotl)
-    
-            print(Nt)
-            print(Dotl)
+            Nt = filtro_sqlite(cursor, sql_NT, True)
+            Dotl = filtro_sqlite(cursor, sql_Dotl, True)
+
+            if len(Nt) > 1 or len(Dotl) > 1:
+                print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
+                return
+            
+            return Nt[0], Dotl[0]
+            
 
     # Passo 4 -- Lado do Tubo
     
@@ -227,52 +249,80 @@ class CascoTubo:
             hi = Nu * k / d
         
         hio = hi * d / de
+    
+    def caract_chicana(self):
+        """ ## Descrição: 
+                - Define as características das chicanas, caso não tenha sido definida previamente. Aleatoriza o valor de acordo com recomendações da norma.
+            ## Return:
+                - ls: Espaçamento das chicanas  
+                - lc: Corte das chicanas
+        """
 
-    def conveccao_casco(self, k_c:float, cp_c:float, mi_c:float, w_c:float, de, Nt, Dotl, Ds, a_tubos,L_t, miw_c = None):
-        k = k_c     #   Condutividade térmica do fluído
-        cp = cp_c   #   Calor específico
-        mi = mi_c   #   Viscosidade do fluído
-        w = w_c     #   vazão mássica do fluido
-        miw = miw_c #   Viscosidade do fluido avaliada na temperatura da parede
-        L_t = L_t     #   Comprimento dos tubos 
-        a_tubos = a_tubos
-
-        if miw == None: # Caso não tenha a temperatura da parede
-            a_ = 1
-        else:
-            a_ = (mi/miw) ** 0.14
-
+    def conveccao_casco(self, k:float, cp:float, mi:float, w:float, de, Nt, Dotl, Ds, a_tubos, L_t, ls, lc):
+        """ ## Descrição:
+                - Função que faz o cálculo da convecção no casco.
+            ## Args:
+                - k: condutividade térmica
+                - cp: calor específico do fluído no casco
+                - mi: viscosidade do fluido no casco
+                - w: vazão mássica do fluido
+                - de: diâmetro externo do tubo
+                - Nt: nº de tubos
+                - Dotl: diâmetro do feixe de tubos
+                - Ds: diâmetro do casco
+                - a_tubos: arranjo dos tubos
+                - L_t:
+                - ls: Espaçamento das chicanas
+                - lc: Corte das chicanas
+                
+                
+                
+        """
         
-        def caract_chicana(self):
-            """ Define as características das chicanas
-
-            Return:
-                -ls: Espaçamento das chicanas  
-                -lc: Corte das chicanas
-                """
-
-        def fator_ji(Re_c, de, a_tubos, p):
-            """ Busca na tabela os valores necessário e faz o cálculo do fator ji 
+        def tabela_passo(a_tubos, de):
+            """ ## Descrrição:
+                    - Filtra da tabela o valor dos passos em [m].
+                ## Args:
+                    - a_tubos: arranjo dos tubos
+                    - de: diâmetro externo do tubo 
             """
-            Re_s = Re_c
+
+        def fator_ji(Res, de, a_tubos, p):
+            """ ## Descrição:
+                    - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
+                ## Args:
+                    - Res: nº de Re lado do casco
+                    - de: diâmetro externo do casco
+                    - a_tubos: arranjo dos tubos
+                    - p: passo dos tubos
+                ## Return:
+                    - ji:
+            """
+
+            angulo_tubos = 0
             
-            #   Trecho para buscar na tabela as constantes
-            #   Filtrar pelo arranjo de tubos e Res
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT * FROM constantes_a WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+
+            Dotl = filtro_sqlite(cursor, sql_linha)
+
+            if len(*Nt) > 1 or len(*Dotl) > 1:
+                print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
+                return
+            
+            return *Nt[0], *Dotl[0]
+
             a1 = ""
             a2 = ""
             a3 = ""
             a4 = ""
             
-            a = a3 / (1 + 0.14 * (Re_s) ** a4)
+            a = a3 / (1 + 0.14 * Res ** a4)
 
-            ji = a1 * (1.33 / (p * de)) ** a * (Re_s) ** a2
+            ji = a1 * (1.33 / (p * de)) ** a * Res ** a2
 
             return ji
 
-        def tabela_passo(a_tubos, de):
-            """ 
-                Escolhe o valor dos passos pela tabela em [m]  
-            """
         
         def tabela_delta_sb(Ds):
             """ Filtra delta_sb [m]
@@ -302,20 +352,17 @@ class CascoTubo:
 
 
         #================= Cálculo para feixe de tubos ideal =====================
-        ls, lc = caract_chicana()
         p, pn, pp = tabela_passo()
 
-        Ds = Ds     #   Diamentro interno do casco
-        Dotl = Dotl   #   Diametro do feixe de tubos 
         
         if a_tubos == "triangula_30" or a_tubos == "triangular_60":
             Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
         else:
             Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
 
-        Re_s = de * w / (mi * Sm)
+        Res = de * w / (mi * Sm)
         
-        ji = fator_ji(Re_s, de, a_tubos, p)
+        ji = fator_ji(Res, de, a_tubos, p)
 
         h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) * a_
 
@@ -340,7 +387,7 @@ class CascoTubo:
 
         Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
 
-        if Re_s <= 100:
+        if Res <= 100:
             Cbh = 1.35
         else:
             Cbh = 1.25
@@ -359,12 +406,12 @@ class CascoTubo:
         
         jr_ = 1.51 / (Nc ** 0.18)
         
-        if Re_s > 100:
+        if Res > 100:
             jr = 1
-        elif Re_s <= 20:
+        elif Res <= 20:
             jr = jr_
-        elif 20<= Re_s <100:
-            jr = jr_ + ((20 - Re_s) / 80) * (jr_ - 1)
+        elif 20<= Res <100:
+            jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
         
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
         d_bocal, Dc = diametroBocal(Ds)
@@ -373,9 +420,9 @@ class CascoTubo:
         lsi = li + d_bocal
         lso = lo + d_bocal
 
-        if Re_s > 100:
+        if Res > 100:
             n = 0.6
-        elif Re_s <= 100:
+        elif Res <= 100:
             n = 1/3
         
         lsi_ = lsi / ls
@@ -570,4 +617,4 @@ class CascoTubo:
 
 if __name__ == "__main__":
     a = CascoTubo()
-    a.filtro_tubos(4, 0.254, 0.01905, "quadrado 1 1/4 pol")
+    

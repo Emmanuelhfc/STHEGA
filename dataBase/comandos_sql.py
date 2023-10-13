@@ -1,5 +1,5 @@
 import sqlite3
-from dataBase.constants import *
+from constants import *
 import openpyxl
 POL2M = 0.0254
 
@@ -24,16 +24,28 @@ def filtro_sqlite(cursor, query, one = False):
 
 
 if __name__ == "__main__":
-    # connect(DB_CONSTANTS_CASCO_TUBO, "CREATE TABLE Constantes_a(angulo_a_tubos INTEGER, Res_max INTEGER, Res_min INTEGER, a1 DOUBLE, a2 DOUBLE, a3 DOUBLE, a4 DOUBLE)")
+    #conect_sqlite(DB_CONSTANTS_DIR, "CREATE TABLE Passos_tubos(de DOUBLE, p DOUBLE, a_tubos TEXT, pp DOUBLE, pn DOUBLE)")
     # connect(DB_CONSTANTS_CASCO_TUBO, "DROP TABLE Constantes_a") 
-    # comandos_sqlite(DB_CONSTANTS_CASCO_TUBO, f"INSERT INTO Constantes_a VALUES({a_t}, {Re_max}, {Re_min}, {a1}, {a2}, {a3}, {a4})")  
-    
-    cursor = conect_sqlite(DB_CONSTANTS_CASCO_TUBO)
-    
-    query  = "SELECT * FROM Contagem_de_tubos WHERE Np_4 =51"
 
-    linhas = filtro_sqlite(cursor, query)
+    de = 0.750 * POL2M
+    p = 1 * POL2M
+    a_tubos = "triangular"
+    pp = 0.866 * POL2M
+    pn = 0.884 * POL2M
 
-    for lin in linhas:
-        for x in lin:
-            print(x)
+    npt = "NP_1"
+    a_tubos = 'triangular 1 pol'
+    Ds = 0.254
+    de = 0.01905
+    cursor = conect_sqlite(DB_CONSTANTS_DIR)
+    sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+    sql_Dotl = f"SELECT Dotl_m FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+
+    Nt = filtro_sqlite(cursor, sql_NT, True)
+    Dotl = filtro_sqlite(cursor, sql_Dotl, True)
+
+    print(Nt)
+    print(Dotl)
+    #conect_sqlite(DB_CONSTANTS_DIR, f"INSERT INTO Passos_tubos VALUES({de}, {p}, '{a_tubos}', {pp}, {pn})")  
+    
+    
