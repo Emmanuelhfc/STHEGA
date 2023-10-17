@@ -273,9 +273,7 @@ class CascoTubo:
                 - a_tubos: arranjo dos tubos
                 - L_t:
                 - ls: Espaçamento das chicanas
-                - lc: Corte das chicanas
-                
-                
+                - lc: Corte das chicanas           
                 
         """
         
@@ -286,6 +284,7 @@ class CascoTubo:
                     - a_tubos: arranjo dos tubos
                     - de: diâmetro externo do tubo 
             """
+
 
         def fator_ji(Res, de, a_tubos, p):
             """ ## Descrição:
@@ -352,7 +351,7 @@ class CascoTubo:
 
 
         #================= Cálculo para feixe de tubos ideal =====================
-        p, pn, pp = tabela_passo()
+        pn, pp = tabela_passo()
 
         
         if a_tubos == "triangula_30" or a_tubos == "triangular_60":
