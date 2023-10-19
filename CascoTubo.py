@@ -287,10 +287,7 @@ class CascoTubo:
                     - Filtra da tabela o valor dos passos em [m].
                 ## Args:
                     - a_tubos: arranjo dos tubos
-                    - de: diâmetro externo do tubo
-                ## Return:
-                    - pn
-                    - pp 
+                    - de: diâmetro externo do tubo 
             """
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
             sql_linha = f"SELECT * FROM Passos_tubos WHERE de = {de} AND a_tubos = {a_tubos}"
