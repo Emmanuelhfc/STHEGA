@@ -72,6 +72,8 @@ class CascoTubo:
 
         TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
         TODO -> Update - arredondar valores das tabelas
+        TODO -> rever se tabelas tem todos tipos de arranjo e se arranjos estão com nomes corretos
+        TODO -> consertar tabela delta_sb, pode ter valores de Dn que não se enquadram em nenhuma condição
 
     """
     
@@ -151,7 +153,7 @@ class CascoTubo:
                 b = (2 - self.S*(2 + 2**0.5))
                 self.F = num/((1 - self.S)*math.log(a/b))
 
-    def filtro_tubos(self, n, Ds, de, a_tubos):
+    def filtro_tubos(self, n, Ds, de, a_tubos, passo):
             """ ## Descrição:
                     - Filtra da tabela de nº de tubos de fabricantes o valor diâmetro do feixe, nº de passagens no tubo e nº de tubos
                 ## Args:
@@ -159,6 +161,7 @@ class CascoTubo:
                     - Ds: diâmetro interno do casco 
                     - de: diâmetro externo do tubo
                     - a_tubos: arranjo dos tubos
+                    - passo:
                 ## Return
                     - Nt: nº de tubos
                     - Dotl: diâmetor do feixe
@@ -174,6 +177,8 @@ class CascoTubo:
                 npt = "Np_6"
             elif n == 8:
                 npt = "Np_8"
+            
+            a_tubos = a_tubos + passo
 
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
             sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
@@ -258,7 +263,7 @@ class CascoTubo:
                 - lc: Corte das chicanas
         """
 
-    def conveccao_casco(self, k:float, cp:float, mi:float, w:float, de, Nt, Dotl, Ds, a_tubos, L_t, ls, lc):
+    def conveccao_casco(self, k:float, cp:float, mi:float, w:float, de, Nt, Dotl, Ds, a_tubos, L_t, ls, lc, p):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
             ## Args:
@@ -274,9 +279,7 @@ class CascoTubo:
                 - L_t:
                 - ls: Espaçamento das chicanas
                 - lc: Corte das chicanas
-                
-                
-                
+                - p: passos dos tubos    
         """
         
         def tabela_passo(a_tubos, de):
@@ -284,38 +287,49 @@ class CascoTubo:
                     - Filtra da tabela o valor dos passos em [m].
                 ## Args:
                     - a_tubos: arranjo dos tubos
-                    - de: diâmetro externo do tubo 
+                    - de: diâmetro externo do tubo
+                ## Return:
+                    - pn
+                    - pp 
             """
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT * FROM Passos_tubos WHERE de = {de} AND a_tubos = {a_tubos}"
+            linha = filtro_sqlite(cursor, sql_linha)
+            
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de passos")
+                return
 
-        def fator_ji(Res, de, a_tubos, p):
+
+            pn = linha[0][-1]
+            pp = linha[0][-2]
+
+            return pn, pp
+
+        def fator_ji(Res, de, angulo_tubos, p):
             """ ## Descrição:
                     - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
                 ## Args:
                     - Res: nº de Re lado do casco
                     - de: diâmetro externo do casco
-                    - a_tubos: arranjo dos tubos
+                    - angulo_tubos: angulo dos tubos dependendo do arranjo
                     - p: passo dos tubos
                 ## Return:
                     - ji:
             """
-
-            angulo_tubos = 0
-            
+                
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT * FROM constantes_a WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
-
-            Dotl = filtro_sqlite(cursor, sql_linha)
-
-            if len(*Nt) > 1 or len(*Dotl) > 1:
-                print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
+            sql_linha = f"SELECT * FROM constantes_a WHERE angulo_a_tubos = '{angulo_tubos}' AND Res_max >= {Res} AND Res_min < {Res}"
+            linha = filtro_sqlite(cursor, sql_linha)
+            
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de constantes a")
                 return
             
-            return *Nt[0], *Dotl[0]
-
-            a1 = ""
-            a2 = ""
-            a3 = ""
-            a4 = ""
+            a4 = linha[0][-1]
+            a3 = linha[0][-2]
+            a2 = linha[0][-3]
+            a1 = linha[0][-4]
             
             a = a3 / (1 + 0.14 * Res ** a4)
 
@@ -324,14 +338,23 @@ class CascoTubo:
             return ji
 
         
-        def tabela_delta_sb(Ds):
-            """ Filtra delta_sb [m]
+        def tabela_delta_sb(Dn):
+            """ ## Descrição:
+                    - Filtra delta_sb [m]
+                ## Args:
+                    - Dn: diâmetro nominal do caso
                 Return:
-                    -p: passo
-                    -pp: passo dos tubos paralelo ao escoamento
-                    -pn: passo dos tubos perpendicular ao escoamento
+                    -delta_sb: arbetura diametral casco chicana
             """
-        def diametroBocal(Ds):
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE Dn_min <= {Dn} AND Dn_max >= {Dn} "
+            linha = filtro_sqlite(cursor, sql_linha)
+            
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de constantes a")
+                return
+
+        def diametro_bocal(Ds):
             """ ## Descrição:
                 Cálculo o diâmetro do casco e filtra da tabela diâmetro do Bocal
                 ## Args:
@@ -352,7 +375,7 @@ class CascoTubo:
 
 
         #================= Cálculo para feixe de tubos ideal =====================
-        p, pn, pp = tabela_passo()
+        pn, pp = tabela_passo()
 
         
         if a_tubos == "triangula_30" or a_tubos == "triangular_60":
@@ -414,7 +437,7 @@ class CascoTubo:
             jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
         
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
-        d_bocal, Dc = diametroBocal(Ds)
+        d_bocal, Dc = diametro_bocal(Ds)
         li, lo = li_lo_tabela(Dc)
 
         lsi = li + d_bocal
