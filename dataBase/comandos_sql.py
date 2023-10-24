@@ -1,5 +1,5 @@
 import sqlite3
-from constants import *
+#from constants import *
 from openpyxl import load_workbook
 POL2M = 0.0254
 
@@ -24,8 +24,8 @@ def filtro_sqlite(cursor, query, one = False):
 
 
 if __name__ == "__main__":
-    # conect_sqlite(DB_CONSTANTS_DIR, "CREATE TABLE Constantes_b(angulo_tubo DOUBLE, Re_max DOUBLE, Re_min DOUBLE, b1 DOUBLE, b2 DOUBLE, b3 DOUBLE, b4 DOUBLE)")
-    # conect_sqlite(DB_CONSTANTS_DIR, "DROP TABLE Diametro_bocal") 
+    #conect_sqlite(DB_CONSTANTS_DIR, "CREATE TABLE Delta_sb(D_nominal_min DOUBLE, D_nominal_max DOUBLE, delta_sb DOUBLE)")
+    # conect_sqlite(DB_CONSTANTS_DIR, "DROP TABLE Delta_sb") 
 
     # de = 0.750 * POL2M
     # p = 1 * POL2M
@@ -56,22 +56,21 @@ if __name__ == "__main__":
     # li = li * POL2M
     # lo = lo * POL2M
     
-    w = load_workbook(r"C:\Users\carvalhoe\Documents\GITHUB\HeatExGA\base_dados.xlsx")
+    # Dc = 1
 
-    a = w["SQL"]
+    # cursor = conect_sqlite(DB_CONSTANTS_DIR)
+    # sql_linha = f"SELECT d_bocal FROM Diametro_bocal WHERE D_casco_min <= {Dc} AND D_casco_max >= {Dc} "
+    # linha = filtro_sqlite(cursor, sql_linha, True)
 
-    for x in range(1, 16):
+    # print(linha[0])
 
-        angulo = a[f"A{x}"].value
-        Res_max = a[f"B{x}"].value
-        Res_min = a[f"C{x}"].value
-        a1 = a[f"D{x}"].value
-        a2 = a[f"E{x}"].value
-        a3 = a[f"F{x}"].value
-        a4 = a[f"G{x}"].value
-
-        print(f"({angulo}, {Res_max}, {Res_min}, {a1}, {a2}, {a3}, {a4})")
+    # angulo_tubo = 30
+    # Res = 100
     
-        conect_sqlite(DB_CONSTANTS_DIR, f"INSERT INTO Constantes_b VALUES({angulo}, {Res_max}, {Res_min}, {a1}, {a2}, {a3}, {a4})")
-    
-    
+    Dn = 0.3
+
+    cursor = conect_sqlite(DB_CONSTANTS_DIR)
+    sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE D_nominal_min <= {Dn} AND D_nominal_max >= {Dn} "
+    linha = filtro_sqlite(cursor, sql_linha, True)
+
+    print(linha)

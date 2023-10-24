@@ -74,6 +74,7 @@ class CascoTubo:
         TODO -> Update - arredondar valores das tabelas
         TODO -> rever se tabelas tem todos tipos de arranjo e se arranjos estão com nomes corretos
         TODO -> consertar tabela delta_sb, pode ter valores de Dn que não se enquadram em nenhuma condição
+        TODO -> Ver se é possível aplica order By em alguns filtros
 
     """
     
@@ -343,33 +344,62 @@ class CascoTubo:
                 Return:
                     -delta_sb: arbetura diametral casco chicana
             """
+            # TODO -> Fazer tabela e terminar
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE Dn_min <= {Dn} AND Dn_max >= {Dn} "
-            linha = filtro_sqlite(cursor, sql_linha)
+            sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE D_nominal_min <= {Dn} AND D_nominal_max >= {Dn} "
+            linha = filtro_sqlite(cursor, sql_linha, True)
             
             if len(linha) > 1 :
                 print("Erro: mais de uma correspondência na tabela de constantes a")
                 return
+            
+            delta_sb = linha[0][0]
+            return delta_sb
 
-        def diametro_bocal(Ds):
+        def diametro_bocal(Dc):
             """ ## Descrição:
                 Cálculo o diâmetro do casco e filtra da tabela diâmetro do Bocal
                 ## Args:
-                    - Ds: diâmetro interno do casco
+                    - Dc: diâmetro do casco
                 ## Return:
                     - d_bocal: diâmetro do bocal [m]
                     - Dc:   diâmetro do casco    [m]
             """
-        def li_lo_tabela(Dc):
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT d_bocal FROM Diametro_bocal WHERE D_casco_min <= {Dc} AND D_casco_max >= {Dc} "
+            linha = filtro_sqlite(cursor, sql_linha, True)
+
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de constantes a")
+                return
+            
+            d_bocal = linha[0]
+            
+            return d_bocal
+
+        def li_lo_tabela(Dc, classe):
             """ ## Descrição:
                 Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
                 ## Args:
                     - Ds: diâmetro do casco
+                    - classe: classe de pressão
                 ## Return:
                     - li: [m]
                     - lo: [m]
             """
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT * FROM li_lo WHERE Classe_pressao_psi = {classe} ORDER BY ABS(D_casco - {Dc}) LIMIT 1 "
+            linha = filtro_sqlite(cursor, sql_linha)
 
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de constantes a")
+                return
+            
+            lo = linha[0][-1]
+            li = linha[0][-2]
+
+            return li, lo
+            
 
         #================= Cálculo para feixe de tubos ideal =====================
         pn, pp = tabela_passo()
@@ -434,7 +464,7 @@ class CascoTubo:
             jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
         
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
-        d_bocal, Dc = diametro_bocal(Ds)
+        d_bocal = diametro_bocal(Dc)
         li, lo = li_lo_tabela(Dc)
 
         lsi = li + d_bocal
@@ -571,8 +601,31 @@ class CascoTubo:
             ## Return
                 - delta_Ps: perda de carga do lado do casco   
         """
-        def constantes_b():
-            ...
+        def constantes_b(Res:float, angulo_tubo: int) -> list:
+            """filtra constantes b
+
+            Args:
+                Res (float): nº de Re
+                angulo_tubo (int): angulo do arranjo dos tubos
+
+            Returns:
+                list: lista [b1, b2, b3, b4]
+            """
+            cursor = conect_sqlite(DB_CONSTANTS_DIR)
+            sql_linha = f"SELECT b1, b2, b3, b4 FROM Constantes_b WHERE angulo_tubo = {angulo_tubo} AND Re_min <= {Res} AND  Re_max > {Res};"
+            linha = filtro_sqlite(cursor, sql_linha)
+
+            if len(linha) > 1 :
+                print("Erro: mais de uma correspondência na tabela de constantes a")
+                return
+            
+            b1 = linha[0][0]
+            b2 = linha[0][1]
+            b3 = linha[0][2]
+            b4 = linha[0][3]
+
+            return [b1, b2, b3, b4]
+        
         #================ Perda de carga na seção de escoamento cruzado ======================
         if Res <= 100:
             Cbp = 4.5
