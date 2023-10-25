@@ -55,7 +55,7 @@ class CascoTubo:
         self.material_casco = limitacoes['material_casco']
         self.d_max_tubo = limitacoes['d_max_tubos']
 
-
+        self.propriedades_termodinamicas()
     """ ## Anotações:
             ## Variáveis de controle (Genes)
                 - Temperaturas de entrada e saída:
@@ -79,27 +79,28 @@ class CascoTubo:
     """
     
     def propriedades_termodinamicas(self):
-        self.cp_frio = 1
-        self.cp_quente = 1
-        pass
+        self.cp_frio = None
+        self.cp_quente = None
 
     def balaco_de_energia(self):
-        self.propriedades_termodinamicas()
-
-        if None in (self.t1, self.t2, self.wq) and  None in (self.T1, self.T2, self.wq):
+        
+        # TODO -> Lógica errada, esse caso pega se tiver 2 valores faltando
+        if None in (self.t1, self.t2, self.wq) and  None in (self.T1, self.T2, self.wf):
             print("Não tem nenhum valor.")
 
         elif None in (self.T1, self.T2, self.wq):
             self.q = self.wf * self.cp_frio * (self.t2 - self.t1)
+
             if self.T1 is None:
-                self.T1 = self.T1 + self.q/(self.wq * self.cp_quente)
+                self.T1 = self.T2 + self.q/(self.wq * self.cp_quente)
             elif self.T2 is None:
-                self.T2 = self.T2 - self.q/(self.wq * self.cp_quente)
+                self.T2 = self.T1 - self.q/(self.wq * self.cp_quente)
             else:
                 self.wq = self.q/(self.cp_quente * (self.T1 - self.T2 ))
 
-        elif None in (self.t1, self.t2, self.wq):
-            self.q = self.wf * self.cp_frio * (self.T1 - self.T2)
+        elif None in (self.t1, self.t2, self.wf):
+            self.q = self.wq * self.cp_quente * (self.T1 - self.T2)
+        
             if self.t1 is None:
                 self.t1 = self.t2 - self.q/(self.wf * self.cp_frio)
             elif self.t2 is None:
@@ -107,16 +108,24 @@ class CascoTubo:
             else:
                 self.wf = self.q/(self.cp_frio * (self.t2 - self.t1 ))
         
-        else: # Se tiver todos os parâmetros
-            self.q = self.wf * self.cp_frio * (self.t2 - self.t1) 
 
-            
+        else: # Se tiver todos os parâmetros
+            try:
+                self.q = self.wf * self.cp_frio * (self.t2 - self.t1) 
+            except Exception as erro:
+                print("Não há valores suficientes")
+        
+        print("T1= ", self.T1)
+        print("T2= ", self.T2)
+        print("wq= ", self.wq)
+        print("wf= ", self.wf)
+        print("q= ", self.q)
+        print("t1= ", self.t1)
+        print("t2= ", self.t2)
+        print("cp_frio= ", self.cp_frio)
+        print("cp_quente= ", self.cp_quente)
 
     def diferenca_temp_deltaT(self):
-        calculo_diferenca_log_MLDT()
-        calculo_R_S()
-        calculo_F()
-        self.deltaT = self.mldt*self.F
 
         def calculo_diferenca_log_MLDT():
             num = ((self.T1 - self.t2)-(self.T2 - self.t1))
@@ -154,7 +163,16 @@ class CascoTubo:
                 b = (2 - self.S*(2 + 2**0.5))
                 self.F = num/((1 - self.S)*math.log(a/b))
 
-    def filtro_tubos(self, n, Ds, de, a_tubos, passo):
+        calculo_diferenca_log_MLDT()
+        calculo_R_S()
+        calculo_F()
+        self.deltaT = self.mldt*self.F
+        
+        print("mldt ", self.mldt)
+        print("F= ", self.F)
+        print("deltaT= ", self.deltaT)
+
+    def filtro_tubos(self, n, Ds, de, a_tubos, passo: str):
             """ ## Descrição:
                     - Filtra da tabela de nº de tubos de fabricantes o valor diâmetro do feixe, nº de passagens no tubo e nº de tubos
                 ## Args:
@@ -687,7 +705,8 @@ class CascoTubo:
         #================ Perda de carga do lado do casco ===============================================
         delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
 
+        
 
 if __name__ == "__main__":
-    a = CascoTubo()
+    ...
     
