@@ -197,7 +197,7 @@ class CascoTubo:
             elif n == 8:
                 npt = "Np_8"
             
-            a_tubos = a_tubos + passo
+            a_tubos = str(a_tubos) + " " + str(passo) + " pol"
 
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
             sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
@@ -210,8 +210,39 @@ class CascoTubo:
                 print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
                 return
             
+            print("Dotl= ", Dotl[0])
+            print("Nt= ", Nt[0])
             return Nt[0], Dotl[0]
-            
+
+    def area_projeto(self, Nt: int, de: float, L:float) -> float:
+        """Cálculo da área de projeto
+
+        Args:
+            Nt (int): nº de tubos
+            de (float): diâmetro externo do tubo TODO -> ver se é isso mesmo
+            L (float): comprimento do trocador
+
+        Returns:
+            float: _description_
+        """
+        A_proj = Nt * math.pi * de * L  
+        print("A_proj= ", A_proj)
+        return A_proj 
+
+    def  coef_global_min(self, A_proj: float, delta_t: float, q: float) -> float:
+        """Cálculo do coeficiente global mínimo
+
+        Args:
+            A_proj (float): área de projeto
+            delta_t (float): diferença de temperatura no trocador, calculado com MLDT
+            q (float): taxa de transferência de calor
+
+        Returns:
+            float: Coeficiente global minímo
+        """
+        Ud_min = q / (A_proj * delta_t)
+        print("Ud_min= ", Ud_min)
+        return Ud_min
 
     # Passo 4 -- Lado do Tubo
     
@@ -243,7 +274,7 @@ class CascoTubo:
         if tipo_fluido == "water":
             #   Como a água é um fluido normalmente incrustante não se utilizam velocidades de escoamento inferiores a 1 m/s. Sugere-se ler a parte referente a “Trocadores usando água” , p. 115, do Kern.
             t = (t2_t - t1_t)/2 #   Temperatura média do fluído
-            hi = 105 * (1.352 + 0.0198 * t) * v_t**0.8 / d**0.2   #   (3.24b)
+            hi = 1055 * (1.352 + 0.0198 * t) * v_t**0.8 / d**0.2   #   (3.24b)
 
         elif Re_t > 10000:
 
@@ -273,7 +304,15 @@ class CascoTubo:
             hi = Nu * k / d
         
         hio = hi * d / de
-    
+
+        print("a_t= ", at)
+        print("G_t= ", Gt)
+        print("Re_t= ", Re_t)
+        print("v= ", v_t)
+        print("hi= ", hi)
+        print("hio= ", hio)
+
+
     def caract_chicana(self):
         """ ## Descrição: 
                 - Define as características das chicanas, caso não tenha sido definida previamente. Aleatoriza o valor de acordo com recomendações da norma.
