@@ -84,6 +84,7 @@ class CascoTubo:
 
     def balaco_de_energia(self):
         
+        # TODO -> Fazer código calcular cp_quente e cp_frio, No caso atual só pode faltar um dado e não pode ser cp_frio e cp_quente
         # TODO -> Lógica errada, esse caso pega se tiver 2 valores faltando
         if None in (self.t1, self.t2, self.wq) and  None in (self.T1, self.T2, self.wf):
             print("Não tem nenhum valor.")
@@ -115,15 +116,7 @@ class CascoTubo:
             except Exception as erro:
                 print("Não há valores suficientes")
         
-        print("T1= ", self.T1)
-        print("T2= ", self.T2)
-        print("wq= ", self.wq)
-        print("wf= ", self.wf)
-        print("q= ", self.q)
-        print("t1= ", self.t1)
-        print("t2= ", self.t2)
-        print("cp_frio= ", self.cp_frio)
-        print("cp_quente= ", self.cp_quente)
+        return self.q
 
     def diferenca_temp_deltaT(self):
 
@@ -168,9 +161,7 @@ class CascoTubo:
         calculo_F()
         self.deltaT = self.mldt*self.F
         
-        print("mldt ", self.mldt)
-        print("F= ", self.F)
-        print("deltaT= ", self.deltaT)
+        return [self.mldt, self.F, self.deltaT]
 
     def filtro_tubos(self, n, Ds, de, a_tubos, passo: str):
             """ ## Descrição:
@@ -212,19 +203,21 @@ class CascoTubo:
             
             print("Dotl= ", Dotl[0])
             print("Nt= ", Nt[0])
-            return Nt[0], Dotl[0]
+            return [Nt[0], Dotl[0]]
 
     def area_projeto(self, Nt: int, de: float, L:float) -> float:
         """Cálculo da área de projeto
 
         Args:
             Nt (int): nº de tubos
-            de (float): diâmetro externo do tubo TODO -> ver se é isso mesmo
+            de (float): diâmetro externo do tubo 
             L (float): comprimento do trocador
 
         Returns:
             float: _description_
         """
+        # TODO -> ver se é com de ou d
+        # TODO -> Confirmar se não deveria multiplicar pelo número de passes
         A_proj = Nt * math.pi * de * L  
         print("A_proj= ", A_proj)
         return A_proj 
@@ -242,6 +235,7 @@ class CascoTubo:
         """
         Ud_min = q / (A_proj * delta_t)
         print("Ud_min= ", Ud_min)
+
         return Ud_min
 
     # Passo 4 -- Lado do Tubo
@@ -251,8 +245,17 @@ class CascoTubo:
         Função para determinar qual o fluido do lado do tubo e qual do lado do casco
         """
 
-    def conveccao_tubo(self,d, n, Nt, L, w_tubo: float, mi_t:float, rho_t: float,  fluido_t: str, t2_t: float, de:float, t1_t: float, cp_t: float, k_t:float, tw:float = None, miw_t = None):
-        d = d
+    def conveccao_tubo(self, n, Nt, L, w_tubo: float, mi_t:float, rho_t: float,  fluido_t: str, t2_t: float, t1_t: float, de:float,  cp_t: float, k_t:float):
+        # TODO -> Rever cálculo de d (diâmetro interno)
+        # TODO -> Temperatura média não pode ser negativa, no caso do fluido quente aqui seria negativo
+        # TODO -> verificar corretamente de onde é k_t
+
+        if de == 0.0254:
+            d = de -2*0.001651
+        else:
+            d = de-2*0.001651
+                
+        print(d)
         n = n
         Nt = Nt
         w = w_tubo       # Vazão mássica fluído do lado do tubo 
@@ -261,7 +264,6 @@ class CascoTubo:
         tipo_fluido = fluido_t
         cp = cp_t
         k = k_t
-        miw = miw_t
         L_t = L
         de = de #   Diâmetro externo do tubo
 
@@ -277,11 +279,9 @@ class CascoTubo:
             hi = 1055 * (1.352 + 0.0198 * t) * v_t**0.8 / d**0.2   #   (3.24b)
 
         elif Re_t > 10000:
-
-            if miw == None: # Caso não tenha a temperatura da parede
-                a = 1
-            else:
-                a = (mi/miw) ** 0.14
+            
+            # Como não temos tw
+            a = 1   #   (mi/miw) ** 0.14
 
             Nu = 0.027 * (d*Gt/mi)**0.8 * (cp*mi/k)**(1/3) * a
             hi = Nu * k/d
@@ -293,10 +293,8 @@ class CascoTubo:
             a = 0.1 *((d * Gt / mi) ** (2 / 3) - 125) * (cp * mi / k) ** 0.495
             b = math.exp(-0.0225 * (math.log(cp * mi / k)) ** 2)
             
-            if miw == None: # Caso não tenha a temperatura da parede
-                a_ = 1
-            else:
-                a_ = (mi/miw) ** 0.14
+            # Como não temos tw
+            a_ = 1   #   (mi/miw) ** 0.14
 
             c = a_ * (1 + d/L_t) ** (2/3)  #   Verificar esse L
 
@@ -304,13 +302,10 @@ class CascoTubo:
             hi = Nu * k / d
         
         hio = hi * d / de
+        
+        
 
-        print("a_t= ", at)
-        print("G_t= ", Gt)
-        print("Re_t= ", Re_t)
-        print("v= ", v_t)
-        print("hi= ", hi)
-        print("hio= ", hio)
+        return [at, Gt, Re_t, v_t, hi, hio, d]
 
 
     def caract_chicana(self):
@@ -321,11 +316,11 @@ class CascoTubo:
                 - lc: Corte das chicanas
         """
 
-    def conveccao_casco(self, k:float, cp:float, mi:float, w:float, de, Nt, Dotl, Ds, a_tubos, L_t, ls, lc, p):
+    def conveccao_casco(self, k:float, cp:float, mi:float, w:float, de, Nt, Dotl, Ds, a_tubos, L_t, ls, lc, p, classe: int):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
             ## Args:
-                - k: condutividade térmica
+                - k: condutividade térmica fluido que escoa no casco
                 - cp: calor específico do fluído no casco
                 - mi: viscosidade do fluido no casco
                 - w: vazão mássica do fluido
@@ -337,10 +332,17 @@ class CascoTubo:
                 - L_t:
                 - ls: Espaçamento das chicanas
                 - lc: Corte das chicanas
-                - p: passos dos tubos    
+                - p: passos dos tubos  
+                - classe: classe de pressão [psi] 
         """
+        # TODO -> verificar se é de mesmo 
+        # TODO -> tabela de contagem de tubos está errada na coluna a_tubos (ARRUMAR) 
+        # TODO -> analisar onde usa Dc ou Ds
+        # TODO -> analisar cálculo do diâmetro do casco
+        # TODO -> rever tabela dos passos
+        # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
         
-        def tabela_passo(a_tubos, de):
+        def tabela_passo(a_tubos, de, p):
             """ ## Descrrição:
                     - Filtra da tabela o valor dos passos em [m].
                 ## Args:
@@ -348,14 +350,14 @@ class CascoTubo:
                     - de: diâmetro externo do tubo 
             """
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT * FROM Passos_tubos WHERE de = {de} AND a_tubos = {a_tubos}"
+            sql_linha = f" SELECT * FROM Passos_tubos WHERE p = {p} AND  a_tubos = '{a_tubos}' ORDER BY ABS(de - {de}) LIMIT 1; "
             linha = filtro_sqlite(cursor, sql_linha)
             
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de passos")
+            if len(linha) > 1 or len(linha) == 0:
+                print("Erro: correspondência na tabela de passos")
                 return
 
-
+            print(linha)
             pn = linha[0][-1]
             pp = linha[0][-2]
 
@@ -372,13 +374,12 @@ class CascoTubo:
                 ## Return:
                     - ji:
             """
-                
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
             sql_linha = f"SELECT * FROM constantes_a WHERE angulo_a_tubos = '{angulo_tubos}' AND Res_max >= {Res} AND Res_min < {Res}"
             linha = filtro_sqlite(cursor, sql_linha)
             
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de constantes a")
+            if len(linha) > 1 or  len(linha) == 0:
+                print("Erro: correspondência na tabela de constantes a")
                 return
             
             a4 = linha[0][-1]
@@ -386,9 +387,11 @@ class CascoTubo:
             a2 = linha[0][-3]
             a1 = linha[0][-4]
             
+
             a = a3 / (1 + 0.14 * Res ** a4)
 
-            ji = a1 * (1.33 / (p * de)) ** a * Res ** a2
+
+            ji = a1 *((1.33 / (p / de)) ** a )* Res ** a2
 
             return ji
 
@@ -406,11 +409,12 @@ class CascoTubo:
             sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE D_nominal_min <= {Dn} AND D_nominal_max >= {Dn} "
             linha = filtro_sqlite(cursor, sql_linha, True)
             
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de constantes a")
+            if len(linha) > 1 or len(linha) == 0:
+                print("Erro: correspondência na tabela de constantes a")
                 return
             
-            delta_sb = linha[0][0]
+            print(linha)
+            delta_sb = linha[0]
             return delta_sb
 
         def diametro_bocal(Dc):
@@ -459,19 +463,27 @@ class CascoTubo:
             
 
         #================= Cálculo para feixe de tubos ideal =====================
-        pn, pp = tabela_passo()
+        pn, pp = tabela_passo(a_tubos, de, p)
 
         
-        if a_tubos == "triangula_30" or a_tubos == "triangular_60":
+        if a_tubos == "triangular":
             Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
         else:
             Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
 
         Res = de * w / (mi * Sm)
         
-        ji = fator_ji(Res, de, a_tubos, p)
+        if a_tubos == "triangular":
+            angulo_tubos = 30
+        elif a_tubos == "quadrado":
+            angulo_tubos = 90
+        elif a_tubos == "rodado":
+            angulo_tubos = 45
 
-        h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) * a_
+
+        ji = fator_ji(Res, de, angulo_tubos, p)
+
+        h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) 
 
         #================= Fator de correção para os efeitos da configuração da chicana =====================
 
@@ -504,9 +516,12 @@ class CascoTubo:
         Nc = Nc // 1        #   Nº Inteiro
         
         folga = (Ds - Dotl)
-        if  folga > 1.5 * POL2M or (folga > 0.5 and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
+
+        if  folga > 1.5 * POL2M or (folga > 0.5 * POL2M and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
             Nss = Nc // 5       #   Nº de pares de tiras selantes. Costuma-se utilizar umq par de tiras selantes para cada 5 a 7 filas de tubos na seção de escoamento cruzado.
-        
+        else:
+            Nss = 0
+
         jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** 1/3))
 
         #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
@@ -521,8 +536,13 @@ class CascoTubo:
             jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
         
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
+        
+        # TODO
+        Dc = Ds + 2 * POL2M
+        
+        
         d_bocal = diametro_bocal(Dc)
-        li, lo = li_lo_tabela(Dc)
+        li, lo = li_lo_tabela(Dc, classe)
 
         lsi = li + d_bocal
         lso = lo + d_bocal
@@ -537,6 +557,8 @@ class CascoTubo:
 
         Nb = (L_t - lsi - lso) / ls + 1
 
+        Nb  = Nb // 1
+
         num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
         den = (Nb - 1) + (lsi_) + (lso_)
 
@@ -544,8 +566,13 @@ class CascoTubo:
 
         #   Cálculo coeficiente de transmissão de calor para o lado do casco
         hs = h_ideal * jc * jl * jb * jr * js
+
+        print("Ds", Ds)
+        print("Dc", Dc)
+
+        return [pn, pp, Res, Sm, h_ideal, ji, jc, Fc, jl, Stb, delta_tb, Ssb, delta_sb, jb, Nc, Fbp, jr, lsi, lso, js, Nb, hs, li, lo, d_bocal], Nss, lsi_, lso_
     
-    def calculo_temp_parede(self, Tmed, tmed, hs, hio, mi_t, mi_c, fluido_frio:bool):
+    def calculo_temp_parede(self, Tmed, tmed, hs, hio, mi_t, mi_c, fluido_frio:bool, tipo_tubo:str):
         """ ## Descrição:
             Cálcula a temperatura da parede, busca valor de miw e correige valores dos coeficientes de transmissão de calor multiplicando-os
             pelo fator phi_t. 
@@ -557,12 +584,15 @@ class CascoTubo:
                 - fluido_frio:bool Se o fluído frio estiver no interior do tubo - True
                 - mi_t: Viscosidade do fluido do tubo
                 - mi_c: Viscosidade do fluido do casco
+                - tipo_tubo: tipo de fluido no tubo
             ## Return:
                 - tw: temperatura da parede 
                 - miw: Viscosidade do fluido avaliada na temperatura da parede
                 - phi_t_tubo: valor do termo (mi / miw) ^ 0.14 para o tubo
                 - phi_t_casco: valor do termo (mi / miw) ^ 0.14 para o casco
         """
+
+        # TODO -> arrumar para cálculo das propriedades termodinâmicas
         Tc = Tmed    
         tc = tmed 
 
@@ -570,14 +600,19 @@ class CascoTubo:
             tw = tc + hs/ (hio + hs) * (Tc - tc) 
         else:
             tw = tc + hio/(hio + hs) * (Tc - tc)
-
+        
+        print(tw)
         miw = self.propriedades_termodinamicas()
 
         phi_t_tubo = (mi_t / miw) ** 0.14
         phi_t_casco= (mi_c / miw) ** 0.14
         
         hs = hs * phi_t_casco
-        hio = hio * phi_t_tubo
+
+        if tipo_tubo != "water":
+            hio = hio * phi_t_tubo
+
+        return tw, miw, hs, hio
 
     def coef_global_limpo(self, hio, hs):
         """## Descrição:
@@ -585,12 +620,18 @@ class CascoTubo:
         """
 
         Uc = hio * hs / (hio + hs)
+        return Uc
     
-    def fator_incrustacao(self, Uc, Ud, Rd_verd):
+    def excesso_area(self, Uc, Ud, Rd_verd, A_proj, delta_t, q):
         """## Descrição:
             Cálcula do fator de inscrustação e excesso da área de troca
         ## Args:
-            - Rd_verd: fator de incrsutação verdadeiro
+            - Uc: coeficiente global limpo
+            - Ud: coeficiente mínimo
+            - Rd_verd: fator de incrsutação verdadeiro (soma dos fatores de incrustação dos dois fluidos)
+            - A_proje: área de projeto
+            - delta_t: diferença de temperatura no trocador
+            - q: taxa de transferência de calor no trocador
         
         ## Return:
             - Rd: fator de incrustação calculado
@@ -599,9 +640,12 @@ class CascoTubo:
         #   Rd calculados deve ser maior que verdadeiro
         Rd = (Uc - Ud) / (Uc * Ud)
         
-        Ud_ = 1 / (1 / Uc + Rd + Rd_verd)
-        A_nec = Q / (Ud_ * delta_t)
+        Ud_ = 1 / (1 / Uc + Rd_verd)
+
+        A_nec = q / (Ud_ * delta_t)
         Ea = (A_proj - A_nec)/A_nec * 100
+
+        return Rd, Ud_, A_nec, Ea
 
 
     def perda_carga_tubo(self, Re_t, rho, di, phi_t, G_t, L, n, v):
@@ -629,7 +673,9 @@ class CascoTubo:
 
         delta_PT = delta_Pt + delta_Pr
 
-    def perda_carga_casco(self, Nb, mi, miw, de, Res, W, rho, Nc, Stb, Ssb, Sm, Nss, Fbp, p, pp, lc, Ds, Fc, Nt, ls, lsi_, lso_):
+        return delta_PT
+
+    def perda_carga_casco(self, Nb, mi, miw, de, Res, W, rho, Nc, Stb, Ssb, Sm, Nss, Fbp, p, pp, lc, Ds, Fc, Nt, ls, lsi_, lso_, a_tubo):
         """ ## Descrição:
             - Cálculo da perda de carga do lado do caso.
             ## Args:
@@ -655,6 +701,7 @@ class CascoTubo:
                 - ls: espaçamento das chicanas
                 - lsi_: razão entre espaçamento da chicana de entrada e espaçamento das chicanas
                 - lso_: razão entre espaçamento da chicana de saída e espaçamento das chicanas
+                - a_tubo: arranjo de tubos
             ## Return
                 - delta_Ps: perda de carga do lado do casco   
         """
@@ -698,37 +745,53 @@ class CascoTubo:
 
         Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
         
-        b1, b2, b3, b4 = constantes_b
-        b = b3 / (1 + 0.14 * Res ** b4)
-        fi = b1 * (1.33 / (p * de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
-        delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) )* (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
-        delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
+        if a_tubo == "triangular":
+            angulo_tubo = 30
+        elif a_tubo == "quadrado":
+            angulo_tubo = 90
+        elif a_tubo == "rodado":
+            angulo_tubo = 45
+       
 
-        #================= Perda de carga nas janelas ==============================================
+        b1, b2, b3, b4 = constantes_b(Res, angulo_tubo)
+        b = b3 / (1 + 0.14 * Res ** b4)
+        fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
+        delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
+        delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
         
+        print("b1", b1)
+        print("p", p)
+        print("de", de)
+        print("b", b)
+        print("Res", Res)
+        print(fi)
+    
+        #================= Perda de carga nas janelas ==============================================
+        Swg_a = 1 - 2 * lc / Ds 
+        Swg_b = (1-Swg_a ** 2) ** (1/2)
+        Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
+
+        Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
+
+        Sw = Swg - Swt      #   Área da seção de escoamento da janela
+
+        Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
+        Ncw = Ncw // 1
         if Res >= 100:      #   Escoamento turbulento
             
-            Swg_a = 1 - 2 * lc / Ds 
-            Swg_b = (1-Swg_a ** 2) ** (1/2)
-            Swg = Ds ** 2 / 4 * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
 
-            Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
-
-            Sw = Swg - Swt      #   Área da seção de escoamento da janela
-
-            Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
-            Ncw = Ncw // 1
             delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
         
         elif Res < 100:     #   Escoamento laminar
             theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
             Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
 
-            delta_Pwi_a = 26 * mi * W / (rho * (Sm * Sw) ** (1/2))
+            delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
             delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
             delta_Pwi_c = 2 * W ** 2 / (2 * Sm * Sw * rho)
             delta_Pwi = delta_Pwi_a * delta_Pwi_b + delta_Pwi_c
-                
+        
+        print(Nb, delta_Pwi, Rl)
         delta_Pw = Nb * delta_Pwi * Rl
 
         #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
@@ -744,8 +807,7 @@ class CascoTubo:
         #================ Perda de carga do lado do casco ===============================================
         delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
 
-        
+        return  delta_Pc, delta_Pw, delta_Pe, delta_Ps
 
 if __name__ == "__main__":
     ...
-    
