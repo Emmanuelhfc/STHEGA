@@ -757,34 +757,32 @@ class CascoTubo:
         b = b3 / (1 + 0.14 * Res ** b4)
         fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
         delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
+        
+        print("deltat_Pb1",delta_Pbi)
+        
         delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
         
-        print("b1", b1)
-        print("p", p)
-        print("de", de)
-        print("b", b)
-        print("Res", Res)
-        print(fi)
     
         #================= Perda de carga nas janelas ==============================================
         Swg_a = 1 - 2 * lc / Ds 
         Swg_b = (1-(Swg_a ** 2)) ** (1/2)
         Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
         
-        print(Swg_a)
-        print(Swg_b)
-        print("Swg=", Swg)
+
         
 
         Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
 
         Sw = Swg - Swt      #   Área da seção de escoamento da janela
-        print("Sw=", Sw)
+        
+        print("Sw", Sw)
 
         Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
+
+        # TODO -> verificar isso, se arredonda pra baixo
         Ncw = Ncw // 1
 
-        print("Ncw", Ncw)
+
         if Res >= 100:      #   Escoamento turbulento
             
 
@@ -793,8 +791,6 @@ class CascoTubo:
         elif Res < 100:     #   Escoamento laminar
             theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
             Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
-
-            print("theta_b", theta_b)
 
             delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
             delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
@@ -810,7 +806,18 @@ class CascoTubo:
             n = 1
         elif Res > 100:
             n = 0.2
-        Rs = 1 / 2 * (lsi_ ** (n - 2) + lso_ ** (n-2))      #   Fator de correção devido o espaçamento desigual das chicanas
+        
+        # TODO-> conferir contas que envolve valores em pol
+        print(n)
+        print(lsi_)
+        print(lso_)
+        print(POL2M)
+
+        Rs = (1 / 2) * (((lsi_ / POL2M) ** (n - 2)) + ((lso_/POL2M) ** (n-2)))      #   Fator de correção devido o espaçamento desigual das chicanas
+
+        print("Rb", Rb)
+        print("Rs", Rs)
+
         delta_Pe = 2 * delta_Pbi * (1 + Ncw / Nc) * Rb * Rs
 
         
