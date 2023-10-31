@@ -143,7 +143,7 @@ class CascoTubo:
                 dens = (((1 - self.S*self.R)/(1 - self.S))**(1/self.num_casco) - self.R)
                 self.S = nums/dens
 
-                num = self.S*2**0.5;
+                num = self.S*2**0.5
                 a = (2 - self.S*(2 - 2**0.5))
                 b = (2 - self.S*(2 + 2**0.5))
                 self.F = num/((1 - self.S)*math.log(a/b))   
@@ -522,7 +522,7 @@ class CascoTubo:
         else:
             Nss = 0
 
-        jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** 1/3))
+        jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** (1/3)))
 
         #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
         
@@ -768,15 +768,23 @@ class CascoTubo:
     
         #================= Perda de carga nas janelas ==============================================
         Swg_a = 1 - 2 * lc / Ds 
-        Swg_b = (1-Swg_a ** 2) ** (1/2)
+        Swg_b = (1-(Swg_a ** 2)) ** (1/2)
         Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
+        
+        print(Swg_a)
+        print(Swg_b)
+        print("Swg=", Swg)
+        
 
         Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
 
         Sw = Swg - Swt      #   Área da seção de escoamento da janela
+        print("Sw=", Sw)
 
         Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
         Ncw = Ncw // 1
+
+        print("Ncw", Ncw)
         if Res >= 100:      #   Escoamento turbulento
             
 
@@ -785,6 +793,8 @@ class CascoTubo:
         elif Res < 100:     #   Escoamento laminar
             theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
             Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
+
+            print("theta_b", theta_b)
 
             delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
             delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
