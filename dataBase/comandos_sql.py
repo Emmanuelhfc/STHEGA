@@ -1,5 +1,5 @@
 import sqlite3
-#from constants import *
+from constants import *
 from openpyxl import load_workbook
 POL2M = 0.0254
 
@@ -24,8 +24,66 @@ def filtro_sqlite(cursor, query, one = False):
 
 
 if __name__ == "__main__":
-    #conect_sqlite(DB_CONSTANTS_DIR, "CREATE TABLE Delta_sb(D_nominal_min DOUBLE, D_nominal_max DOUBLE, delta_sb DOUBLE)")
-    # conect_sqlite(DB_CONSTANTS_DIR, "DROP TABLE Delta_sb") 
+    # conect_sqlite(DB_CONSTANTS_DIR, "CREATE TABLE Contagem_de_tubos(Ds DOUBLE, Dotl DOUBLE, de_pol DOUBLE, arranjo TEXT, p_pol DOUBLE, Npt1 INTEGER, Npt2 INTEGER, Npt4 INTEGER, Npt6 INTEGER, Npt8 INTEGER)")
+    # conect_sqlite(DB_CONSTANTS_DIR, "DROP TABLE Contagem_de_tubos") 
+    
+    wb = load_workbook(r"C:\Users\carvalhoe\Documents\GITHUB\HeatExGA\base_dados.xlsx")
+    sheet = wb["SQL"]
+
+    for row in sheet.iter_rows(values_only=True):
+        Ds = row[0] * POL2M
+        Dotl = row[1]  *POL2M
+        de = row[2]
+        arranjo_num = row[3]
+
+        Np1 = row[4]
+        Np2 = row[5]
+        Np4 = row[6]
+        Np6 = row[7]
+        Np8 = row[8]
+
+        if Np8 == None:
+            Np8 = 0
+        print(arranjo_num)
+        if arranjo_num ==1:
+            p = 15/16
+            arranjo = "triangular"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+
+            conect_sqlite(DB_CONSTANTS_DIR, sql)
+        elif arranjo_num ==2:
+            p =1
+            arranjo = "rodado"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+
+            conect_sqlite(DB_CONSTANTS_DIR, sql)
+            
+            p = 1
+            arranjo = "quadrado"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+            conect_sqlite(DB_CONSTANTS_DIR, sql)
+        elif arranjo_num == 3:
+            p=1
+            arranjo = "triangular"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+            conect_sqlite(DB_CONSTANTS_DIR, sql)        
+        elif arranjo_num == 4:
+            p =1 + 1/4
+            arranjo = "rodado"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+            conect_sqlite(DB_CONSTANTS_DIR, sql)
+
+            p = 1 + 1/4
+            arranjo = "quadrado"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+            conect_sqlite(DB_CONSTANTS_DIR, sql)            
+        elif arranjo_num == 5:
+            p =1 + 1/4
+            arranjo = "triangular"
+            sql = f"INSERT INTO Contagem_de_tubos VALUES ({Ds}, {Dotl}, {de}, '{arranjo}', {p}, {Np1}, {Np2}, {Np4}, {Np6}, {Np8});"
+            conect_sqlite(DB_CONSTANTS_DIR, sql)
+            
+
 
     # de = 0.750 * POL2M
     # p = 1 * POL2M
@@ -66,11 +124,3 @@ if __name__ == "__main__":
 
     # angulo_tubo = 30
     # Res = 100
-    
-    Dn = 0.3
-
-    cursor = conect_sqlite(DB_CONSTANTS_DIR)
-    sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE D_nominal_min <= {Dn} AND D_nominal_max >= {Dn} "
-    linha = filtro_sqlite(cursor, sql_linha, True)
-
-    print(linha)

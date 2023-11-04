@@ -4,83 +4,28 @@ import math
 import sqlite3
 from dataBase.constants import*
 from dataBase.comandos_sql import*
+
+# TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
+# TODO -> Update - arredondar valores das tabelas
+# TODO -> rever se tabelas tem todos tipos de arranjo e se arranjos estão com nomes corretos
+# TODO -> consertar tabela delta_sb, pode ter valores de Dn que não se enquadram em nenhuma condição
+# TODO -> Ver se é possível aplica order By em alguns filtros
+
 POL2M = 0.0254
 class CascoTubo:
-    def __init__(self,propriedades = {
-                                    'temp_ent_fluido_quente': None,
-                                    'temp_sai_fluido_quente': None,
-                                    'temp_sai_fluido_frio': None,
-                                    'temp_ent_fluido_frio': None,
-                                    'vazao_fluido_frio': None,
-                                    'vazao_fluido_quente': None,
-                                    'tipo_fluido_quente': None,
-                                    'tipo_fluido_frio': None,
-                                    'Num_passagens_casco': None,
-                                    'L':None,
-                                    'Num_passagens_tubo': None,
-                                    'd_int_tubo': None,
-                                    'arranjo_tubos': None,
-                                    'diametro_interno_casco': None
-                                },
-                                limitacoes = {
-                                    'L_max': None,
-                                    'd_max_casco': None,
-                                    'd_max_tubos': None,
-                                    'material_tubos': None,
-                                    'material_casco': None,
-                                }):
+    def __init__(self, cp_quente:float, cp_frio:float, T1:float, T2:float, t1:float, t2:float, wq:float, wf:float, num_casco:int):
+        self.T1 = T1
+        self.T2 = T2
+        self.t1 = t1
+        self.t2 = t2
+        self.wf = wf
+        self.wq = wq
+        self.cp_quente = cp_quente
+        self.cp_frio = cp_frio
+        self.num_casco = num_casco
         
-        # Propriedades termodinâmicas
-        self.T1 = propriedades['temp_ent_fluido_quente']
-        self.T2 = propriedades['temp_sai_fluido_quente']
-        self.t2 = propriedades['temp_sai_fluido_frio']
-        self.t1 = propriedades['temp_ent_fluido_frio']
-        self.wf = propriedades['vazao_fluido_frio']
-        self.wq = propriedades['vazao_fluido_quente']
-        self.tipo_quente = propriedades['tipo_fluido_quente']
-        self.tipo_frio = propriedades['tipo_fluido_frio']
-
-        # Propriedades mecânicas
-        self.num_casco = propriedades['Num_passagens_casco'] 
-        self.L = propriedades['L'] 
-        self.n = propriedades['Num_passagens_tubo']
-        self.d = propriedades['d_int_tubo']
-        self.a_tubos = propriedades['arranjo_tubos']
-        self.d_casco = propriedades['diametro_interno_casco']
-
-        # Limitações
-        self.L_max = limitacoes['L_max']
-        self.d_max_casco = limitacoes['d_max_casco']
-        self.material_tubos = limitacoes['material_tubos']
-        self.material_casco = limitacoes['material_casco']
-        self.d_max_tubo = limitacoes['d_max_tubos']
-
-        self.propriedades_termodinamicas()
-    """ ## Anotações:
-            ## Variáveis de controle (Genes)
-                - Temperaturas de entrada e saída:
-                - vazão:
-                - L
-                - Ds -> de
-                - a_tubos
-                - fluido do lado do casco e fluido do lado do tubo
-                - lc: corte da chicana
-                - ls: espaçamento das chicanas
-                - Npt: nº de passagens no casco
-            
-            ## Por enquanto o programa não tem a lógica da troca de fase 
-
-        TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
-        TODO -> Update - arredondar valores das tabelas
-        TODO -> rever se tabelas tem todos tipos de arranjo e se arranjos estão com nomes corretos
-        TODO -> consertar tabela delta_sb, pode ter valores de Dn que não se enquadram em nenhuma condição
-        TODO -> Ver se é possível aplica order By em alguns filtros
-
-    """
-    
-    def propriedades_termodinamicas(self):
-        self.cp_frio = None
-        self.cp_quente = None
+        self.balaco_de_energia()
+        self.diferenca_temp_deltaT()
 
     def balaco_de_energia(self):
         
@@ -161,38 +106,44 @@ class CascoTubo:
         calculo_F()
         self.deltaT = self.mldt*self.F
         
-        return [self.mldt, self.F, self.deltaT]
 
-    def filtro_tubos(self, n, Ds, de, a_tubos, passo: str):
+    def filtro_tubos(self, n, Ds, de, a_tubos, passo_pol: str):
             """ ## Descrição:
                     - Filtra da tabela de nº de tubos de fabricantes o valor diâmetro do feixe, nº de passagens no tubo e nº de tubos
                 ## Args:
                     - n: número de passes no tubos
                     - Ds: diâmetro interno do casco 
-                    - de: diâmetro externo do tubo
-                    - a_tubos: arranjo dos tubos
-                    - passo:
+                    - de: diâmetro externo do tubo (m) [1' ou 3/4']
+                    - a_tubos: arranjo dos tubos ["triangular", "quadrado", "rodado"]
+                    - passo_pol: [1, 1 1/4, 15/16 ]
                 ## Return
                     - Nt: nº de tubos
                     - Dotl: diâmetor do feixe
             """
+            self.n = n
+            self.Ds = Ds
+            self.de = de
+            self.a_tubos = a_tubos
+            self.passo = passo_pol
+
             npt = ""
             if n == 1:
-                npt = "Np_1"
+                npt = "Npt1"
             elif n == 2:
-                npt = "Np_2"
+                npt = "Npt2"
             elif n == 4:
-                npt = "Np_4"
+                npt = "Npt4"
             elif n == 6:
-                npt = "Np_6"
+                npt = "Npt6"
             elif n == 8:
-                npt = "Np_8"
+                npt = "Npt8"
             
-            a_tubos = str(a_tubos) + " " + str(passo) + " pol"
+            a_tubos = str(a_tubos) 
+            passo = passo_pol
 
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
-            sql_Dotl = f"SELECT Dotl_m FROM Contagem_de_tubos WHERE a_tubos = '{a_tubos}' AND Ds_m = {Ds} AND d_m = {de}"
+            sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE arranjo = '{a_tubos}' AND Ds = {Ds} AND de_pol = {de} AND p_pol = {passo}"
+            sql_Dotl = f"SELECT Dotl_m FROM Contagem_de_tubos WHERE arranjo = '{a_tubos}' AND Ds = {Ds} AND de_pol = {de} AND p_pol = {passo}"
 
             Nt = filtro_sqlite(cursor, sql_NT, True)
             Dotl = filtro_sqlite(cursor, sql_Dotl, True)
@@ -245,15 +196,10 @@ class CascoTubo:
         Função para determinar qual o fluido do lado do tubo e qual do lado do casco
         """
 
-    def conveccao_tubo(self, n, Nt, L, w_tubo: float, mi_t:float, rho_t: float,  fluido_t: str, t2_t: float, t1_t: float, de:float,  cp_t: float, k_t:float):
+    def conveccao_tubo(self, n, Nt, L, w_tubo: float, mi_t:float, rho_t: float,  fluido_t: str, t2_t: float, t1_t: float, de:float,  cp_t: float, k_t:float, d:float):
         # TODO -> Rever cálculo de d (diâmetro interno)
         # TODO -> Temperatura média não pode ser negativa, no caso do fluido quente aqui seria negativo
         # TODO -> verificar corretamente de onde é k_t
-
-        if de == 0.0254:
-            d = de -2*0.001651
-        else:
-            d = de-2*0.001651
                 
         print(d)
         n = n
@@ -271,6 +217,8 @@ class CascoTubo:
         at = Nt*at_/n           #   área de escoamento tubo
         Gt = w/at               #   vazão mássica por unidade de área
         Re_t = Gt*d/mi          #   Nº de Re
+        print(d, Gt, mi)
+        print(Re_t)
         v_t = Gt/rho            #   Velocidade escoamento lado do tubo
 
         if tipo_fluido == "water":
@@ -290,6 +238,7 @@ class CascoTubo:
             hi = 3.66*k/d
 
         elif 2100 <= Re_t <=10000:
+            # TODO -> rever
             a = 0.1 *((d * Gt / mi) ** (2 / 3) - 125) * (cp * mi / k) ** 0.495
             b = math.exp(-0.0225 * (math.log(cp * mi / k)) ** 2)
             
