@@ -14,12 +14,12 @@ from dataBase.comandos_sql import*
 POL2M = 0.0254
 class CascoTubo:
     def __init__(self, cp_quente:float, cp_frio:float, T1:float, T2:float, t1:float, t2:float, wq:float, wf:float, num_casco:int,
-                 rho_q:float, rho_f:float, mi_q:float, mi_f:float, k_q:float, k_f:float, tipo_q:str, tipo_f:str, Rd_q:float, Rd_f:float, ):
+                 rho_q:float, rho_f:float, mi_q:float, mi_f:float, k_q:float, k_f:float, tipo_q:str, tipo_f:str, Rd_q:float, Rd_f:float ):
 
-        self.T1 = T1
-        self.T2 = T2
-        self.t1 = t1
-        self.t2 = t2
+        self.T1 = T1 + 273.15
+        self.T2 = T2 + 273.15
+        self.t1 = t1 + 273.15
+        self.t2 = t2 + 273.15
         self.wf = wf
         self.wq = wq
         self.cp_quente = cp_quente
@@ -599,6 +599,7 @@ class CascoTubo:
 
         Nb = (L - lsi - lso) / ls + 1
         Nb  = Nb // 1
+        self.Nb = Nb
 
         num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
         den = (Nb - 1) + (lsi_) + (lso_)
@@ -633,9 +634,11 @@ class CascoTubo:
         hs = self.hs
         hio = self.hio
         
-        Tc = (self.T1 - self.T2)/2
-        tc = (self.t2 - self.t2)/2
-
+        Tc = (self.T1 + self.T2)/2
+        tc = (self.t2 + self.t1)/2
+        
+        print(Tc)
+        print(tc)
 
         if fluido_frio:
             tw = tc + hs/ (hio + hs) * (Tc - tc) 
@@ -847,7 +850,7 @@ class CascoTubo:
         Swg_a = 1 - 2 * lc / Ds 
         Swg_b = (1-(Swg_a ** 2)) ** (1/2)
         Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
-        
+        self.Swg= Swg
 
         
 
