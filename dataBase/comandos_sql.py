@@ -1,5 +1,5 @@
 import sqlite3
-from constants import *
+# from constants import *
 from openpyxl import load_workbook
 POL2M = 0.0254
 
