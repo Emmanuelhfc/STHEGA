@@ -1,9 +1,9 @@
 
-import thermo
 import math
 import sqlite3
 from dataBase.constants import*
 from dataBase.comandos_sql import*
+import logging
 
 # TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
 # TODO -> Update - arredondar valores das tabelas
@@ -15,6 +15,8 @@ POL2M = 0.0254
 class CascoTubo:
     def __init__(self, cp_quente:float, cp_frio:float, T1:float, T2:float, t1:float, t2:float, wq:float, wf:float, num_casco:int,
                  rho_q:float, rho_f:float, mi_q:float, mi_f:float, k_q:float, k_f:float, tipo_q:str, tipo_f:str, Rd_q:float, Rd_f:float ):
+
+        logging.basicConfig(filename='report.log', encoding='utf-8', level=logging.DEBUG)
 
         self.T1 = T1 + 273.15
         self.T2 = T2 + 273.15
@@ -38,6 +40,10 @@ class CascoTubo:
   
         self.balaco_de_energia()
         self.diferenca_temp_deltaT()
+    
+    def __setattr__(self, __name: str, __value) -> None:
+        logging.debug(f"  {__name}: {__value}")
+        pass
 
     def balaco_de_energia(self):
         
@@ -913,4 +919,4 @@ class CascoTubo:
         self.delta_Pc = delta_Pc
 
 if __name__ == "__main__":
-    ...
+    CascoTubo(1,1,1,1,1,1,1,1,11,1,1,1,1,1,1,1,1,1,1)
