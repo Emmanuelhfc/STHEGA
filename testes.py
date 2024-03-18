@@ -1,1 +1,9 @@
-print( 3 // 1.8)
+
+
+def testando(*args, **kwargs):
+
+    print(kwargs["teste"])
+
+
+
+testando(**{"teste":"Foi"})

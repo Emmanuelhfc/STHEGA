@@ -4,6 +4,9 @@ import sqlite3
 from dataBase.constants import*
 from dataBase.comandos_sql import*
 import logging
+import os
+import json
+
 
 # TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
 # TODO -> Update - arredondar valores das tabelas
@@ -13,36 +16,39 @@ import logging
 
 POL2M = 0.0254
 class CascoTubo:
-    def __init__(self, cp_quente:float, cp_frio:float, T1:float, T2:float, t1:float, t2:float, wq:float, wf:float, num_casco:int,
-                 rho_q:float, rho_f:float, mi_q:float, mi_f:float, k_q:float, k_f:float, tipo_q:str, tipo_f:str, Rd_q:float, Rd_f:float ):
+    def __init__(self, *args, **kwargs):
+
+        if os.path.exists("report.log"):
+            os.remove("report.log")
 
         logging.basicConfig(filename='report.log', encoding='utf-8', level=logging.DEBUG)
 
-        self.T1 = T1 + 273.15
-        self.T2 = T2 + 273.15
-        self.t1 = t1 + 273.15
-        self.t2 = t2 + 273.15
-        self.wf = wf
-        self.wq = wq
-        self.cp_quente = cp_quente
-        self.cp_frio = cp_frio
-        self.num_casco = num_casco
-        self.rho_q = rho_q
-        self.rho_f = rho_f
-        self.mi_f = mi_f
-        self.mi_q = mi_q
-        self.k_q = k_q
-        self.k_f = k_f
-        self.tipo_q = tipo_q
-        self.tipo_f = tipo_f
-        self.Rd_f = Rd_f
-        self.Rd_q = Rd_q
+        self.T1 = kwargs["T1"] + 273.15
+        self.T2 = kwargs["T2"] + 273.15
+        self.t1 = kwargs["t1"] + 273.15
+        self.t2 = kwargs["t2"] + 273.15
+        self.wf = kwargs["wf"]
+        self.wq = kwargs["wq"]
+        self.cp_quente = kwargs["cp_quente"]
+        self.cp_frio = kwargs["cp_frio"]
+        self.num_casco = kwargs["num_casco"]
+        self.rho_q = kwargs["rho_q"]
+        self.rho_f = kwargs["rho_f"]
+        self.mi_f = kwargs["mi_f"]
+        self.mi_q = kwargs["mi_q"]
+        self.k_q = kwargs["k_q"]
+        self.k_f = kwargs["k_f"]
+        self.tipo_q = kwargs["tipo_q"]
+        self.tipo_f = kwargs["tipo_f"]
+        self.Rd_f = kwargs["Rd_f"]
+        self.Rd_q = kwargs["Rd_q"]
   
         self.balaco_de_energia()
         self.diferenca_temp_deltaT()
     
     def __setattr__(self, __name: str, __value) -> None:
         logging.debug(f"  {__name}: {__value}")
+        super().__setattr__(__name, __value)
         pass
 
     def balaco_de_energia(self):
@@ -919,4 +925,14 @@ class CascoTubo:
         self.delta_Pc = delta_Pc
 
 if __name__ == "__main__":
-    CascoTubo(1,1,1,1,1,1,1,1,11,1,1,1,1,1,1,1,1,1,1)
+    str_dados = ""
+    with open("public\\json\\comparacoes.json", "r", encoding="utf-8", ) as file:
+        str_dados = file.read()
+
+    dados = json.loads(str_dados)
+
+    a = CascoTubo(**dados["comp_2"]["input"])
+
+
+
+

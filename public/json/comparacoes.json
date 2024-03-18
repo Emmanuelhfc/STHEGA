@@ -1,0 +1,64 @@
+{
+    "comp_1":{
+        "title": "DIMENSIONAMENTO DE UM TROCADOR DE CALOR CASCO E TUBO ATRAVÉS DO MÉTODO DE BELL-DELAWARE PARA O APROVEITAMENTO DA ENERGIA TÉRMICA DA ÁGUA QUENTE DE UM FORNO A INDUÇÃO",
+        "input":{
+            "T1": 60,
+            "T2": 30,
+            "t1": 20,
+            "t2": 35,
+            "wf": 14.45
+        
+
+        }
+    },
+
+    "comp_2":{
+        "title": "Petróleo/ Querosene - exemplo 1 - S&THEX",
+        "input":{
+            "T1": 215,
+            "T2": 75,
+            "t1": 30,
+            "t2": 68,
+            "wf": 25.27,
+            "wq": null,
+            "cp_quente": 2470,
+            "cp_frio": 2050,
+            "num_casco": 1,
+            "rho_q": 730,
+            "rho_f": 820, 
+            "mi_f": 0.0032,
+            "mi_q": 0.0004,
+            "k_q": 0.132,
+            "k_f": 0.134,
+            "tipo_q": "Petroleum",
+            "tipo_f": "Kerosene",
+            "Rd_f": 0.0004,
+            "Rd_q": 0.0002
+        }
+    },
+
+    "comp_3":{
+        "title": "APLICAÇÃO DE UM ALGORITMO BIO-INSPIRADO NA OTIMIZAÇÃO DO PROJETO DE UM TROCADOR DE CALOR CASCO E TUBOS DO PONTO DE VISTA ECONÔMICO",
+        "input":{
+            "T1": 95,
+            "T2": 40,
+            "t1": 25,
+            "t2": 40,
+            "wf": 68.9,
+            "wq": 27.8,
+            "cp_quente": 4200,
+            "cp_frio": 2840,
+            "num_casco": 1, 
+            "rho_q": 750,
+            "rho_f": 995,
+            "mi_f": 0.0008,
+            "mi_q": 0.00034,
+            "k_q": 0.19,
+            "k_f": 0.59,
+            "tipo_q": "water",
+            "tipo_f": "metanol",
+            "Rd_f": 0.0002,
+            "Rd_q": 0.0003
+        }
+    }
+}
