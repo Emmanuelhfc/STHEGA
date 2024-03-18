@@ -24,3 +24,13 @@ DEBUG:root:  R: 3.6842105263157894
 DEBUG:root:  S: 0.20540540540540542
 DEBUG:root:  F: 0.8539436258974061
 DEBUG:root:  deltaT: 73.58037684991136
+DEBUG:root:  n: 2
+DEBUG:root:  Ds: 0.6
+DEBUG:root:  a_tubos: quadrado
+DEBUG:root:  de: 0.019049999999999997
+DEBUG:root:  passo: 0.0254
+DEBUG:root:  Nt: 321
+DEBUG:root:  Dotl: 0.5461
+DEBUG:root:  Nt: 400
+DEBUG:root:  L: 5
+DEBUG:root:  A_proj: 119.69468010177111

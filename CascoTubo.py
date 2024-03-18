@@ -161,9 +161,24 @@ class CascoTubo:
             passo = passo_pol
 
             cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_NT = f"SELECT {npt} FROM Contagem_de_tubos WHERE arranjo = '{a_tubos}' AND Ds = {Ds} AND de_pol = {de_pol} AND p_pol = {passo}"
-            sql_Dotl = f"SELECT Dotl FROM Contagem_de_tubos WHERE arranjo = '{a_tubos}' AND Ds = {Ds} AND de_pol = {de_pol} AND p_pol = {passo}"
+            sql_NT =f""" 
+                SELECT {npt} 
+                FROM Contagem_de_tubos 
+                WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
+                ORDER BY ABS(Ds - {Ds})
+                LIMIT 1
 
+             """ 
+            
+            sql_Dotl = f"""  
+                SELECT Dotl 
+                FROM Contagem_de_tubos 
+                WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
+                ORDER BY ABS(Ds - {Ds})
+                LIMIT 1
+            
+            """
+            
             Nt = filtro_sqlite(cursor, sql_NT, True)
             Dotl = filtro_sqlite(cursor, sql_Dotl, True)
 
@@ -929,9 +944,15 @@ if __name__ == "__main__":
     with open("public\\json\\comparacoes.json", "r", encoding="utf-8", ) as file:
         str_dados = file.read()
 
-    dados = json.loads(str_dados)
+    dados = json.loads(str_dados)["comp_2"]
 
-    a = CascoTubo(**dados["comp_2"]["input"])
+    a = CascoTubo(**dados["input"])
+    
+    a.filtro_tubos(dados["n"], dados["Ds"], dados["de_pol"], dados["a_tubos"], dados["passo_pol"])
+    a.Nt = 400
+    a.area_projeto(dados["L"])
+
+    
 
 
 

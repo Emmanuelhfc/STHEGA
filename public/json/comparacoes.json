@@ -34,7 +34,14 @@
             "tipo_f": "Kerosene",
             "Rd_f": 0.0004,
             "Rd_q": 0.0002
-        }
+        },
+        "n": 2,
+        "de_pol": 0.75,
+        "a_tubos": "quadrado",
+        "passo_pol":  1,
+        "Ds": 0.6,
+        "L": 5
+
     },
 
     "comp_3":{
