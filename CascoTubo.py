@@ -223,7 +223,10 @@ class CascoTubo:
         Args:
             expe (float): espessura dos tubos em [m]
         """
+
+        
         self.di = self.de - 2*espe
+        self.tube_thickness = espe
         
 
 
@@ -309,11 +312,16 @@ class CascoTubo:
         
         hio = hi * di / de
         
-        
-        self.at = at
+        try:
+            self.Nu_t = Nu
+        except:
+            ...
+        self.hot_fluid_tube = fluido_tubo_quente
+        self.area_one_tube = at_
+        self.area_tube = at
         self.Gt = Gt
         self.Re_t = Re_t
-        self.v_t = v_t
+        self.tube_velocity = v_t
         self.hi = hi
         self.hio = hio
 
@@ -353,8 +361,10 @@ class CascoTubo:
         Args:
             espessura (float): espessura do casco em [m]
         """
+        
         Dc = self.Ds + 2 * espessura
         
+        self.shell_thickness = espessura
         self.Dc = Dc
 
 
@@ -749,7 +759,7 @@ class CascoTubo:
         G_t = self.Gt
         L = self.L
         n = self.n
-        v = self.v_t
+        v = self.tube_velocity
 
         if self.fluido_casco == "quente":
             rho = self.rho_f
@@ -944,13 +954,23 @@ if __name__ == "__main__":
     with open("public\\json\\comparacoes.json", "r", encoding="utf-8", ) as file:
         str_dados = file.read()
 
-    dados = json.loads(str_dados)["comp_2"]
+    dados = json.loads(str_dados)["comp_5"]
 
     a = CascoTubo(**dados["input"])
     
     a.filtro_tubos(dados["n"], dados["Ds"], dados["de_pol"], dados["a_tubos"], dados["passo_pol"])
-    a.Nt = 400
+    a.Nt = 36
     a.area_projeto(dados["L"])
+    # a.q = a.q * 1.1
+    a.coef_global_min()
+
+    a.diametro_interno_tubo(dados["tube_thickness"])
+    a.conveccao_tubo(dados["hot_fluid_tube"])
+
+    # a.caract_chicana(1)
+
+    # a.diametro_casco(dados["shell_thickness"])
+    
 
     
 
