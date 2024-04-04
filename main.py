@@ -1,4 +1,4 @@
-from CascoTubo import*
+from modules.CascoTubo import*
 
 dados_entrada_nomes = ["cp_quente", "cp_frio", "T1", "T2", "t1", "t2", "wq", "wf", "num_casco", "rho_q", "rho_f", "mi_q", "mi_f", "k_q", "k_f", "tipo_q", "tipo_f", "Rd_q", "Rd_f"]
 dados_entrada = []
