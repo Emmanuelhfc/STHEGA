@@ -268,7 +268,7 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
 
 /* Não estava funcionando por aqui, foi aplicadodiretamente*/</string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_20">
+   <layout class="QHBoxLayout" name="horizontalLayout_8">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -1214,7 +1214,7 @@ QPushButton:pressed {
 </string>
                      </property>
                      <property name="currentIndex">
-                      <number>0</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="input_thermodynamic">
                       <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -1245,6 +1245,9 @@ QPushButton:pressed {
                           </item>
                           <item>
                            <widget class="QTableWidget" name="tableWidget">
+                            <property name="styleSheet">
+                             <string notr="true">color: black;</string>
+                            </property>
                             <row>
                              <property name="text">
                               <string>Temperature In</string>
@@ -1332,6 +1335,9 @@ QPushButton:pressed {
                           </item>
                           <item>
                            <widget class="QTableWidget" name="tableWidget_2">
+                            <property name="styleSheet">
+                             <string notr="true">color: black;</string>
+                            </property>
                             <row>
                              <property name="text">
                               <string>Temperature In</string>
@@ -1390,6 +1396,117 @@ QPushButton:pressed {
                            </widget>
                           </item>
                          </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QWidget" name="input_Design">
+                      <layout class="QHBoxLayout" name="horizontalLayout_7">
+                       <item>
+                        <widget class="QTableWidget" name="tableWidget_3">
+                         <property name="styleSheet">
+                          <string notr="true">color: black</string>
+                         </property>
+                         <row>
+                          <property name="text">
+                           <string>Shell Diameter</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Shell Thickness</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Outside Tube Diameter</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Length</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Tube Fluid</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Shell Fluid</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Tube pitch</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Pitch Type</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Number Of Tube Passes</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Number Of Tubes</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Baffle Spacing</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Baffle Cut</string>
+                          </property>
+                         </row>
+                         <row>
+                          <property name="text">
+                           <string>Tube Wall Correction ((mi/miw) ^ 0.14 )</string>
+                          </property>
+                         </row>
+                         <column>
+                          <property name="text">
+                           <string>Value</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Unity</string>
+                          </property>
+                         </column>
+                         <item row="0" column="1">
+                          <property name="text">
+                           <string>pol</string>
+                          </property>
+                         </item>
+                         <item row="1" column="1">
+                          <property name="text">
+                           <string>m</string>
+                          </property>
+                         </item>
+                         <item row="2" column="1">
+                          <property name="text">
+                           <string>pol</string>
+                          </property>
+                         </item>
+                         <item row="3" column="1">
+                          <property name="text">
+                           <string>m</string>
+                          </property>
+                         </item>
+                         <item row="6" column="1">
+                          <property name="text">
+                           <string>pol</string>
+                          </property>
+                         </item>
                         </widget>
                        </item>
                       </layout>
@@ -1560,8 +1677,6 @@ QPushButton:pressed {
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
