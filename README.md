@@ -6,6 +6,6 @@
 ## Comandos 
 
 ```
-
+pyside6-uic interface/ui_MainWindow.ui -o interface/ui_mainwindow.py
 
 ```
