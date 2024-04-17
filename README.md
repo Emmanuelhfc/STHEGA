@@ -19,7 +19,7 @@ alembic init alembic
 
 makemigration
 ```
-alembic revision — autogenerate -m “First commit”
+alembic revision --autogenerate -m "upgrade"
 ```
 
 migrate

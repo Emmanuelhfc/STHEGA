@@ -26,9 +26,11 @@ class AvaliationTermoInputs(Base):
     tipo_q: Mapped[float] = mapped_column(String(30))
     fluid_side: Mapped[float] = mapped_column(String(30))
 
-    # back_populate é o campo que linka essa classe para outra
-    # cascade  - definido que se um item desse model for deletado os itens linkados do outro modos serão deletados todos
-    # "sem orfãos"
+    design_inputs: Mapped[Optional["AvaliationTermoInputsCold"]] = relationship(
+        back_populates="avaliation_termo_input",
+        cascade="delete"
+    )
+
     design_inputs: Mapped[Optional["AvaliationDesignInputs"]] = relationship(
         back_populates="avaliation_termo_input",
         cascade="delete"
@@ -41,9 +43,7 @@ class AvaliationTermoInputs(Base):
 
     def __repr__(self) -> str:
         return f"AvaliationTermoInputs(id={self.id!r}, name={self.name_avaliation!r})"
-    # addresses: Mapped[List["Address"]] = relationship(
-    #     back_populates="user", cascade="all, delete-orphan"
-    # )
+
 
 class AvaliationTermoInputsCold(Base):
     __tablename__ = "avaliation_termo_inputs_cold"
@@ -60,17 +60,18 @@ class AvaliationTermoInputsCold(Base):
     tipo_f: Mapped[float] = mapped_column(String(30))
     fluid_side: Mapped[float] = mapped_column(String(30))
 
-    seila: Mapped[float] = mapped_column(String(30))
-    seila2: Mapped[float] = mapped_column(String(30))
-
-
+    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
+    termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
+        back_populates="avaliation_termo_input_cold",
+    )
 
 
 
 class AvaliationDesignInputs(Base):
     __tablename__ = "avaliation_design_inputs"
     id: Mapped[int] = mapped_column(primary_key=True)
-    seila2: Mapped[float] = mapped_column(String(30))
+    
+    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
     termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
         back_populates="avaliation_design_input",
     )
@@ -80,6 +81,7 @@ class AvaliationResults(Base):
     __tablename__ = "avaliation_results"
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
     termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
         back_populates="avaliation_result",
     )
