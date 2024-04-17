@@ -284,10 +284,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
     <item>
      <widget class="QFrame" name="app_conteiner">
       <property name="frameShape">
-       <enum>QFrame::Shape::StyledPanel</enum>
+       <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Shadow::Raised</enum>
+       <enum>QFrame::Raised</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
@@ -320,10 +320,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <property name="spacing">
@@ -359,10 +359,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
              <string notr="true"/>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+             <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_9">
              <property name="spacing">
@@ -386,10 +386,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
           <item>
            <widget class="QFrame" name="mid_menu">
             <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+             <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_10">
              <property name="spacing">
@@ -561,10 +561,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
              <item>
               <widget class="QFrame" name="frame_space_mid_menu">
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
               </widget>
              </item>
@@ -586,10 +586,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
              </size>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+             <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <property name="spacing">
@@ -653,10 +653,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::StyledPanel</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
         </widget>
        </item>
@@ -666,10 +666,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
           <string notr="true"/>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
+          <enum>QFrame::Raised</enum>
          </property>
          <layout class="QVBoxLayout" name="left_layout">
           <property name="spacing">
@@ -702,10 +702,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
              </size>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+             <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_9">
              <property name="spacing">
@@ -732,10 +732,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
                 </sizepolicy>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <property name="spacing">
@@ -768,10 +768,10 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
                    </size>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_14">
                    <property name="spacing">
@@ -817,10 +817,10 @@ font: 700 20pt &quot;Sitka&quot;;</string>
                 <item>
                  <widget class="QFrame" name="frame_22">
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                   <layout class="QHBoxLayout" name="horizontalLayout_16">
                    <property name="spacing">
@@ -846,10 +846,10 @@ background-repeat: no-repeat;
 background-position: left center;</string>
                      </property>
                      <property name="frameShape">
-                      <enum>QFrame::Shape::StyledPanel</enum>
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
+                      <enum>QFrame::Raised</enum>
                      </property>
                     </widget>
                    </item>
@@ -868,10 +868,10 @@ background-position: left center;</string>
                 </size>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_13">
                 <property name="spacing">
@@ -907,10 +907,10 @@ background-position: left center;</string>
                    <string notr="true"/>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                   <layout class="QHBoxLayout" name="horizontalLayout_10">
                    <property name="spacing">
@@ -931,10 +931,10 @@ background-position: left center;</string>
                    <item>
                     <widget class="QFrame" name="frame_19">
                      <property name="frameShape">
-                      <enum>QFrame::Shape::StyledPanel</enum>
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
+                      <enum>QFrame::Raised</enum>
                      </property>
                     </widget>
                    </item>
@@ -958,10 +958,10 @@ background-repeat: no-repeat;
 background-position: right center;</string>
                      </property>
                      <property name="frameShape">
-                      <enum>QFrame::Shape::StyledPanel</enum>
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
+                      <enum>QFrame::Raised</enum>
                      </property>
                     </widget>
                    </item>
@@ -976,10 +976,10 @@ font: 12pt &quot;Swis721 Blk BT&quot;;
 </string>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                   <layout class="QHBoxLayout" name="horizontalLayout_5">
                    <item>
@@ -1012,10 +1012,10 @@ font: 12pt &quot;Swis721 Blk BT&quot;;
              <string notr="true"/>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+             <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+             <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <property name="spacing">
@@ -1059,10 +1059,10 @@ QPushButton:pressed {
 }</string>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <property name="spacing">
@@ -1155,10 +1155,10 @@ QPushButton:pressed {
                 <string notr="true"/>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <property name="spacing">
@@ -1182,10 +1182,10 @@ QPushButton:pressed {
                    <string notr="true"/>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
                    <property name="spacing">
@@ -1219,10 +1219,10 @@ QPushButton:pressed {
                        <item>
                         <widget class="QFrame" name="frame">
                          <property name="frameShape">
-                          <enum>QFrame::Shape::StyledPanel</enum>
+                          <enum>QFrame::StyledPanel</enum>
                          </property>
                          <property name="frameShadow">
-                          <enum>QFrame::Shadow::Raised</enum>
+                          <enum>QFrame::Raised</enum>
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout">
                           <item>
@@ -1239,47 +1239,47 @@ QPushButton:pressed {
                             </property>
                             <row>
                              <property name="text">
-                              <string>Temperature In</string>
+                              <string>Temperature In (T1)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Temperature Out</string>
+                              <string>Temperature Out (T2)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Viscosity</string>
+                              <string>Viscosity (mi_q)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Specific Heat</string>
+                              <string>Specific Heat (cp_quente)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Fouling Factor</string>
+                              <string>Fouling Factor (Rd_q)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Thermal Conductivity</string>
+                              <string>Thermal Conductivity (k_q)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Density</string>
+                              <string>Density (rho_q)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Mass Flow Rate</string>
+                              <string>Mass Flow Rate (w_q)</string>
                              </property>
                             </row>
                             <row>
                              <property name="text">
-                              <string>Type</string>
+                              <string>Type (tipo_q)</string>
                              </property>
                             </row>
                             <column>
@@ -1300,10 +1300,10 @@ QPushButton:pressed {
                        <item>
                         <widget class="QFrame" name="frame_2">
                          <property name="frameShape">
-                          <enum>QFrame::Shape::StyledPanel</enum>
+                          <enum>QFrame::StyledPanel</enum>
                          </property>
                          <property name="frameShadow">
-                          <enum>QFrame::Shadow::Raised</enum>
+                          <enum>QFrame::Raised</enum>
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout_4">
                           <item>
@@ -1512,10 +1512,10 @@ QPushButton:pressed {
                    </size>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                  </widget>
                 </item>
@@ -1537,10 +1537,10 @@ QPushButton:pressed {
                 </size>
                </property>
                <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
+                <enum>QFrame::Raised</enum>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <property name="spacing">
@@ -1587,7 +1587,7 @@ QPushButton:pressed {
                    <string>By Emmanuel Henrique de Faria Carvalho</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                   <property name="margin">
                    <number>0</number>
@@ -1623,7 +1623,7 @@ QPushButton:pressed {
                    <string>v0.01</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1642,10 +1642,10 @@ QPushButton:pressed {
                    </size>
                   </property>
                   <property name="frameShape">
-                   <enum>QFrame::Shape::StyledPanel</enum>
+                   <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                  </widget>
                 </item>

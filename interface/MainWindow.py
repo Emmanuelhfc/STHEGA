@@ -10,7 +10,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.showMaximized()
-
+        
+        self.inputs = {}
         self.set_line_edit_termo_tables()
 
     def set_line_edit_termo_tables(self):
@@ -19,8 +20,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             line_edit = QLineEdit()
             self.termoTableShell.setCellWidget(i, 1, line_edit)
             self.termoTableTube.setCellWidget(i, 1, line_edit)
-
             
+    def save_termo_table_inputs_avaliation(self, row, column):
 
-            
-
+        ...
