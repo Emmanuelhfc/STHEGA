@@ -1177,7 +1177,7 @@ QPushButton:pressed {
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QFrame" name="pages_conteiner">
+                 <widget class="QFrame" name="pages_container">
                   <property name="styleSheet">
                    <string notr="true"/>
                   </property>
@@ -1204,12 +1204,15 @@ QPushButton:pressed {
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="QTabWidget" name="tabWidget">
+                    <widget class="QTabWidget" name="avaliation_tabs">
                      <property name="styleSheet">
                       <string notr="true">color:black;</string>
                      </property>
                      <property name="currentIndex">
                       <number>0</number>
+                     </property>
+                     <property name="tabBarAutoHide">
+                      <bool>false</bool>
                      </property>
                      <widget class="QWidget" name="input_termo">
                       <attribute name="title">
@@ -1498,6 +1501,50 @@ QPushButton:pressed {
                        </item>
                       </widget>
                      </widget>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="pages_container_footer">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_7">
+                      <item>
+                       <widget class="QFrame" name="frame_3">
+                        <property name="frameShape">
+                         <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                         <enum>QFrame::Raised</enum>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="next_pages">
+                        <property name="minimumSize">
+                         <size>
+                          <width>100</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>100</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">color:black;</string>
+                        </property>
+                        <property name="text">
+                         <string>Next</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
                     </widget>
                    </item>
                   </layout>
