@@ -12,7 +12,7 @@ interface.show_app()
 # individuo_cromossomo = ["n", "Ds", "de_pol", "a_tubos", "passo_pol", "L", "espess_tubo", "espess_casco", "classe", "ls", r"%lc", "grupo_material"]
 # n = 2
 # Ds = 8.071 * 0.0254
-# de_pol = 0.75
+# de_pol = 0.75s
 # a_tubos = "quadrado"
 # L = 1
 # passo_pol = 1

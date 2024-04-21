@@ -1,8 +1,8 @@
 """upgrade
 
-Revision ID: b23a9fa5e2f4
+Revision ID: e10deac0ddd3
 Revises: 
-Create Date: 2024-04-17 17:01:07.934764
+Create Date: 2024-04-21 15:19:10.084652
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b23a9fa5e2f4'
+revision: str = 'e10deac0ddd3'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -37,15 +37,14 @@ def upgrade() -> None:
     )
     op.create_table('avaliation_design_inputs',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('seila2', sa.String(length=30), nullable=False),
-    sa.Column('termo_inputs_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['termo_inputs_id'], ['avaliation_termo_inputs.id'], ),
+    sa.Column('thermo_inputs_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['thermo_inputs_id'], ['avaliation_termo_inputs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('avaliation_results',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('termo_inputs_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['termo_inputs_id'], ['avaliation_termo_inputs.id'], ),
+    sa.Column('thermo_inputs_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['thermo_inputs_id'], ['avaliation_termo_inputs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('avaliation_termo_inputs_cold',
@@ -60,8 +59,8 @@ def upgrade() -> None:
     sa.Column('w_f', sa.Float(), nullable=False),
     sa.Column('tipo_f', sa.String(length=30), nullable=False),
     sa.Column('fluid_side', sa.String(length=30), nullable=False),
-    sa.Column('termo_inputs_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['termo_inputs_id'], ['avaliation_termo_inputs.id'], ),
+    sa.Column('thermo_inputs_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['thermo_inputs_id'], ['avaliation_termo_inputs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

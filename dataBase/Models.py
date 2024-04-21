@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-class AvaliationTermoInputs(Base):
+class AvaliationThermoInputs(Base):
     __tablename__ = "avaliation_termo_inputs"
     id: Mapped[int] = mapped_column(primary_key=True)
     name_avaliation: Mapped[str] = mapped_column(String(30))
@@ -26,7 +26,7 @@ class AvaliationTermoInputs(Base):
     tipo_q: Mapped[float] = mapped_column(String(30))
     fluid_side: Mapped[float] = mapped_column(String(30))
 
-    design_inputs: Mapped[Optional["AvaliationTermoInputsCold"]] = relationship(
+    termo_inputs_cold: Mapped[Optional["AvaliationThermoInputsCold"]] = relationship(
         back_populates="avaliation_termo_input",
         cascade="delete"
     )
@@ -44,8 +44,7 @@ class AvaliationTermoInputs(Base):
     def __repr__(self) -> str:
         return f"AvaliationTermoInputs(id={self.id!r}, name={self.name_avaliation!r})"
 
-
-class AvaliationTermoInputsCold(Base):
+class AvaliationThermoInputsCold(Base):
     __tablename__ = "avaliation_termo_inputs_cold"
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -60,8 +59,8 @@ class AvaliationTermoInputsCold(Base):
     tipo_f: Mapped[float] = mapped_column(String(30))
     fluid_side: Mapped[float] = mapped_column(String(30))
 
-    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
-    termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
+    thermo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
+    thermo_inputs: Mapped["AvaliationThermoInputs"] = relationship(
         back_populates="avaliation_termo_input_cold",
     )
 
@@ -71,8 +70,8 @@ class AvaliationDesignInputs(Base):
     __tablename__ = "avaliation_design_inputs"
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
-    termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
+    thermo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
+    thermo_inputs: Mapped["AvaliationThermoInputs"] = relationship(
         back_populates="avaliation_design_input",
     )
     
@@ -81,8 +80,8 @@ class AvaliationResults(Base):
     __tablename__ = "avaliation_results"
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    termo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
-    termo_inputs: Mapped["AvaliationTermoInputs"] = relationship(
+    thermo_inputs_id: Mapped[int] = mapped_column(ForeignKey("avaliation_termo_inputs.id"))
+    thermo_inputs: Mapped["AvaliationThermoInputs"] = relationship(
         back_populates="avaliation_result",
     )
 

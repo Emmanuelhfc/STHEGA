@@ -18,10 +18,7 @@ POL2M = 0.0254
 class CascoTubo:
     def __init__(self, *args, **kwargs):
 
-        if os.path.exists("report.log"):
-            os.remove("report.log")
-
-        logging.basicConfig(filename='report.log', encoding='utf-8', level=logging.DEBUG)
+        
 
         self.T1 = kwargs["T1"] + 273.15
         self.T2 = kwargs["T2"] + 273.15
@@ -49,7 +46,6 @@ class CascoTubo:
     def __setattr__(self, __name: str, __value) -> None:
         logging.debug(f"  {__name}: {__value}")
         super().__setattr__(__name, __value)
-        pass
 
     def balaco_de_energia(self):
         
