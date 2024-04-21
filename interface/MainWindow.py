@@ -34,6 +34,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i in range(1, self.avaliation_tabs.count()):
             self.avaliation_tabs.setTabVisible(i, False)
 
+    def calculate_tubes_number(self):
+        ...
+    
+    def calculate_avaliation_shell_tube(self):
+        ...
+
     def change_pages_avaliation(self):
         logging.debug("")
         page_atual = self.avaliation_tabs.currentIndex()
