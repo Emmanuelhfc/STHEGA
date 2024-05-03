@@ -7,6 +7,7 @@ from dataBase.connection import engine
 from dataBase.Models import*
 import logging
 import os
+from modules.CascoTubo import CascoTubo
 
 
 
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.showMaximized()
         
         self.inputs = {}
-        self.set_line_edit_termo_tables()
+        self.set_line_edit_inputs_tables()
         self.page = 0
         
         if os.path.exists("static/logs/report.log"):
@@ -46,95 +47,126 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         match page_atual:
             case 0:
-                # try:
+                try:
                     self.connvert_table_thermo_input_to_dict()
                     self.avaliation_tabs.setTabVisible(1, True)
                     self.avaliation_tabs.setCurrentIndex(1)
-                # except:
-                #     trace
-                #     self.status_msg.setText("Por Favor preencha todos os dados")
+                except:
+                    self.status_msg.setText("Por Favor preencha todos os dados")
             case 1:
+                
                 self.convert_table_design_input_to_dict()
                 self.avaliation_tabs.setCurrentIndex(2)
-        
+                
+    def initial_termo_calculate_shell_and_tube(self):
 
-    def set_line_edit_termo_tables(self):
+        # Nº passes no casco =1
+        self.shell_and_tube =  CascoTubo(
+            T1 = self.hot['t_in'],
+            T2 = self.hot['t_o'],
+            t1 = self.cold['t_in'],
+            t2 = self.cold['t_o'],
+            wf = self.frio['w'],
+            wq = self.hot['w'],
+            cp_quente = self.hot["cp"],
+            cp_frio = self.cold['cp'],
+            num_casco = 1,
+            rho_q = self.hot['rho'],
+            rho_f = self.cold['rho'],
+            mi_f = self.cold['mi_f'],
+            mi_q = self.hot['mi_q'],
+            k_q = self.hot['k'],
+            k_f = self.cold['k'],
+            tipo_q = self.hot['type'],
+            tipo_f = self.cold['type'],
+            Rd_f = self.cold['Rd'],
+            Rd_q = self.hot['Rd_q'],
+        )      
+
+        Nt = self.shell_and_tube.filtro_tubos(
+                n=,
+                Ds=,
+                de_pol=,
+                a_tubos=,
+                passo_pol=,
+
+            )
+
+    def set_line_edit_inputs_tables(self):
+        names_termo_table = ['t_in', 't_o', 'mi', 'cp', 'Rd', 'k', 'rho', 'w', 'type']
+        self.names_design_table = ['Ds', 'shell_thickness', 'de_pol', 'L', 'passo_pol', 'a_tubos', 'n', 'Nt', 'ls', 'lc', 'tube_wall_correction']
         
         for i in range(self.termoTableShell.rowCount()):
+            
+            name_shell = f'shell_{names_termo_table[i]}'
+            name_tube = f'tube_{names_termo_table[i]}'
+            
             line_edit = QLineEdit()
+            setattr(self, name_shell, line_edit)
             self.termoTableShell.setCellWidget(i, 0, line_edit)
+
             line_edit = QLineEdit()
+            setattr(self, name_tube, line_edit)
             self.termoTableTube.setCellWidget(i, 0, line_edit)
+
+        for i in range(self.designInpTable.rowCount()):
             line_edit = QLineEdit()
+            setattr(self, self.names_design_table[i], line_edit)
             self.designInpTable.setCellWidget(i, 0, line_edit)
 
-        
+
 
     def connvert_table_thermo_input_to_dict(self):
-        params = {
-            "t_in": (0, 0),
-            "t_o": (1, 0),
-            "mi": (2, 0),
-            "cp": (3, 0),
-            "Rd": (4, 0),
-            "k": (5, 0),
-            "rho": (6, 0),
-            "w": (7, 0),
-            "type": (8, 0),
+        dict_termo_in_shell = {
+            't_in': float(self.shell_t_in.text()),
+            't_o': float(self.shell_t_o.text()),
+            'mi': float(self.shell_mi.text()),
+            'cp': float(self.shell_cp.text()),
+            'Rd': float(self.shell_Rd.text()),
+            'k': float(self.shell_k.text()),
+            "rho": float(self.shell_rho.text()),
+            "w": float(self.shell_w.text()),
+            "type": self.shell_type.text(),
         }
-
-        dict_termo_in_shell = {}
-        dict_termo_in_tube = {}
-
-        for param in params:
-            
-            if param == "type":
-                value_shell = self.termoTableShell.cellWidget(*params[param]).text()
-                value_tube = self.termoTableTube.cellWidget(*params[param]).text()
-            else:
-                value_shell = float(self.termoTableShell.cellWidget(*params[param]).text())
-                value_tube = float(self.termoTableTube.cellWidget(*params[param]).text())
-
-            dict_termo_in_shell[param] = value_shell
-            dict_termo_in_tube[param] = value_tube
-        
+        dict_termo_in_tube = {
+            't_in': float(self.tube_t_in.text()),
+            't_o': float(self.tube_t_o.text()),
+            'mi': float(self.tube_mi.text()),
+            'cp': float(self.tube_cp.text()),
+            'Rd': float(self.tube_Rd.text()),
+            'k': float(self.tube_k.text()),
+            "rho": float(self.tube_rho.text()),
+            "w": float(self.tube_w.text()),
+            "type": self.tube_type.text(),
+        }
         
         dict_termo_in_shell['fluid_side'] = "shell"
         dict_termo_in_tube['fluid_side'] = "tube"
 
         t_in_s = dict_termo_in_shell['t_in'] 
         t_o_s = dict_termo_in_shell['t_o']
-        
-        self.quente = dict_termo_in_tube
-        self.frio = dict_termo_in_shell
+    
+        self.hot = dict_termo_in_tube
+        self.cold = dict_termo_in_shell
 
         if t_in_s > t_o_s:
-            self.quente = dict_termo_in_shell
-            self.frio = dict_termo_in_tube
+            self.hot = dict_termo_in_shell
+            self.cold = dict_termo_in_tube
+        
+        if any(value == "" for value in dict_termo_in_shell.values()) or any(value == "" for value in dict_termo_in_shell.values()):
+            raise
 
     def convert_table_design_input_to_dict(self):
+        self.design_inps = {}   
 
-        params = {
-            "Ds": (0, 0),
-            "shell_thickness": (1, 0),
-            "de_pol": (2, 0),
-            "L": (3, 0),
-            "passo_pol": (4, 0),
-            "a_tubos": (5, 0),
-            "n": (6, 0),
-            "Nt": (7, 0),
-            "ls": (8, 0),
-            'lc': (9,0)
-        }
+        for param in self.names_design_table:
+            
+            atribute = getattr(self, param).text()
+            if param != 'a_tubos':
+                atribute = float(atribute)
 
-        self.design_inps = {}
-        for param in params:
-            if param == "a_tubos":
-                value = self.designInpTable.cellWidget(*param).text()
-                continue
-            value = float(self.designInpTable.cellWidget(*param).text())
+            self.design_inps[param] = atribute
 
-            self.design_inps[param] = value
 
     def save_termo_table_inputs_avaliation(self):
         engine_ = engine()
@@ -142,31 +174,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             name_avaliation = self.name_avaliation.text().strip()
 
             inputs_frio = AvaliationThermoInputsCold(
-                t1= self.frio['t_in'],
-                t2=self.frio['t_o'],
-                mi_f=self.frio['mi'],
-                cp_frio=self.frio['cp'],
-                Rd_f=self.frio['Rd'],
-                k_f=self.frio['k'],
-                rho_f=self.frio['rho'],
-                w_f=self.frio['w'],
-                tipo_f=self.frio['type'],
-                fluid_side=self.frio['fluid_side'],
+                t1= self.cold['t_in'],
+                t2=self.cold['t_o'],
+                mi_f=self.cold['mi'],
+                cp_frio=self.cold['cp'],
+                Rd_f=self.cold['Rd'],
+                k_f=self.cold['k'],
+                rho_f=self.cold['rho'],
+                w_f=self.cold['w'],
+                tipo_f=self.cold['type'],
+                fluid_side=self.cold['fluid_side'],
 
             )
 
             inputs_quente = AvaliationThermoInputs(
                 name_avaliation = name_avaliation,
-                T1= self.quente["t_in"],
-                T2= self.quente["t_o"],
-                mi_q=self.quente["mi"],
-                cp_quente=self.quente["cp"],
-                Rd_q=self.quente["Rd"],
-                k_q=self.quente["k"],
-                rho_q=self.quente["rho"],
-                w_q=self.quente["w"],
-                tipo_q=self.quente["type"],
-                fluid_side=self.quente["fluid_side"],
+                T1= self.hot["t_in"],
+                T2= self.hot["t_o"],
+                mi_q=self.hot["mi"],
+                cp_quente=self.hot["cp"],
+                Rd_q=self.hot["Rd"],
+                k_q=self.hot["k"],
+                rho_q=self.hot["rho"],
+                w_q=self.hot["w"],
+                tipo_q=self.hot["type"],
+                fluid_side=self.hot["fluid_side"],
                 thermo_inputs_cold= inputs_frio
 
             )

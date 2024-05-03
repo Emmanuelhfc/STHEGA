@@ -18,8 +18,6 @@ POL2M = 0.0254
 class CascoTubo:
     def __init__(self, *args, **kwargs):
 
-        
-
         self.T1 = kwargs["T1"] + 273.15
         self.T2 = kwargs["T2"] + 273.15
         self.t1 = kwargs["t1"] + 273.15
@@ -40,14 +38,14 @@ class CascoTubo:
         self.Rd_f = kwargs["Rd_f"]
         self.Rd_q = kwargs["Rd_q"]
   
-        self.balaco_de_energia()
-        self.diferenca_temp_deltaT()
+        self._balaco_de_energia()
+        self._diferenca_temp_deltaT()
     
     def __setattr__(self, __name: str, __value) -> None:
         logging.debug(f"  {__name}: {__value}")
         super().__setattr__(__name, __value)
 
-    def balaco_de_energia(self):
+    def _balaco_de_energia(self):
         
         # TODO -> Fazer código calcular cp_quente e cp_frio, No caso atual só pode faltar um dado e não pode ser cp_frio e cp_quente
         # TODO -> Lógica errada, esse caso pega se tiver 2 valores faltando
@@ -83,7 +81,7 @@ class CascoTubo:
         
         return self.q
 
-    def diferenca_temp_deltaT(self):
+    def _diferenca_temp_deltaT(self):
 
         def calculo_diferenca_log_MLDT():
             num = ((self.T1 - self.t2)-(self.T2 - self.t1))
@@ -127,65 +125,70 @@ class CascoTubo:
         self.deltaT = self.mldt*self.F
         
 
-    def filtro_tubos(self, n, Ds, de_pol, a_tubos, passo_pol: str):
-            """ ## Descrição:
-                    - Filtra da tabela de nº de tubos de fabricantes o valor diâmetro do feixe, nº de passagens no tubo e nº de tubos
-                ## Args:
-                    - n: número de passes no tubos
-                    - Ds: diâmetro interno do casco 
-                    - de_pol: diâmetro externo do tubo em polegadas [1' ou 3/4']
-                    - a_tubos: arranjo dos tubos ["triangular", "quadrado", "rodado"]
-                    - passo_pol: [1, 1 1/4, 15/16 ]
-            """
-            self.n = n
-            self.Ds = Ds
-            self.a_tubos = a_tubos
+    def filtro_tubos(self, n, Ds, de_pol, a_tubos, passo_pol: str) -> int:
+        """_summary_
 
-            npt = ""
-            if n == 1:
-                npt = "Npt1"
-            elif n == 2:
-                npt = "Npt2"
-            elif n == 4:
-                npt = "Npt4"
-            elif n == 6:
-                npt = "Npt6"
-            elif n == 8:
-                npt = "Npt8"
-            
-            a_tubos = str(a_tubos) 
-            passo = passo_pol
+        Args:
+            n (_type_): _description_
+            Ds (_type_): _description_
+            de_pol (_type_): _description_
+            a_tubos (_type_): _description_
+            passo_pol (str): _description_
 
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_NT =f""" 
-                SELECT {npt} 
-                FROM Contagem_de_tubos 
-                WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
-                ORDER BY ABS(Ds - {Ds})
-                LIMIT 1
+        Returns:
+            int: Nº de tubos
+        """
+        self.n = n
+        self.Ds = Ds
+        self.a_tubos = a_tubos
 
-             """ 
-            
-            sql_Dotl = f"""  
-                SELECT Dotl 
-                FROM Contagem_de_tubos 
-                WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
-                ORDER BY ABS(Ds - {Ds})
-                LIMIT 1
-            
-            """
-            
-            Nt = filtro_sqlite(cursor, sql_NT, True)
-            Dotl = filtro_sqlite(cursor, sql_Dotl, True)
+        npt = ""
+        if n == 1:
+            npt = "Npt1"
+        elif n == 2:
+            npt = "Npt2"
+        elif n == 4:
+            npt = "Npt4"
+        elif n == 6:
+            npt = "Npt6"
+        elif n == 8:
+            npt = "Npt8"
+        
+        a_tubos = str(a_tubos) 
+        passo = passo_pol
+        
+        cursor = conect_sqlite(DB_CONSTANTS_DIR)
+        sql_NT =f""" 
+            SELECT {npt} 
+            FROM Contagem_de_tubos 
+            WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
+            ORDER BY ABS(Ds - {Ds})
+            LIMIT 1
 
-            if len(Nt) > 1 or len(Dotl) > 1:
-                print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
-                return
-            
-            self.de = de_pol * POL2M
-            self.passo = passo_pol * POL2M
-            self.Nt = Nt[0]
-            self.Dotl = Dotl[0]
+            """ 
+        
+        sql_Dotl = f"""  
+            SELECT Dotl 
+            FROM Contagem_de_tubos 
+            WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
+            ORDER BY ABS(Ds - {Ds})
+            LIMIT 1
+        
+        """
+        
+        Nt = filtro_sqlite(cursor, sql_NT, True)
+        Dotl = filtro_sqlite(cursor, sql_Dotl, True)
+
+        if len(Nt) > 1 or len(Dotl) > 1:
+            print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
+            return
+        
+        self.de = de_pol * POL2M
+        self.passo = passo_pol * POL2M
+        self.Nt = Nt[0]
+        self.Dotl = Dotl[0]
+
+        return self.Nt
 
     def area_projeto(self, L:float) -> float:
         """Cálculo da área de projeto
