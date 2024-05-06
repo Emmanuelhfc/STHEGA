@@ -18,25 +18,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.showMaximized()
         
+        if os.path.exists("static/logs/report.log"):
+            os.remove("static/logs/report.log")
+        logging.basicConfig(filename='static/logs/report.log', encoding='utf-8', level=logging.DEBUG)
+
         self.inputs = {}
         self.set_line_edit_inputs_tables()
         self.page = 0
-        
-        if os.path.exists("static/logs/report.log"):
-            os.remove("static/logs/report.log")
-
-        logging.basicConfig(filename='static/logs/report.log', encoding='utf-8', level=logging.DEBUG)
-
-
-        self.set_visible_tabs_avaliation()
-        self.next_pages.clicked.connect(self.change_pages_avaliation)
     
+        self.set_visible_tabs_avaliation()
+
+        # Btns - Avaliation
+        self.next_pages.clicked.connect(self.change_pages_avaliation)
+        self.calculate_Nt.clicked.connect(self.calculate_tubes_number)
+
     def set_visible_tabs_avaliation(self):
         for i in range(1, self.avaliation_tabs.count()):
             self.avaliation_tabs.setTabVisible(i, False)
 
     def calculate_tubes_number(self):
-        ...
+        Nt = self.initial_termo_calculate_shell_and_tube(True)
+        self.Nt.setText(str(Nt))
     
     def calculate_avaliation_shell_tube(self):
         ...
@@ -54,11 +56,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 except:
                     self.status_msg.setText("Por Favor preencha todos os dados")
             case 1:
-                
                 self.convert_table_design_input_to_dict()
                 self.avaliation_tabs.setCurrentIndex(2)
                 
-    def initial_termo_calculate_shell_and_tube(self):
+    def initial_termo_calculate_shell_and_tube(self, calculate_Nt = False):
 
         # Nº passes no casco =1
         self.shell_and_tube =  CascoTubo(
@@ -66,31 +67,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             T2 = self.hot['t_o'],
             t1 = self.cold['t_in'],
             t2 = self.cold['t_o'],
-            wf = self.frio['w'],
+            wf = self.cold['w'],
             wq = self.hot['w'],
             cp_quente = self.hot["cp"],
             cp_frio = self.cold['cp'],
             num_casco = 1,
             rho_q = self.hot['rho'],
             rho_f = self.cold['rho'],
-            mi_f = self.cold['mi_f'],
-            mi_q = self.hot['mi_q'],
+            mi_f = self.cold['mi'],
+            mi_q = self.hot['mi'],
             k_q = self.hot['k'],
             k_f = self.cold['k'],
             tipo_q = self.hot['type'],
             tipo_f = self.cold['type'],
             Rd_f = self.cold['Rd'],
-            Rd_q = self.hot['Rd_q'],
+            Rd_q = self.hot['Rd'],
         )      
 
-        Nt = self.shell_and_tube.filtro_tubos(
-                n=,
-                Ds=,
-                de_pol=,
-                a_tubos=,
-                passo_pol=,
-
-            )
+        if calculate_Nt:
+            Nt = self.shell_and_tube.filtro_tubos(
+                    n= int(self.n.text()),
+                    Ds= float(self.Ds.text()),
+                    de_pol= float(self.de_pol.text()),
+                    a_tubos= self.a_tubos.text(),
+                    passo_pol= float(self.passo_pol.text()),
+                )
+            return Nt
+        
+        self.shell_and_tube.Nt = int(self.Nt.text())
 
     def set_line_edit_inputs_tables(self):
         names_termo_table = ['t_in', 't_o', 'mi', 'cp', 'Rd', 'k', 'rho', 'w', 'type']
@@ -156,16 +160,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if any(value == "" for value in dict_termo_in_shell.values()) or any(value == "" for value in dict_termo_in_shell.values()):
             raise
 
-    def convert_table_design_input_to_dict(self):
-        self.design_inps = {}   
+    # def convert_table_design_input_to_dict(self):
+    #     self.design_inps = {}   
 
-        for param in self.names_design_table:
+    #     for param in self.names_design_table:
             
-            atribute = getattr(self, param).text()
-            if param != 'a_tubos':
-                atribute = float(atribute)
+    #         atribute = getattr(self, param).text()
+    #         if param != 'a_tubos':
+    #             atribute = float(atribute)
 
-            self.design_inps[param] = atribute
+    #         self.design_inps[param] = atribute
 
 
     def save_termo_table_inputs_avaliation(self):

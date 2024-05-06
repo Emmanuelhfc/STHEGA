@@ -1,15 +1,12 @@
-params = {
-            "Ds": (0, 0),
-            "shell_thickness": (1, 0),
-            "de_pol": (2, 0),
-            "L": (3, 0),
-            "passo_pol": (4, 0),
-            "a_tubos": (5, 0),
-            "n": (6, 0),
-            "Nt": (7, 0),
-            "ls": (8, 0),
-            'lc': (9,0)
-        }
+import pint
+
+ureg = pint.UnitRegistry()
+Q_ = ureg.Quantity
+
+T1 = Q_(219, ureg.degF)
+T2 = Q_(219, ureg.degF)
+t1 = Q_(219, ureg.degF)s
+T1 = Q_(219, ureg.degF)
 
 
-print(params.keys())
+print(a.to_base_units())

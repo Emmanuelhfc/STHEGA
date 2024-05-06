@@ -7,8 +7,16 @@ from sqlalchemy.orm import DeclarativeBase, declarative_base
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
+from enum import Enum
+
 
 Base = declarative_base()
+
+class TubeLayout(Enum):
+    TRIANGULAR = 1 # 30
+    ROTATED_TRIANGULAR = 2  #60
+    SQUARE = 3 # 90
+    ROTATED_SQUARE = 4 #45
 
 class AvaliationThermoInputs(Base):
     __tablename__ = "avaliation_termo_inputs"
@@ -87,6 +95,33 @@ class AvaliationResults(Base):
 
     # fullname: Mapped[Optional[str]]
 
+class ConstantsAB(Base):
+    __tablename__ = "constants_for_ab"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    layout: Mapped[TubeLayout]
+    Re: Mapped[float] = mapped_column(Float())
+    a1: Mapped[float] = mapped_column(Float())
+    a2: Mapped[float] = mapped_column(Float())
+    a3: Mapped[float] = mapped_column(Float())
+    a4: Mapped[float] = mapped_column(Float())
+
+    b1: Mapped[float] = mapped_column(Float())
+    b2: Mapped[float] = mapped_column(Float())
+    b3: Mapped[float] = mapped_column(Float())
+    b4: Mapped[float] = mapped_column(Float())
+
+class TubeCount(Base):
+    __tablename = 'tube_count'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    Ds: Mapped[float] = mapped_column(Float())
+    Dotl: Mapped[float] = mapped_column(Float())
+    de_inch: Mapped[float] = mapped_column(Float())
+    layout: Mapped[TubeLayout]
+    n1: Mapped[int] = mapped_column(Integer())
+    n2: Mapped[int] = mapped_column(Integer())
+    n4: Mapped[int] = mapped_column(Integer())
+    n6: Mapped[int] = mapped_column(Integer())
+    n8: Mapped[int] = mapped_column(Integer())
 
 if __name__ == '__main__':
     engine_ = engine()
