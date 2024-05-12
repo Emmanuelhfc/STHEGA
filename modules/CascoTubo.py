@@ -6,6 +6,10 @@ from dataBase.comandos_sql import*
 import logging
 import os
 import json
+from dataBase.models import*
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+import pint
 
 
 # TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
@@ -125,68 +129,46 @@ class CascoTubo:
         self.deltaT = self.mldt*self.F
         
 
-    def filtro_tubos(self, n, Ds, de_pol, a_tubos, passo_pol: str) -> int:
-        """_summary_
+    def filtro_tubos(self, n: int, Ds: float, de_inch: float, layout: TubeLayout, pitch_inch: float) -> int:
+        ureg = pint.UnitRegistry()
+        Q_ = ureg.Quantity
 
-        Args:
-            n (_type_): _description_
-            Ds (_type_): _description_
-            de_pol (_type_): _description_
-            a_tubos (_type_): _description_
-            passo_pol (str): _description_
-
-        Returns:
-            int: Nº de tubos
-        """
         self.n = n
         self.Ds = Ds
-        self.a_tubos = a_tubos
+        self.layout = layout
 
-        npt = ""
-        if n == 1:
-            npt = "Npt1"
-        elif n == 2:
-            npt = "Npt2"
-        elif n == 4:
-            npt = "Npt4"
-        elif n == 6:
-            npt = "Npt6"
-        elif n == 8:
-            npt = "Npt8"
-        
-        a_tubos = str(a_tubos) 
-        passo = passo_pol
-        
-        cursor = conect_sqlite(DB_CONSTANTS_DIR)
-        sql_NT =f""" 
-            SELECT {npt} 
-            FROM Contagem_de_tubos 
-            WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
-            ORDER BY ABS(Ds - {Ds})
-            LIMIT 1
 
-            """ 
-        
-        sql_Dotl = f"""  
-            SELECT Dotl 
-            FROM Contagem_de_tubos 
-            WHERE arranjo = '{a_tubos}' AND de_pol = {de_pol} AND p_pol = {passo}
-            ORDER BY ABS(Ds - {Ds})
-            LIMIT 1
-        
-        """
-        
-        Nt = filtro_sqlite(cursor, sql_NT, True)
-        Dotl = filtro_sqlite(cursor, sql_Dotl, True)
 
-        if len(Nt) > 1 or len(Dotl) > 1:
-            print(" ERRO: mais de uma correspondência para Nt e Dotl em filtro_tubos")
-            return
+        stmt = select(TubeCount).where(
+            TubeCount.de_inch == de_inch,
+            TubeCount.pitch_inch == pitch_inch,
+            TubeCount.layout == layout,
+        ).order_by(
+            TubeCount.Ds - Ds
+        )
+
         
-        self.de = de_pol * POL2M
-        self.passo = passo_pol * POL2M
-        self.Nt = Nt[0]
-        self.Dotl = Dotl[0]
+        with Session(engine()) as session:
+            tube_count_line = session.scalars(stmt).first() 
+
+        match n:
+            case 1:
+                Nt = tube_count_line.n1
+            case 2:
+                Nt = tube_count_line.n2
+            case 4:
+                Nt = tube_count_line.n4
+            case 6:
+                Nt = tube_count_line.n6
+            case 8:
+                Nt = tube_count_line.n8
+
+        self.Nt = Nt
+
+
+        self.de = tube_count_line.de
+        self.pitch = tube_count_line.pitch
+        self.Dotl = tube_count_line.Dotl
 
         return self.Nt
 
@@ -380,9 +362,9 @@ class CascoTubo:
         Nt = self.Nt
         Dotl = self.Dotl
         Ds = self.Ds
-        a_tubos = self.a_tubos
+        layout = self.layout
         L = self.L
-        p = self.passo
+        p = self.pitch
         self.classe = classe
         Dc = self.Dc
 
@@ -406,28 +388,28 @@ class CascoTubo:
         # TODO -> rever tabela dos passos
         # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
         
-        def tabela_passo(a_tubos, de, p):
+        def tabela_passo(layout: TubeLayout, de: float, p: float):
             """ ## Descrrição:
                     - Filtra da tabela o valor dos passos em [m].
                 ## Args:
-                    - a_tubos: arranjo dos tubos
+                    - layout: arranjo dos tubos
                     - de: diâmetro externo do tubo 
             """
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f" SELECT * FROM Passos_tubos WHERE p = {p} AND  a_tubos = '{a_tubos}' ORDER BY ABS(de - {de}) LIMIT 1; "
-            linha = filtro_sqlite(cursor, sql_linha)
+            stmt = select(Pitch).where(
+                Pitch.pitch == p,
+                Pitch.layout == layout,
+                Pitch.de == de,
+            )
             
-            if len(linha) > 1 or len(linha) == 0:
-                print("Erro: correspondência na tabela de passos")
-                return
+            with Session(engine()) as session:
+                selected_line = session.scalars(stmt).one()
 
-            print(linha)
-            pn = linha[0][-1]
-            pp = linha[0][-2]
+            pn = selected_line.pn
+            pp = selected_line.pp
 
             return pn, pp
 
-        def fator_ji(Res, de, angulo_tubos, p):
+        def fator_ji(Res, de, layout, p):
             """ ## Descrição:
                     - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
                 ## Args:
@@ -438,20 +420,20 @@ class CascoTubo:
                 ## Return:
                     - ji:
             """
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT * FROM constantes_a WHERE angulo_a_tubos = '{angulo_tubos}' AND Res_max >= {Res} AND Res_min < {Res}"
-            linha = filtro_sqlite(cursor, sql_linha)
-            
-            if len(linha) > 1 or  len(linha) == 0:
-                print("Erro: correspondência na tabela de constantes a")
-                return
-            
-            a4 = linha[0][-1]
-            a3 = linha[0][-2]
-            a2 = linha[0][-3]
-            a1 = linha[0][-4]
-            
+            stmt = select(ConstantsAB).where(
+                ConstantsAB.layout == layout,
+                ConstantsAB.Re_max >= Res,
+                ConstantsAB.Re_min < Res,
+            )
 
+            with Session(engine()) as session:
+                line = session.scalars(stmt).one()
+            
+            a4 = line.a4
+            a3 = line.a3
+            a2 = line.a2
+            a1 = line.a1
+            
             a = a3 / (1 + 0.14 * Res ** a4)
 
 
@@ -468,17 +450,15 @@ class CascoTubo:
                 Return:
                     -delta_sb: arbetura diametral casco chicana
             """
-            # TODO -> Fazer tabela e terminar
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT delta_sb FROM Delta_sb WHERE D_nominal_min <= {Dn} AND D_nominal_max >= {Dn} "
-            linha = filtro_sqlite(cursor, sql_linha, True)
+            stmt = select(DeltaSB).where(
+                DeltaSB.Dn_max > Dn,
+                DeltaSB.Dn_min <= Dn,
+            )
             
-            if len(linha) > 1 or len(linha) == 0:
-                print("Erro: correspondência na tabela de constantes a")
-                return
+            with Session(engine()) as session:
+                selected_line = session.scalars(stmt).one()
             
-            print(linha)
-            delta_sb = linha[0]
+            delta_sb = selected_line.Delta_sb
             return delta_sb
 
         def diametro_bocal(Dc):
@@ -490,19 +470,19 @@ class CascoTubo:
                     - d_bocal: diâmetro do bocal [m]
                     - Dc:   diâmetro do casco    [m]
             """
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT d_bocal FROM Diametro_bocal WHERE D_casco_min <= {Dc} AND D_casco_max >= {Dc} "
-            linha = filtro_sqlite(cursor, sql_linha, True)
+            stmt = select(NozzleDiameter).where(
+                NozzleDiameter.Dc_min < Dc,
+                NozzleDiameter.Dc_max >= Dc
+            )
 
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de constantes a")
-                return
-            
-            d_bocal = linha[0]
+            with Session(engine()) as session:
+                selected_line = session.scalars(stmt).one()
+
+            d_bocal = selected_line.d_nozzle
             
             return d_bocal
 
-        def li_lo_tabela(Dc, classe):
+        def li_lo_tabela(Dc, classe_psi):
             """ ## Descrição:
                 Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
                 ## Args:
@@ -512,26 +492,28 @@ class CascoTubo:
                     - li: [m]
                     - lo: [m]
             """
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT * FROM li_lo WHERE Classe_pressao_psi = {classe} ORDER BY ABS(D_casco - {Dc}) LIMIT 1 "
-            linha = filtro_sqlite(cursor, sql_linha)
+            stmt = select(li_lo).where(
+                li_lo.pressure_class_psi == classe_psi,
+            ).order_by(
+                li_lo.Dc - Dc
+            )
 
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de constantes a")
-                return
-            
-            lo = linha[0][-1]
-            li = linha[0][-2]
+            with Session(engine()) as session:
+                selected_line = session.scalars(stmt).first()
+
+
+            lo = selected_line.lo
+            li = selected_line.li
 
             return li, lo
             
 
         #================= Cálculo para feixe de tubos ideal =====================
-        pn, pp = tabela_passo(a_tubos, de, p)
+        pn, pp = tabela_passo(layout, de, p)
         self.pp = pp
         self.pn = pn
         
-        if a_tubos == "triangular":
+        if layout == TubeLayout.TRIANGULAR:
             Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
         else:
             Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
@@ -542,15 +524,10 @@ class CascoTubo:
         
         self.Res =Res
 
-        if a_tubos == "triangular":
-            angulo_tubos = 30
-        elif a_tubos == "quadrado":
-            angulo_tubos = 90
-        elif a_tubos == "rodado":
-            angulo_tubos = 45
+        angulo_tubos = layout.value
 
 
-        ji = fator_ji(Res, de, angulo_tubos, p)
+        ji = fator_ji(Res, de, layout, p)
         self.ji = ji
 
         h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) 
@@ -633,7 +610,7 @@ class CascoTubo:
         lsi_ = lsi / ls
         lso_ = lso / ls
 
-        Nb = (L - lsi - lso) / ls + 1
+        Nb = (L - lsi - lso) / ls + 1 #TODO verificar isso
         Nb  = Nb // 1
         self.Nb = Nb
 
@@ -801,7 +778,7 @@ class CascoTubo:
         Sm = self.Sm
         Nss = self.Nss
         Fbp = self.Fbp
-        p = self.passo
+        p = self.pitch
         pp = self.pp
         lc = self.lc
         Ds = self.Ds
@@ -810,7 +787,7 @@ class CascoTubo:
         ls = self.ls
         lsi_ = self.lsi_
         lso_ = self.lso_
-        a_tubo = self.a_tubos
+        layout = self.layout
 
 
 
@@ -824,28 +801,20 @@ class CascoTubo:
             rho = self.rho_f
 
 
-        def constantes_b(Res:float, angulo_tubo: int) -> list:
-            """filtra constantes b
+        def constantes_b(Res:float, layout: TubeLayout) -> list:
+            stmt = select(ConstantsAB).where(
+                ConstantsAB.layout == layout,
+                ConstantsAB.Re_min < Res,
+                ConstantsAB.Re_max >= Res,
+            )
 
-            Args:
-                Res (float): nº de Re
-                angulo_tubo (int): angulo do arranjo dos tubos
-
-            Returns:
-                list: lista [b1, b2, b3, b4]
-            """
-            cursor = conect_sqlite(DB_CONSTANTS_DIR)
-            sql_linha = f"SELECT b1, b2, b3, b4 FROM Constantes_b WHERE angulo_tubo = {angulo_tubo} AND Re_min <= {Res} AND  Re_max > {Res};"
-            linha = filtro_sqlite(cursor, sql_linha)
-
-            if len(linha) > 1 :
-                print("Erro: mais de uma correspondência na tabela de constantes a")
-                return
+            with Session(engine()) as session:
+                selected_line = session.scalars(stmt).one()
             
-            b1 = linha[0][0]
-            b2 = linha[0][1]
-            b3 = linha[0][2]
-            b4 = linha[0][3]
+            b1 = selected_line.b1
+            b2 = selected_line.b2
+            b3 = selected_line.b3
+            b4 = selected_line.b4
 
             return [b1, b2, b3, b4]
         
@@ -864,15 +833,10 @@ class CascoTubo:
 
         Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
         
-        if a_tubo == "triangular":
-            angulo_tubo = 30
-        elif a_tubo == "quadrado":
-            angulo_tubo = 90
-        elif a_tubo == "rodado":
-            angulo_tubo = 45
+        angulo_tubo = layout.value
        
 
-        b1, b2, b3, b4 = constantes_b(Res, angulo_tubo)
+        b1, b2, b3, b4 = constantes_b(Res, layout)
         b = b3 / (1 + 0.14 * Res ** b4)
         fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
         delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
@@ -957,7 +921,7 @@ if __name__ == "__main__":
 
     a = CascoTubo(**dados["input"])
     
-    a.filtro_tubos(dados["n"], dados["Ds"], dados["de_pol"], dados["a_tubos"], dados["passo_pol"])
+    a.filtro_tubos(dados["n"], dados["Ds"], dados["de_pol"], dados["layout"], dados["passo_pol"])
     a.Nt = 36
     a.area_projeto(dados["L"])
     # a.q = a.q * 1.1

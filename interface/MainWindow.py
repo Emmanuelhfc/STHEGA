@@ -88,9 +88,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             Nt = self.shell_and_tube.filtro_tubos(
                     n= int(self.n.text()),
                     Ds= float(self.Ds.text()),
-                    de_pol= float(self.de_pol.text()),
-                    a_tubos= self.a_tubos.text(),
-                    passo_pol= float(self.passo_pol.text()),
+                    de_inch= float(self.de_pol.text()),
+                    layout= self.a_tubos.text(),
+                    pitch_inch= float(self.passo_pol.text()),
                 )
             return Nt
         
