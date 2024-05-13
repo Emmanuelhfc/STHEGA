@@ -1,1 +1,192 @@
 DEBUG:root:
+DEBUG:root:  T1: 377.0388888888889
+DEBUG:root:  T2: 311.15000000000003
+DEBUG:root:  t1: 303.15000000000003
+DEBUG:root:  t2: 311.15000000000003
+DEBUG:root:  wf: 59.95
+DEBUG:root:  wq: 13.94632740505278
+DEBUG:root:  cp_quente: 2177.1363041225754
+DEBUG:root:  cp_frio: 4178.426983681405
+DEBUG:root:  num_casco: 1
+DEBUG:root:  rho_q: 750.5242773845165
+DEBUG:root:  rho_f: 997.0324102463891
+DEBUG:root:  mi_f: 0.0007
+DEBUG:root:  mi_q: 0.000375
+DEBUG:root:  k_q: 0.12097837007874018
+DEBUG:root:  k_f: 0.5815269291338584
+DEBUG:root:  tipo_q: Gasolina
+DEBUG:root:  tipo_f: water
+DEBUG:root:  Rd_f: 0.00035222031816320654
+DEBUG:root:  Rd_q: 0.00017611015908160327
+DEBUG:root:  q: 2003973.5813736017
+DEBUG:root:  mldt: 27.45464191231626
+DEBUG:root:  R: 8.236111111111107
+DEBUG:root:  S: 0.10827067669172936
+DEBUG:root:  F: 0.8260978363387186
+DEBUG:root:  deltaT: 22.68022028121876
+DEBUG:root:  n: 2.0
+DEBUG:root:  Ds: 0.84
+DEBUG:root:  layout: TubeLayout.TRIANGULAR
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT tube_count.id, tube_count."Ds", tube_count."Ds_inch", tube_count."Dotl", tube_count."Dotl_inch", tube_count.de, tube_count.de_inch, tube_count.pitch, tube_count.pitch_inch, tube_count.layout, tube_count.n1, tube_count.n2, tube_count.n4, tube_count.n6, tube_count.n8 
+FROM tube_count 
+WHERE tube_count.de_inch = ? AND tube_count.pitch_inch = ? AND tube_count.layout = ? ORDER BY abs(tube_count."Ds" - ?)
+INFO:sqlalchemy.engine.Engine:[generated in 0.00127s] (0.75, 1.0, 'TRIANGULAR', 0.84)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  Nt: 830
+DEBUG:root:  de: 0.019049999999999997
+DEBUG:root:  pitch: 0.0254
+DEBUG:root:  Dotl: 0.822325
+DEBUG:root:  L: 7.32
+DEBUG:root:  A_proj: 363.60849921316026
+DEBUG:root:  Ud_min: 243.0024752641006
+DEBUG:root:  di: 0.017271999999999996
+DEBUG:root:  tube_thickness: 0.000889
+DEBUG:root:  fluido_casco: quente
+DEBUG:root:  hot_fluid_tube: False
+DEBUG:root:  area_one_tube: 0.00023430153833468284
+DEBUG:root:  area_tube: 0.09723513840889338
+DEBUG:root:  Gt: 616.5466618445912
+DEBUG:root:  Re_t: 15212.84849054254
+DEBUG:root:  tube_velocity: 0.6183817652349222
+DEBUG:root:  hi: 2314.6727618491936
+DEBUG:root:  hio: 2098.6366374099352
+DEBUG:root:
+DEBUG:root:  T1: 377.0388888888889
+DEBUG:root:  T2: 311.15000000000003
+DEBUG:root:  t1: 303.15000000000003
+DEBUG:root:  t2: 311.15000000000003
+DEBUG:root:  wf: 59.95
+DEBUG:root:  wq: 13.94632740505278
+DEBUG:root:  cp_quente: 2177.1363041225754
+DEBUG:root:  cp_frio: 4178.426983681405
+DEBUG:root:  num_casco: 1
+DEBUG:root:  rho_q: 750.5242773845165
+DEBUG:root:  rho_f: 997.0324102463891
+DEBUG:root:  mi_f: 0.0007
+DEBUG:root:  mi_q: 0.000375
+DEBUG:root:  k_q: 0.12097837007874018
+DEBUG:root:  k_f: 0.5815269291338584
+DEBUG:root:  tipo_q: Gasolina
+DEBUG:root:  tipo_f: water
+DEBUG:root:  Rd_f: 0.00035222031816320654
+DEBUG:root:  Rd_q: 0.00017611015908160327
+DEBUG:root:  q: 2003973.5813736017
+DEBUG:root:  mldt: 27.45464191231626
+DEBUG:root:  R: 8.236111111111107
+DEBUG:root:  S: 0.10827067669172936
+DEBUG:root:  F: 0.8260978363387186
+DEBUG:root:  deltaT: 22.68022028121876
+DEBUG:root:  n: 2.0
+DEBUG:root:  Ds: 0.84
+DEBUG:root:  layout: TubeLayout.TRIANGULAR
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT tube_count.id, tube_count."Ds", tube_count."Ds_inch", tube_count."Dotl", tube_count."Dotl_inch", tube_count.de, tube_count.de_inch, tube_count.pitch, tube_count.pitch_inch, tube_count.layout, tube_count.n1, tube_count.n2, tube_count.n4, tube_count.n6, tube_count.n8 
+FROM tube_count 
+WHERE tube_count.de_inch = ? AND tube_count.pitch_inch = ? AND tube_count.layout = ? ORDER BY abs(tube_count."Ds" - ?)
+INFO:sqlalchemy.engine.Engine:[generated in 0.00117s] (0.75, 1.0, 'TRIANGULAR', 0.84)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  Nt: 830
+DEBUG:root:  de: 0.019049999999999997
+DEBUG:root:  pitch: 0.0254
+DEBUG:root:  Dotl: 0.822325
+DEBUG:root:  L: 7.32
+DEBUG:root:  A_proj: 363.60849921316026
+DEBUG:root:  Ud_min: 243.0024752641006
+DEBUG:root:  di: 0.017271999999999996
+DEBUG:root:  tube_thickness: 0.000889
+DEBUG:root:  fluido_casco: quente
+DEBUG:root:  hot_fluid_tube: False
+DEBUG:root:  area_one_tube: 0.00023430153833468284
+DEBUG:root:  area_tube: 0.09723513840889338
+DEBUG:root:  Gt: 616.5466618445912
+DEBUG:root:  Re_t: 15212.84849054254
+DEBUG:root:  tube_velocity: 0.6183817652349222
+DEBUG:root:  hi: 2314.6727618491936
+DEBUG:root:  hio: 2098.6366374099352
+DEBUG:root:  Nt: 830
+DEBUG:root:  shell_thickness: 0.0254
+DEBUG:root:  Dc: 0.8907999999999999
+DEBUG:root:  classe: 150
+DEBUG:root:  lc: 0.126
+DEBUG:root:  ls: 0.168
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT pitch.id, pitch.de, pitch.de_inch, pitch.pitch, pitch.pitch_inch, pitch.layout, pitch.pp, pitch.pp_inch, pitch.pn, pitch.pn_inch 
+FROM pitch 
+WHERE pitch.pitch = ? AND pitch.layout = ? AND pitch.de = ?
+INFO:sqlalchemy.engine.Engine:[generated in 0.00117s] (0.0254, 'TRIANGULAR', 0.019049999999999997)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  pp: 0.0219964
+DEBUG:root:  pn: 0.0127
+DEBUG:root:  Sm: 0.03670695000000001
+DEBUG:root:  Res: 19300.7981370471
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT constants_for_ab.id, constants_for_ab.layout, constants_for_ab."Re_max", constants_for_ab."Re_min", constants_for_ab.a1, constants_for_ab.a2, constants_for_ab.a3, constants_for_ab.a4, constants_for_ab.b1, constants_for_ab.b2, constants_for_ab.b3, constants_for_ab.b4 
+FROM constants_for_ab 
+WHERE constants_for_ab.layout = ? AND constants_for_ab."Re_max" >= ? AND constants_for_ab."Re_min" < ?
+INFO:sqlalchemy.engine.Engine:[generated in 0.00101s] ('TRIANGULAR', 19300.7981370471, 19300.7981370471)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  ji: 0.006976496595136981
+DEBUG:root:  h_ideal: 1615.95200227747
+DEBUG:root:  Fc: 0.825417046000587
+DEBUG:root:  jc: 1.1211395628816407
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT delta_sb.id, delta_sb."Dn_max", delta_sb."Dn_min", delta_sb."Dn_max_inch", delta_sb."Dn_min_inch", delta_sb."Delta_sb", delta_sb."Delta_sb_inch" 
+FROM delta_sb 
+WHERE delta_sb."Dn_max" > ? AND delta_sb."Dn_min" <= ?
+INFO:sqlalchemy.engine.Engine:[generated in 0.00117s] (0.84, 0.84)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  delta_sb: 0.004444999999999999
+DEBUG:root:  Ssb: 0.004380109248916006
+DEBUG:root:  delta_tb: 0.0007938
+DEBUG:root:  Stb: 0.017994349442684486
+DEBUG:root:  jl: 0.5228837243774719
+DEBUG:root:  Fbp: 0.08089476243599643
+DEBUG:root:  Sbp: 0.0029693999999999996
+DEBUG:root:  Nc: 26.0
+DEBUG:root:  Nss: 5.0
+DEBUG:root:  jb: 0.9727954519148586
+DEBUG:root:  jr: 1
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT nozzle_diameter.id, nozzle_diameter."Dc_max", nozzle_diameter."Dc_max_inch", nozzle_diameter."Dc_min", nozzle_diameter."Dc_min_inch", nozzle_diameter.d_nozzle, nozzle_diameter.d_nozzle_inch 
+FROM nozzle_diameter 
+WHERE nozzle_diameter."Dc_min" < ? AND nozzle_diameter."Dc_max" >= ?
+INFO:sqlalchemy.engine.Engine:[generated in 0.00237s] (0.8907999999999999, 0.8907999999999999)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT li_lo.id, li_lo.pressure_class, li_lo.pressure_class_psi, li_lo."Dc", li_lo."Dc_inch", li_lo.li, li_lo.li_inch, li_lo.lo, li_lo.lo_inch 
+FROM li_lo 
+WHERE li_lo.pressure_class_psi = ? ORDER BY abs(li_lo."Dc" - ?)
+INFO:sqlalchemy.engine.Engine:[generated in 0.00088s] (150, 0.8907999999999999)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  Nb: 39.0
+DEBUG:root:  d_bocal: 0.2032
+DEBUG:root:  li: 0.1905
+DEBUG:root:  lo: 0.3175
+DEBUG:root:  lsi: 0.3937
+DEBUG:root:  lso: 0.5206999999999999
+DEBUG:root:  lsi_: 2.343452380952381
+DEBUG:root:  lso_: 3.0994047619047613
+DEBUG:root:  js: 0.9432637880539747
+DEBUG:root:  hs: 869.256511969291
+DEBUG:root:  tw: 317.9705374311195
+DEBUG:root:  Uc: 614.6628168562903
+DEBUG:root:  Rd_verd: 0.0005283304772448098
+DEBUG:root:  Rd_calc: 0.0024882761816069484
+DEBUG:root:  A_nec: 190.43207659609823
+DEBUG:root:  Ea: 90.93868307930339
+DEBUG:root:  Ud: 463.9857261193836
+DEBUG:root:  delta_Pr: 1525.0448524046276
+DEBUG:root:  delta_Pt: 4537.212404265326
+DEBUG:root:  delta_PT: 6062.257256669954
+INFO:sqlalchemy.engine.Engine:BEGIN (implicit)
+INFO:sqlalchemy.engine.Engine:SELECT constants_for_ab.id, constants_for_ab.layout, constants_for_ab."Re_max", constants_for_ab."Re_min", constants_for_ab.a1, constants_for_ab.a2, constants_for_ab.a3, constants_for_ab.a4, constants_for_ab.b1, constants_for_ab.b2, constants_for_ab.b3, constants_for_ab.b4 
+FROM constants_for_ab 
+WHERE constants_for_ab.layout = ? AND constants_for_ab."Re_min" < ? AND constants_for_ab."Re_max" >= ?
+INFO:sqlalchemy.engine.Engine:[generated in 0.00110s] ('TRIANGULAR', 19300.7981370471, 19300.7981370471)
+INFO:sqlalchemy.engine.Engine:ROLLBACK
+DEBUG:root:  Swg: 0.05212599540883582
+DEBUG:root:  delta_Ps: 36278.15381289763
+DEBUG:root:  delta_Pw: 7227.609351572955
+DEBUG:root:  delta_Pe: 1.0943198806260355
+DEBUG:root:  delta_Pc: 29049.450141444046

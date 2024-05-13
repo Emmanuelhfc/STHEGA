@@ -9,6 +9,7 @@ import json
 from dataBase.models import*
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy import func
 import pint
 
 
@@ -22,10 +23,10 @@ POL2M = 0.0254
 class CascoTubo:
     def __init__(self, *args, **kwargs):
 
-        self.T1 = kwargs["T1"] + 273.15
-        self.T2 = kwargs["T2"] + 273.15
-        self.t1 = kwargs["t1"] + 273.15
-        self.t2 = kwargs["t2"] + 273.15
+        self.T1 = kwargs["T1"] 
+        self.T2 = kwargs["T2"] 
+        self.t1 = kwargs["t1"] 
+        self.t2 = kwargs["t2"] 
         self.wf = kwargs["wf"]
         self.wq = kwargs["wq"]
         self.cp_quente = kwargs["cp_quente"]
@@ -144,7 +145,7 @@ class CascoTubo:
             TubeCount.pitch_inch == pitch_inch,
             TubeCount.layout == layout,
         ).order_by(
-            TubeCount.Ds - Ds
+           func.abs(TubeCount.Ds - Ds)
         )
 
         
@@ -323,7 +324,7 @@ class CascoTubo:
 
         espacamento_max = 74 * self.de ** 0.75
 
-        if grupo_de_material ==2:
+        if grupo_de_material == 2:
             espacamento_max =espacamento_max * 0.88
 
         limites_ls = [espacamento_min, espacamento_max] 
@@ -495,7 +496,7 @@ class CascoTubo:
             stmt = select(li_lo).where(
                 li_lo.pressure_class_psi == classe_psi,
             ).order_by(
-                li_lo.Dc - Dc
+                func.abs(li_lo.Dc - Dc)
             )
 
             with Session(engine()) as session:
