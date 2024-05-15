@@ -12,15 +12,10 @@ class Mutacao:
         Entrada:
             pmut - probabilidade de ocorrer uma mutação.
         """
-        self.pmut = pmut
+        self.pmut = pmut   
         self._populacao = None
         self.npop = None
         self.ngen = None
-
-    def selecao(self):
-        nmut = array([i for i in range(self.npop) if random() < self.pmut])
-        return nmut
-
 
     def _set_populacao(self, populacao):
         self._populacao = populacao

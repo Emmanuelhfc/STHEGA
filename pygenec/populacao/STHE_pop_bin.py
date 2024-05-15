@@ -1,6 +1,7 @@
 from numpy.random import randint, choice
 from numpy import argsort, unique, array, concatenate
-from populacao import Populacao
+from pygenec.populacao.populacao import Populacao
+
 
 
 class PopSTHEBin(Populacao):
@@ -40,7 +41,18 @@ class PopSTHEBin(Populacao):
             index = [i, i+1]
             self.dict_index_caracterisc[value] = index
             i += 1
-        print(self.dict_index_caracterisc)
+
+
+        list_parans_cromo = []
+        for param in self.dict_index_caracterisc:
+            start, end = self.dict_index_caracterisc[param]
+            list_ = [param for i in range(start, end)]
+            list_parans_cromo.extend(list_)
+        
+        self.list_parans_cromo = list_parans_cromo
+        print(list_parans_cromo)
+
+
         genes_totais = size_genes_bins + len(self.dict_categorical_values)
 
         super().__init__(avaliacao, genes_totais, pop_size)
@@ -62,20 +74,29 @@ class PopSTHEBin(Populacao):
         self.populacao = population
 
 if __name__ == '__main__':
-    def avalicao():
-        return
+    ...
+    # def avalicao():
+    #     return
 
 
-    dic_categorical_values ={
-        'param_1': ['banana', 'peira', 'maça', 'abacaxi'],
-        'param_2': ['peixe', 'bife', 'camarão']
-    }
+    # dic_categorical_values ={
+    #     'param_1': ['banana', 'peira', 'maça', 'abacaxi'],
+    #     'param_2': ['peixe', 'bife', 'camarão']
+    # }
 
-    dict_index_carac = {
-        'param3': [0, 5],
-        'param4': [5, 10]
-    }
+    # dict_index_carac = {
+    #     'param3': [0, 5],
+    #     'param4': [5, 10]
+    # }
 
+    # size_gen_bins = 10
+    # a = PopSTHEBin(avalicao, size_gen_bins, 20,dic_categorical_values,dict_index_carac)
+    # a.gerar_populacao()
 
-    a = PopSTHEBin(avalicao, 10, 20,dic_categorical_values,dict_index_carac)
-    a.gerar_populacao()
+    # list_params_cromo = a.list_parans_cromo
+    # dict_categorical_values = a.dict_categorical_values
+
+    # m = MutacaoHibridaBin(0.05, size_gen_bins, list_params_cromo, dict_categorical_values)
+    # m.populacao = a.populacao
+    # m.mutacao()
+    # print(m.populacao)
