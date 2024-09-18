@@ -1,5 +1,7 @@
 *.pyc
 /pycache
 .venv
+.pyc
+
 
 
