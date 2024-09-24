@@ -1,4 +1,31 @@
 services:
+  postgresContainer:
+    image: postgres:13
+    container_name: heatExGA-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my-shared-network
+
+  pgadminContainer:
+    image: dpage/pgadmin4
+    container_name: pgadmin-heatExGa
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+        - ./pgadmin:/root/.pgadmin
+    depends_on:
+      - postgresContainer
+
   heatexga-api:
     container_name: heatexga-api
     build:
@@ -16,6 +43,11 @@ services:
     
     networks:
       - my-shared-network
+    
+    depends_on:
+      - postgresContainer
+  
+
 
 networks:
   my-shared-network:
