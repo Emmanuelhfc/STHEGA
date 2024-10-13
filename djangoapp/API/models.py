@@ -4,16 +4,21 @@ from django.db import models
 class Layout(models.Model):
     name = models.CharField()
     angle = models.FloatField()
-    description = models.FloatField()
+    description = models.CharField()
 
     def __str__(self):
         return f"{self.name}-{self.angle}"
+class TubeDiameter(models.Model):
+    diameter_meters = models.FloatField()
+    diameter_inch = models.FloatField()
+    description = models.CharField(null=True)
+
+    def __str__(self) -> str:
+        return f'{self.description}'
     
-
-
 class ConstantsB(models.Model):
-    reynolds_min = models.FloatField(unique=True)
-    reynolds_max = models.FloatField(unique=True)
+    reynolds_min = models.FloatField()
+    reynolds_max = models.FloatField()
     layout = models.ForeignKey(Layout, on_delete=models.CASCADE)
     b1 = models.FloatField()
     b2 = models.FloatField()
@@ -21,8 +26,8 @@ class ConstantsB(models.Model):
     b4 = models.FloatField()
 
 class ConstantsA(models.Model):
-    reynolds_min = models.FloatField(unique=True)
-    reynolds_max = models.FloatField(unique=True)
+    reynolds_min = models.FloatField()
+    reynolds_max = models.FloatField()
     layout = models.ForeignKey(Layout, on_delete=models.CASCADE)
     a1 = models.FloatField()
     a2 = models.FloatField()
@@ -40,9 +45,7 @@ class LiLo(models.Model):
 
 
 
-class TubeDiameter(models.Model):
-    diameter_meters = models.FloatField()
-    diameter_inch = models.FloatField()
+
 
 class Pitch(models.Model):
     de = models.ForeignKey(TubeDiameter, on_delete=models.CASCADE)
