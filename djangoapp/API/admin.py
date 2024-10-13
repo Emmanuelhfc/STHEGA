@@ -36,10 +36,21 @@ class ConstantsBAdmin(admin.ModelAdmin):
 class LiLoAdmin(admin.ModelAdmin):
     list_per_page = 60
     list_max_show_all = 100
-
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.fields]
-    
     def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
         return [field.name for field in self.model._meta.fields]
 
+@admin.register(TubeCount)
+class TubeCountAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+        return [field.name for field in self.model._meta.fields]
+    
+@admin.register(Pitch)
+class PitchAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+        return [field.name for field in self.model._meta.fields]
