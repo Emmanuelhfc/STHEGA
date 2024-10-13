@@ -42,11 +42,6 @@ class LiLo(models.Model):
     li_inch = models.FloatField()
     lo_inch = models.FloatField()
 
-
-
-
-
-
 class Pitch(models.Model):
     de = models.ForeignKey(TubeDiameter, on_delete=models.CASCADE)
     layout = models.ForeignKey(Layout, on_delete=models.CASCADE)

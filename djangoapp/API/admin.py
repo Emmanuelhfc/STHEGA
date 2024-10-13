@@ -1,4 +1,6 @@
+from collections.abc import Sequence
 from django.contrib import admin
+from django.http import HttpRequest
 from API.models import*
 
 # Register your models here.
@@ -29,4 +31,15 @@ class ConstantsBAdmin(admin.ModelAdmin):
     list_per_page = 60
     list_max_show_all = 100
     list_display_links = "id", "reynolds_min","reynolds_max","layout","a1","a2","a3","a4",
+
+@admin.register(LiLo)
+class LiLoAdmin(admin.ModelAdmin):
+    list_per_page = 60
+    list_max_show_all = 100
+
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+    
+    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+        return [field.name for field in self.model._meta.fields]
 
