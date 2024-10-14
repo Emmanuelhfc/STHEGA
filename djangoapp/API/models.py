@@ -51,6 +51,10 @@ class Pitch(models.Model):
     pp_inch = models.FloatField()
     pn_meters = models.FloatField()
     pn_inch = models.FloatField()
+    description = models.CharField(null=True)
+
+    def __str__(self) -> str:
+        return f'{self.description}'
     
 class TubeCount(models.Model):
     Ds_meters = models.FloatField()

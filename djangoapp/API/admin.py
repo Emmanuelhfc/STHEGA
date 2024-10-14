@@ -56,3 +56,10 @@ class PitchAdmin(admin.ModelAdmin):
         return [field.name for field in self.model._meta.fields]
     def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
         return [field.name for field in self.model._meta.fields]
+
+@admin.register(DeltaSB)
+class DeltaSBAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+        return [field.name for field in self.model._meta.fields]
