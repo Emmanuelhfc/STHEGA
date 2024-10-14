@@ -43,6 +43,8 @@ class LiLoAdmin(admin.ModelAdmin):
 
 @admin.register(TubeCount)
 class TubeCountAdmin(admin.ModelAdmin):
+    list_per_page = 300
+    list_max_show_all = 600
     def get_list_display(self, request):
         return [field.name for field in self.model._meta.fields]
     def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
