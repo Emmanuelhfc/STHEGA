@@ -11,6 +11,9 @@ class Layout(models.Model):
 class TubeDiameter(models.Model):
     diameter_meters = models.FloatField()
     diameter_inch = models.FloatField()
+    intern_diameter_meters = models.FloatField(null=True)
+    intern_diameter_inch = models.FloatField(null=True)
+    tube_thickness = models.FloatField(null=True)
     description = models.CharField(null=True)
 
     def __str__(self) -> str:
@@ -88,6 +91,13 @@ class NozzleDiameter(models.Model):
     nozzle_diameter_inch = models.FloatField()
 
 class InputsShellAndTube(models.Model):
+    class TubePasses(models.IntegerChoices):
+        ONE = 1, "Uma Passagem nos tubos"
+        TWO = 2, "Duas Passagem nos tubos"
+        FOUR = 4, "Quatro Passagem nos tubos"
+        SIX = 6, "Seis Passagem nos tubos"
+        EIGHT = 8, "Oito Passagem nos tubos"
+
     T1 = models.FloatField()
     T2 = models.FloatField()
     t1 = models.FloatField()
@@ -107,3 +117,5 @@ class InputsShellAndTube(models.Model):
     tipo_f = models.CharField()
     Rd_f = models.FloatField()
     Rd_q = models.FloatField()
+    n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
+    de = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)

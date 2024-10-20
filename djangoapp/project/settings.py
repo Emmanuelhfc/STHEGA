@@ -182,7 +182,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
         },
-        'api': {
+        'API': {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
