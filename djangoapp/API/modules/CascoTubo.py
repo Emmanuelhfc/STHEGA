@@ -1,10 +1,8 @@
 
 import math
-import sqlite3
 from dataBase.constants import*
 from dataBase.comandos_sql import*
 import logging
-import os
 import json
 from dataBase.models import*
 from sqlalchemy.orm import Session
@@ -138,8 +136,6 @@ class CascoTubo:
         self.Ds = Ds
         self.layout = layout
 
-
-
         stmt = select(TubeCount).where(
             TubeCount.de_inch == de_inch,
             TubeCount.pitch_inch == pitch_inch,
@@ -207,7 +203,7 @@ class CascoTubo:
         """
 
         
-        self.di = self.de - 2*espe
+        self.di = self.de - 2 * espe
         self.tube_thickness = espe
         
 
