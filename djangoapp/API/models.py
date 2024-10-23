@@ -2,9 +2,9 @@ from django.db import models
 
 
 class Layout(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=256)
     angle = models.FloatField()
-    description = models.CharField()
+    description = models.CharField(max_length=256)
 
     def __str__(self):
         return f"{self.name}-{self.angle}"
@@ -14,7 +14,7 @@ class TubeDiameter(models.Model):
     intern_diameter_meters = models.FloatField(null=True)
     intern_diameter_inch = models.FloatField(null=True)
     tube_thickness = models.FloatField(null=True)
-    description = models.CharField(null=True)
+    description = models.CharField(max_length=256,null=True)
 
     def __str__(self) -> str:
         return f'{self.description}'
@@ -54,7 +54,7 @@ class Pitch(models.Model):
     pp_inch = models.FloatField()
     pn_meters = models.FloatField()
     pn_inch = models.FloatField()
-    description = models.CharField(null=True)
+    description = models.CharField(max_length=256,null=True)
 
     def __str__(self) -> str:
         return f'{self.description}'
@@ -98,10 +98,10 @@ class InputsShellAndTube(models.Model):
         SIX = 6, "Seis Passagem nos tubos"
         EIGHT = 8, "Oito Passagem nos tubos"
 
-    T1 = models.FloatField()
-    T2 = models.FloatField()
-    t1 = models.FloatField()
-    t2 = models.FloatField()
+    T1_hot = models.FloatField()
+    T2_hot = models.FloatField()
+    t1_cold = models.FloatField()
+    t2_cold = models.FloatField()
     wf = models.FloatField()
     wq = models.FloatField()
     cp_quente = models.FloatField()
@@ -113,8 +113,8 @@ class InputsShellAndTube(models.Model):
     mi_q = models.FloatField()
     k_q = models.FloatField()
     k_f = models.FloatField()
-    tipo_q = models.CharField()
-    tipo_f = models.CharField()
+    tipo_q = models.CharField(max_length=256)
+    tipo_f = models.CharField(max_length=256)
     Rd_f = models.FloatField()
     Rd_q = models.FloatField()
     n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
