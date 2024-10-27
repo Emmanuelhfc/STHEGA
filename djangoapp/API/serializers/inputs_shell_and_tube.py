@@ -7,5 +7,7 @@ class InputsShellAndTubeSerializer(serializers.ModelSerializer):
     class Meta:
         model = InputsShellAndTube
         fields = '__all__'
+
+    
     
     

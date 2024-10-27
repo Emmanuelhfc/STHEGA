@@ -1,7 +1,5 @@
 
 import math
-from dataBase.constants import*
-from dataBase.comandos_sql import*
 import logging
 import json
 from API.models import *
@@ -17,37 +15,37 @@ POL2M = 0.0254
 
 logger = logging.getLogger('API')
 class CascoTubo:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, input: InputsShellAndTube, *args, **kwargs, ):
 
-
-        self.T1 = kwargs["T1"] 
-        self.T2 = kwargs["T2"] 
-        self.t1 = kwargs["t1"] 
-        self.t2 = kwargs["t2"] 
-        self.wf = kwargs["wf"]
-        self.wq = kwargs["wq"]
-        self.cp_quente = kwargs["cp_quente"]
-        self.cp_frio = kwargs["cp_frio"]
-        self.num_casco = kwargs["casco_passagens"]
-        self.rho_q = kwargs["rho_q"]
-        self.rho_f = kwargs["rho_f"]
-        self.mi_f = kwargs["mi_f"]
-        self.mi_q = kwargs["mi_q"]
-        self.k_q = kwargs["k_q"]
-        self.k_f = kwargs["k_f"]
-        self.tipo_q = kwargs["tipo_q"]
-        self.tipo_f = kwargs["tipo_f"]
-        self.Rd_f = kwargs["Rd_f"]
-        self.Rd_q = kwargs["Rd_q"]
-        self.de:TubeDiameter = kwargs["de"]
-        self.pitch:Pitch = kwargs["pitch"]
+        self.T1 = input.T1_hot
+        self.T2 = input.T2_hot 
+        self.t1 = input.t1_cold 
+        self.t2 = input.t2_cold
+        self.wf = input.wf
+        self.wq = input.wq
+        self.cp_quente = input.cp_quente
+        self.cp_frio = input.cp_frio
+        self.num_casco = input.casco_passagens
+        self.rho_q = input.rho_q
+        self.rho_f = input.rho_f
+        self.mi_f = input.mi_f
+        self.mi_q = input.mi_q
+        self.k_q = input.k_q
+        self.k_f = input.k_f
+        self.tipo_q = input.tipo_q
+        self.tipo_f = input.tipo_f
+        self.Rd_f = input.Rd_f
+        self.Rd_q = input.Rd_q
+        self.de:TubeDiameter = input.de
+        self.pitch:Pitch = input.pitch
   
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
     
-    def __setattr__(self, __name: str, __value) -> None:
-        logging.debug(f"  {__name}: {__value}")
-        super().__setattr__(__name, __value)
+    # def __setattr__(self, __name: str, __value) -> None:
+    #     logging.debug(f"  {__name}: {__value}")
+    #     super().__setattr__(__name, __value)
+
 
     def _balaco_de_energia(self):
         

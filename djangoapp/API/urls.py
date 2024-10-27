@@ -31,12 +31,18 @@ tube_diameter_detail = TubeDiameterViewSet.as_view({
     'delete': 'destroy'
 })
 
+inputs_shell_and_tube_list = InputsShellAndTubeViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
 
 
 app_name = 'API'
 urlpatterns = [
     # Shell And Tube Inputs
-    path('shell_and_tube/avaliation/', InputsShellAndTubeViewSet.as_view({'post':'shell_and_tube_avaliation'}), name='shell_and_tube_avaliation'),
+    path('shell_and_tube/avaliation/<int:pk>/', InputsShellAndTubeViewSet.as_view({'get':'shell_and_tube_avaliation'}), name='shell_and_tube_avaliation'),
+    path('shell_and_tube/', inputs_shell_and_tube_list, name='inputs_shell_and_tube_list'),
 
     # Tube Diameter
     path('tube_diameter/', tube_diameter_list, name='tube_diameter_list'),

@@ -98,25 +98,38 @@ class InputsShellAndTube(models.Model):
         SIX = 6, "Seis Passagem nos tubos"
         EIGHT = 8, "Oito Passagem nos tubos"
 
-    T1_hot = models.FloatField()
-    T2_hot = models.FloatField()
-    t1_cold = models.FloatField()
-    t2_cold = models.FloatField()
-    wf = models.FloatField()
-    wq = models.FloatField()
-    cp_quente = models.FloatField()
-    cp_frio = models.FloatField()
-    casco_passagens = models.IntegerField()
-    rho_q = models.FloatField()
-    rho_f = models.FloatField()
-    mi_f = models.FloatField()
-    mi_q = models.FloatField()
-    k_q = models.FloatField()
-    k_f = models.FloatField()
+    T1_hot = models.FloatField(default=219)
+    T2_hot = models.FloatField(default=100.4)
+
+    t1_cold = models.FloatField(default=86)
+    t2_cold = models.FloatField(default=100.4)
+
+    wq = models.FloatField(default=110687)
+    wf = models.FloatField(default=59.95)
+    
+    cp_quente = models.FloatField(default=0.52)
+    cp_frio = models.FloatField(default=0.998)
+
+    casco_passagens = models.IntegerField(default=1)
+
+    rho_q = models.FloatField(default=46.8537)
+    rho_f = models.FloatField(default=62.2427)
+
+    mi_q = models.FloatField(default=0.375)
+    mi_f = models.FloatField(default=0.7)
+
+    k_q = models.FloatField(default=0.0699)
+    k_f = models.FloatField(default=0.336)
+
+    
+
+    Rd_q = models.FloatField(default=0.001)
+    Rd_f = models.FloatField(default=0.002)
+    
+
     tipo_q = models.CharField(max_length=256)
     tipo_f = models.CharField(max_length=256)
-    Rd_f = models.FloatField()
-    Rd_q = models.FloatField()
+
     n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
     de = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)
-    pith = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
+    pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
