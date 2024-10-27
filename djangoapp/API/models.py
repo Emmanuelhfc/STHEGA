@@ -119,3 +119,4 @@ class InputsShellAndTube(models.Model):
     Rd_q = models.FloatField()
     n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
     de = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)
+    pith = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
