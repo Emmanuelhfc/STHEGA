@@ -19,7 +19,26 @@ from django.urls import path
 from API.views import *
 
 
+tube_diameter_list = TubeDiameterViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+tube_diameter_detail = TubeDiameterViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+
+
 app_name = 'API'
 urlpatterns = [
+    # Shell And Tube Inputs
     path('shell_and_tube/avaliation/', InputsShellAndTubeViewSet.as_view({'post':'shell_and_tube_avaliation'}), name='shell_and_tube_avaliation'),
+
+    # Tube Diameter
+    path('tube_diameter/', tube_diameter_list, name='tube_diameter_list'),
+    path('tube_diameter/<int:pk>/', tube_diameter_detail, name='tube_diameter_detail'),
 ]
