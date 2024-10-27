@@ -47,4 +47,7 @@ urlpatterns = [
     # Tube Diameter
     path('tube_diameter/', tube_diameter_list, name='tube_diameter_list'),
     path('tube_diameter/<int:pk>/', tube_diameter_detail, name='tube_diameter_detail'),
+
+    # Unit Conversion
+    path('unit_conversion/', UnitConversionViewSet.as_view({'post':'conversion'}), name='conversion'),
 ]
