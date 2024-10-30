@@ -98,6 +98,10 @@ class InputsShellAndTube(models.Model):
         SIX = 6, "Seis Passagem nos tubos"
         EIGHT = 8, "Oito Passagem nos tubos"
 
+    def get_ds_inch_choices():
+        choices = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
+        return choices
+    
     T1_hot = models.FloatField()
     T2_hot = models.FloatField()
 
@@ -130,5 +134,7 @@ class InputsShellAndTube(models.Model):
     n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
     de = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)
     pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
+
+    Ds_inch = models.FloatField(null=True, choices=get_ds_inch_choices)
 
     reference = models.TextField(default="")

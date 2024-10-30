@@ -14,7 +14,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
     serializer_class = InputsShellAndTubeSerializer
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
 
-
+    @extend_schema(tags=['SHELL AND TUBE CALCULATION'])
     def shell_and_tube_avaliation(self, request, pk):
         input = InputsShellAndTube.objects.get(id=pk)
 

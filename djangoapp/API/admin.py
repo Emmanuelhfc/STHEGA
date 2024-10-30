@@ -1,5 +1,8 @@
 from collections.abc import Sequence
+from typing import Any
 from django.contrib import admin
+from django.db.models.fields import Field
+from django.forms.fields import TypedChoiceField
 from django.http import HttpRequest
 from API.models import*
 
@@ -77,3 +80,8 @@ class InputsShellAndTubeAdmin(admin.ModelAdmin):
         return [field.name for field in self.model._meta.fields]
     def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
         return [field.name for field in self.model._meta.fields]
+
+    def formfield_for_choice_field(self, db_field, request: HttpRequest | None, **kwargs: Any) -> TypedChoiceField:
+        if db_field.name == "Ds_inch":
+            kwargs['choices'] = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
