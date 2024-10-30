@@ -38,6 +38,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
 
         data['di'] = data['di'].__dict__
         data['di'].pop('_state')
+        
         return Response(data)
         
         
