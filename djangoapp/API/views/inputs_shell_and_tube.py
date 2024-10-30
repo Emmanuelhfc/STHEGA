@@ -18,8 +18,9 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
     def shell_and_tube_avaliation(self, request, pk):
         input = InputsShellAndTube.objects.get(id=pk)
 
-
         shell_and_tube = CascoTubo(input)
+        shell_and_tube.filtro_tubos()
+
         
         data = shell_and_tube.__dict__
 
@@ -28,6 +29,9 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
 
         data['pitch'] = data['pitch'].__dict__
         data['pitch'].pop('_state')
+
+        data['layout'] = data['layout'].__dict__
+        data['layout'].pop('_state')
 
         return Response(data)
         

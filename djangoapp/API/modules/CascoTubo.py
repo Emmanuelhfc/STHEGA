@@ -38,7 +38,9 @@ class CascoTubo:
         self.Rd_q = input.Rd_q
         self.de:TubeDiameter = input.de
         self.pitch:Pitch = input.pitch
+        self.layout:Layout = input.pitch.layout
         self.n = input.n
+        self.Ds_inch = input.Ds_inch
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -128,15 +130,19 @@ class CascoTubo:
         self.deltaT = self.mldt*self.F
         
 
-    def filtro_tubos(self, Ds_inch: float, de: TubeDiameter, layout: Layout, pitch: Pitch) -> int:
+    def filtro_tubos(self) -> int:
+        logger.debug(f"""  
+        de={self.de},
+        pitch={self.pitch},
+        layout={self.layout},
+        Ds_inch = {self.Ds_inch}
+    """)
 
-        self.layout = layout
-        
         tube_count = TubeCount.objects.filter(
             de=self.de,
             pitch=self.pitch,
-            layout=layout,
-            Ds_inch = Ds_inch
+            layout=self.layout,
+            Ds_inch = self.Ds_inch
         ).first()
         
         self.Ds = tube_count.Ds_meters
