@@ -85,3 +85,10 @@ class InputsShellAndTubeAdmin(admin.ModelAdmin):
         if db_field.name == "Ds_inch":
             kwargs['choices'] = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
         return super().formfield_for_choice_field(db_field, request, **kwargs)
+    
+@admin.register(TubeInternDiameter)
+class TubeInternDiameterAdmin(admin.ModelAdmin):
+    def get_list_display(self, request):
+        return [field.name for field in self.model._meta.fields]
+    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+        return [field.name for field in self.model._meta.fields]

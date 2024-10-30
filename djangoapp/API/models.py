@@ -11,14 +11,22 @@ class Layout(models.Model):
 class TubeDiameter(models.Model):
     diameter_meters = models.FloatField()
     diameter_inch = models.FloatField()
-    intern_diameter_meters = models.FloatField(null=True)
-    intern_diameter_inch = models.FloatField(null=True)
-    tube_thickness = models.FloatField(null=True)
+
     description = models.CharField(max_length=256,null=True)
 
     def __str__(self) -> str:
         return f'{self.description}'
-    
+class TubeInternDiameter(models.Model):
+    intern_diameter_meters = models.FloatField(null=True)
+    intern_diameter_inch = models.FloatField(null=True)
+    tube_diameter = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)
+    standard = models.CharField(max_length=100)
+    description = models.CharField(max_length=256,null=True)
+    tube_thickness_inch = models.FloatField(null=True)
+
+    def __str__(self) -> str:
+        return f'{self.tube_diameter}-{self.standard}'
+
 class ConstantsB(models.Model):
     reynolds_min = models.FloatField()
     reynolds_max = models.FloatField()
@@ -132,7 +140,7 @@ class InputsShellAndTube(models.Model):
     tipo_f = models.CharField(max_length=256)
 
     n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
-    de = models.ForeignKey(TubeDiameter, null=True, on_delete=models.CASCADE)
+    di = models.ForeignKey(TubeInternDiameter, null=True, on_delete=models.CASCADE)
     pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
 
     Ds_inch = models.FloatField(null=True, choices=get_ds_inch_choices)

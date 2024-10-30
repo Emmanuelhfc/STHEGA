@@ -36,7 +36,8 @@ class CascoTubo:
         self.tipo_f = input.tipo_f
         self.Rd_f = input.Rd_f
         self.Rd_q = input.Rd_q
-        self.de:TubeDiameter = input.de
+        self.di:TubeInternDiameter = input.di
+        self.de:TubeDiameter = input.di.tube_diameter
         self.pitch:Pitch = input.pitch
         self.layout:Layout = input.pitch.layout
         self.n = input.n
@@ -201,8 +202,8 @@ class CascoTubo:
         n = self.n
         Nt = self.Nt
         L = self.L
-        de = self.de
-        di = self.de.intern_diameter_meters
+        de = self.de.diameter_meters
+        di = self.di.intern_diameter_meters
         
         # Fluido quente no lado do tubo
         if self.shell_fluid == "cold":
@@ -704,7 +705,7 @@ class CascoTubo:
     #             - phi_t: termo (mi/miw) ^ 0.14 para lado do tubo
     #     """
     #     Re_t = self.Re_t
-    #     di = self.de.intern_diameter_meters
+    #     di = self.di.intern_diameter_meters
     #     G_t = self.Gt
     #     L = self.L
     #     n = self.n
