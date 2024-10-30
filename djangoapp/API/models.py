@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(1)]
 
 
 class Layout(models.Model):
@@ -148,5 +151,7 @@ class InputsShellAndTube(models.Model):
     L = models.FloatField(null=True)
 
     shell_fluid = models.CharField(choices=[("hot", "hot"), ("cold", "cold")], null=True, max_length=4)
+
+    ls_percent = models.DecimalField(max_digits=4, decimal_places=3, validators=PERCENTAGE_VALIDATOR, null=True, help_text="Espaçamento entre defletores em funçao do comprimento (L) do trocador (%)")
 
     reference = models.TextField(default="")

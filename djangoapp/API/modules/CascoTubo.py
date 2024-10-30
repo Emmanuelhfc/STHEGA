@@ -44,6 +44,7 @@ class CascoTubo:
         self.Ds_inch = input.Ds_inch
         self.L = input.L
         self.shell_fluid = input.shell_fluid
+        self.ls_percent = input.ls
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -280,6 +281,9 @@ class CascoTubo:
         self.hi = hi
         self.hio = hio
 
+    def espacamento_defletor(self):
+        ...
+
 
     def caract_chicana(self, grupo_de_material:int) -> list:
         """Defini os limites máximos e mínimos para o espaçamento das chicanas (ls) e o corte (lc)
@@ -295,7 +299,7 @@ class CascoTubo:
         if espacamento_min < (2*POL2M):
             espacamento_min = 2*POL2M
 
-        espacamento_max = 74 * self.de.diameter_meters ** 0.75
+        espacamento_max = 74 * (self.de.diameter_inch ** 0.75)
 
         if grupo_de_material == 2:
             espacamento_max =espacamento_max * 0.88
