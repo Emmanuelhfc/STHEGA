@@ -136,5 +136,9 @@ class InputsShellAndTube(models.Model):
     pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
 
     Ds_inch = models.FloatField(null=True, choices=get_ds_inch_choices)
+    
+    L = models.FloatField(null=True)
+
+    shell_fluid = models.CharField(choices=[("hot", "hot"), ("cold", "cold")], null=True, max_length=4)
 
     reference = models.TextField(default="")

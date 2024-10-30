@@ -41,6 +41,8 @@ class CascoTubo:
         self.layout:Layout = input.pitch.layout
         self.n = input.n
         self.Ds_inch = input.Ds_inch
+        self.L = input.L
+        self.shell_fluid = input.shell_fluid
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -164,7 +166,7 @@ class CascoTubo:
         
         return self.Nt
 
-    def area_projeto(self, L:float) -> float:
+    def area_projeto(self) -> float:
         """Cálculo da área de projeto
 
         Args: 
@@ -174,9 +176,7 @@ class CascoTubo:
         # TODO -> Confirmar se não deveria multiplicar pelo número de passes
         Nt = self.Nt
         de = self.de.diameter_meters
-        A_proj = Nt * math.pi * de * L  
-
-        self.L = L
+        A_proj = Nt * math.pi * de * self.L  
         self.A_proj = A_proj
 
     def  coef_global_min(self) -> float:
@@ -190,12 +190,8 @@ class CascoTubo:
         self.Ud_min = Ud_min
 
     # Passo 4 -- Lado do Tubo
-    def conveccao_tubo(self, fluido_tubo_quente:bool):
+    def conveccao_tubo(self):
         """Faz o cálculo da convecção no lado do tubo
-
-        Args:
-            fluido_tubo_quente (bool): True para fluido quente no lado do tubo, False para o contrário
-
         """
         
         # TODO -> Rever cálculo de d (diâmetro interno)
@@ -207,8 +203,9 @@ class CascoTubo:
         L = self.L
         de = self.de
         di = self.de.intern_diameter_meters
-
-        if fluido_tubo_quente:
+        
+        # Fluido quente no lado do tubo
+        if self.shell_fluid == "cold":
             w = self.wq
             mi = self.mi_q
             rho = self.rho_q
@@ -217,8 +214,6 @@ class CascoTubo:
             t1_t = self.T2
             cp = self.cp_quente
             k = self.k_q
-
-            self.fluido_casco = "frio"
 
         else:
             w = self.wf
@@ -230,7 +225,6 @@ class CascoTubo:
             cp = self.cp_frio
             k = self.k_f
 
-            self.fluido_casco = "quente"
 
         L_t = L
 
@@ -276,7 +270,7 @@ class CascoTubo:
             self.Nu_t = Nu
         except:
             ...
-        self.hot_fluid_tube = fluido_tubo_quente
+
         self.area_one_tube = at_
         self.area_tube = at
         self.Gt = Gt
@@ -350,12 +344,12 @@ class CascoTubo:
     #     self.lc = lc
     #     self.ls = ls
 
-    #     if self.fluido_casco == "quente":
+    #     if self.shell_fluid == "hot":
     #         k = self.k_q
     #         cp = self.cp_quente
     #         mi = self.mi_q
     #         w = self.wq
-    #     elif self.fluido_casco == "frio":
+    #     else
     #         k = self.k_f
     #         cp = self.cp_frio
     #         mi = self.mi_f
@@ -618,9 +612,9 @@ class CascoTubo:
     #             - fluido_frio:bool Se o fluído frio estiver no interior do tubo - True
     #     """
 
-    #     if self.fluido_casco == "quente":
+    #     if self.shell_fluid == "hot":
     #         fluido_frio = True
-    #     elif self.fluido_casco == "frio":
+    #     elif self.shell_fluid == "cold":
     #         fluido_frio = False
 
     #     hs = self.hs
@@ -646,11 +640,11 @@ class CascoTubo:
     #     # TODO -> arrumar para cálculo das propriedades termodinâmicas
     #     miw = self.propriedades_termodinamicas()
         
-    #     if self.fluido_casco == "quente":
+    #     if self.shell_fluid == "hot":
     #         mi_c = self.mi_q
     #         mi_t = self.mi_f
     #         tipo_tubo = self.tipo_f
-    #     elif self.fluido_casco == "frio":
+    #     elif self.shell_fluid == "cold":
     #         mi_c = self.mi_f
     #         mi_t = self.mi_q
     #         tipo_tubo = self.tipo_q
@@ -716,9 +710,9 @@ class CascoTubo:
     #     n = self.n
     #     v = self.tube_velocity
 
-    #     if self.fluido_casco == "quente":
+    #     if self.shell_fluid == "hot":
     #         rho = self.rho_f
-    #     elif self.fluido_casco == "frio":
+    #     elif self.shell_fluid == "cold":
     #         rho = self.rho_q
 
     #     delta_Pr = (4 * n * rho * v ** 2) / 2       #   Perda de carga de retorno 
@@ -770,11 +764,11 @@ class CascoTubo:
 
 
 
-    #     if self.fluido_casco == "quente":
+    #     if self.shell_fluid == "hot":
     #         mi = self.mi_q
     #         W = self.wq
     #         rho = self.rho_q
-    #     elif self.fluido_casco == "frio":
+    #     elif self.shell_fluid == "cold":
     #         mi = self.mi_f
     #         W = self.wf
     #         rho = self.rho_f

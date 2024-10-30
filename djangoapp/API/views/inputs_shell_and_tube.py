@@ -20,6 +20,9 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
 
         shell_and_tube = CascoTubo(input)
         shell_and_tube.filtro_tubos()
+        shell_and_tube.area_projeto()
+        shell_and_tube.coef_global_min()
+        shell_and_tube.conveccao_tubo()
 
         
         data = shell_and_tube.__dict__
