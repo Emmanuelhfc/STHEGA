@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(1)]
+PERCENTAGE_VALIDATOR = [MinValueValidator(0.0), MaxValueValidator(1.0)]
 
 
 class Layout(models.Model):
@@ -101,6 +101,14 @@ class NozzleDiameter(models.Model):
     nozzle_diameter_meters = models.FloatField()
     nozzle_diameter_inch = models.FloatField()
 
+class TubeMaterial(models.Model):
+    group = models.IntegerField(choices=[(1, "GRUPO 1"), (2, "GRUPO 2")], help_text="De acordo com tabela TEMA - RCB-4.5.2")
+    material = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return f'{self.material}-{self.group}'
+
+
 class InputsShellAndTube(models.Model):
     class TubePasses(models.IntegerChoices):
         ONE = 1, "Uma Passagem nos tubos"
@@ -153,5 +161,7 @@ class InputsShellAndTube(models.Model):
     shell_fluid = models.CharField(choices=[("hot", "hot"), ("cold", "cold")], null=True, max_length=4)
 
     ls_percent = models.DecimalField(max_digits=4, decimal_places=3, validators=PERCENTAGE_VALIDATOR, null=True, help_text="Espaçamento entre defletores em funçao do comprimento (L) do trocador (%)")
+
+    tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE)
 
     reference = models.TextField(default="")

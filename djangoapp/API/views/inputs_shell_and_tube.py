@@ -23,6 +23,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
         shell_and_tube.area_projeto()
         shell_and_tube.coef_global_min()
         shell_and_tube.conveccao_tubo()
+        shell_and_tube.espacamento_defletor()
 
         
         data = shell_and_tube.__dict__
@@ -38,6 +39,9 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
 
         data['di'] = data['di'].__dict__
         data['di'].pop('_state')
+
+        data['tube_material'] = data['tube_material'].__dict__
+        data['tube_material'].pop('_state')
         
         return Response(data)
         

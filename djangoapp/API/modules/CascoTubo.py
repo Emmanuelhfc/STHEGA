@@ -44,7 +44,8 @@ class CascoTubo:
         self.Ds_inch = input.Ds_inch
         self.L = input.L
         self.shell_fluid = input.shell_fluid
-        self.ls_percent = input.ls
+        self.ls_percent = input.ls_percent
+        self.tube_material:TubeMaterial = input.tube_material
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -132,15 +133,6 @@ class CascoTubo:
         calculo_R_S()
         calculo_F()
         self.deltaT = self.mldt*self.F
-        
-
-    def filtro_tubos(self) -> int:
-        logger.debug(f"""  
-        de={self.de},
-        pitch={self.pitch},
-        layout={self.layout},
-        Ds_inch = {self.Ds_inch}
-    """)
 
         tube_count = TubeCount.objects.filter(
             de=self.de,
@@ -282,7 +274,30 @@ class CascoTubo:
         self.hio = hio
 
     def espacamento_defletor(self):
-        ...
+
+        ls = self.L * float(self.ls_percent)
+
+        espacamento_min = 1/5 *self.Ds
+        
+        if espacamento_min < (2*POL2M):
+            espacamento_min = 2*POL2M
+
+        espacamento_max = 74 * (self.de.diameter_inch ** 0.75)
+
+        if self.tube_material.group == 2:
+            espacamento_max = espacamento_max * 0.88
+        
+        espacamento_max = espacamento_max * POL2M
+
+        if ls < espacamento_min:
+            ls = espacamento_min
+
+        elif ls > espacamento_max:
+            ls = espacamento_max
+
+        self.min_ls = espacamento_max
+        self.max_ls = espacamento_min
+        self.ls = ls
 
 
     def caract_chicana(self, grupo_de_material:int) -> list:
