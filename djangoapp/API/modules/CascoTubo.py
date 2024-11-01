@@ -47,6 +47,7 @@ class CascoTubo:
         self.ls_percent = input.ls_percent
         self.lc_percent = input.lc_percent
         self.tube_material:TubeMaterial = input.tube_material
+        self.shell_thickness_meters = input.shell_thickness_meters
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -135,6 +136,8 @@ class CascoTubo:
         calculo_F()
         self.deltaT = self.mldt*self.F
 
+
+    def filtro_tubos(self) -> int:
         tube_count = TubeCount.objects.filter(
             de=self.de,
             pitch=self.pitch,
@@ -301,47 +304,17 @@ class CascoTubo:
         self.ls = ls
 
     def corte_defletor(self):
-        self.lc = self.lc_percent * self.Ds
-
-    def caract_chicana(self, grupo_de_material:int) -> list:
-        """Defini os limites máximos e mínimos para o espaçamento das chicanas (ls) e o corte (lc)
-
-        Args:
-            grupo_de_material (int): de acordo com TEMA. 2 para Al, Cu, Ti.
-
-        Returns:
-            list: limites_ls(list), limites_lc(list)
-        """
-        espacamento_min = 1/5 *self.Ds
-        
-        if espacamento_min < (2*POL2M):
-            espacamento_min = 2*POL2M
-
-        espacamento_max = 74 * (self.de.diameter_inch ** 0.75)
-
-        if grupo_de_material == 2:
-            espacamento_max =espacamento_max * 0.88
-
-        limites_ls = [espacamento_min, espacamento_max] 
-
-        min_lc = 0.15 * self.Ds
-        max_lc = 0.4 * self.Ds
-
-        limite_lc = [min_lc, max_lc]
-
-        return limites_ls, limite_lc
+        self.lc = float(self.lc_percent) * self.Ds
 
     
-    def diametro_casco(self, espessura:float):
+    def diametro_casco(self):
         """Determinação do diâmetro externo do casco.
 
         Args:
             espessura (float): espessura do casco em [m]
         """
         
-        Dc = self.Ds + 2 * espessura
-        
-        self.shell_thickness = espessura
+        Dc = self.Ds + 2 * self.shell_thickness_meters
         self.Dc = Dc
 
 

@@ -178,6 +178,8 @@ class InputsShellAndTube(models.Model):
     )
 
 
+    shell_thickness_meters = models.FloatField(null=True)
+
     tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE)
 
     reference = models.TextField(default="")
