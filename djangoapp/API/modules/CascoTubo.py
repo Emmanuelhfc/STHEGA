@@ -3,6 +3,8 @@ import math
 import logging
 import json
 from API.models import *
+from django.db.models import F, Value
+from django.db.models.functions import Abs
 
 
 # TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
@@ -48,6 +50,7 @@ class CascoTubo:
         self.lc_percent = input.lc_percent
         self.tube_material:TubeMaterial = input.tube_material
         self.shell_thickness_meters = input.shell_thickness_meters
+        self.pressure_class = input.pressure_class
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -317,289 +320,255 @@ class CascoTubo:
         Dc = self.Ds + 2 * self.shell_thickness_meters
         self.Dc = Dc
 
+    def _fator_ji(self):
+        """ ## Descrição:
+                - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
+            ## Args:
+                - Res: nº de Re lado do casco
+                - de: diâmetro externo do casco
+                - angulo_tubos: angulo dos tubos dependendo do arranjo
+                - p: passo dos tubos
+            ## Return:
+                - ji:
+        """
+        self.constantA = ConstantsA.objects.get(
+            layout= self.layout,
+            reynolds_max__gte= self.Res,
+            reynolds_min__lt= self.Res
+        )
 
-
-    # def conveccao_casco(self, ls, lc, classe: int):
-    #     """ ## Descrição:
-    #             - Função que faz o cálculo da convecção no casco.
-    #         ## Args:
-    #             - ls: Espaçamento das chicanas
-    #             - lc: Corte das chicanas  
-    #             - classe: classe de pressão (150 ou 600 psi)[psi] 
-    #     """
-    #     de = self.de.diameter_meters
-    #     Nt = self.Nt
-    #     Dotl = self.Dotl
-    #     Ds = self.Ds
-    #     layout = self.layout
-    #     L = self.L
-    #     p = self.pitch
-    #     self.classe = classe
-    #     Dc = self.Dc
-
-    #     self.lc = lc
-    #     self.ls = ls
-
-    #     if self.shell_fluid == "hot":
-    #         k = self.k_q
-    #         cp = self.cp_quente
-    #         mi = self.mi_q
-    #         w = self.wq
-    #     else
-    #         k = self.k_f
-    #         cp = self.cp_frio
-    #         mi = self.mi_f
-    #         w = self.wf
-
-    #     # TODO -> verificar se é de mesmo 
-    #     # TODO -> analisar onde usa Dc ou Ds
-    #     # TODO -> analisar cálculo do diâmetro do casco
-    #     # TODO -> rever tabela dos passos
-    #     # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
+        a4 = self.constantA.a4
+        a3 = self.constantA.a3
+        a2 = self.constantA.a2
+        a1 = self.constantA.a1
         
-    #     def tabela_passo(layout: TubeLayout, de: float, p: float):
-    #         """ ## Descrrição:
-    #                 - Filtra da tabela o valor dos passos em [m].
-    #             ## Args:
-    #                 - layout: arranjo dos tubos
-    #                 - de: diâmetro externo do tubo 
-    #         """
-    #         stmt = select(Pitch).where(
-    #             Pitch.pitch == p,
-    #             Pitch.layout == layout,
-    #             Pitch.de == de,
-    #         )
-            
-    #         with Session(engine()) as session:
-    #             selected_line = session.scalars(stmt).one()
-
-    #         pn = selected_line.pn
-    #         pp = selected_line.pp
-
-    #         return pn, pp
-
-    #     def fator_ji(Res, de, layout, p):
-    #         """ ## Descrição:
-    #                 - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
-    #             ## Args:
-    #                 - Res: nº de Re lado do casco
-    #                 - de: diâmetro externo do casco
-    #                 - angulo_tubos: angulo dos tubos dependendo do arranjo
-    #                 - p: passo dos tubos
-    #             ## Return:
-    #                 - ji:
-    #         """
-    #         stmt = select(ConstantsAB).where(
-    #             ConstantsAB.layout == layout,
-    #             ConstantsAB.Re_max >= Res,
-    #             ConstantsAB.Re_min < Res,
-    #         )
-
-    #         with Session(engine()) as session:
-    #             line = session.scalars(stmt).one()
-            
-    #         a4 = line.a4
-    #         a3 = line.a3
-    #         a2 = line.a2
-    #         a1 = line.a1
-            
-    #         a = a3 / (1 + 0.14 * Res ** a4)
+        a = a3 / (1 + 0.14 * self.Res ** a4)
 
 
-    #         ji = a1 *((1.33 / (p / de)) ** a )* Res ** a2
+        ji = a1 *((1.33 / (self.pitch.pitch_meters / self.de.diameter_meters)) ** a )* self.Res ** a2
 
-    #         return ji
+        return ji
+
+    def _tabela_delta_sb(self):
+        """ ## Descrição:
+                - Filtra delta_sb [m]
+            ## Args:
+                - Dn: diâmetro nominal do caso
+            Return:
+                -delta_sb: arbetura diametral casco chicana
+        """
+
+        self.delta_sb = DeltaSB.objects.get(
+            Dn_min_meters__lte = self.Ds,
+            Dn_max_meters__gt = self.Ds
+        )        
+
+        return self.delta_sb.DeltaSB_meters
+
+    def _diametro_bocal(self):
+        """ ## Descrição:
+            Cálculo o diâmetro do casco e filtra da tabela diâmetro do Bocal
+            ## Args:
+                - Dc: diâmetro do casco
+            ## Return:
+                - d_bocal: diâmetro do bocal [m]
+                - Dc:   diâmetro do casco    [m]
+        """
+
+        self.nozzle_diameter = NozzleDiameter.objects.get(
+            Dc_min_meters__lt = self.Ds,
+            Dc_max_meters__gte = self.Ds
+        )
+        
+        
+        return self.nozzle_diameter.nozzle_diameter_meters
+    
+    def _li_lo_tabela(self):
+            """ ## Descrição:
+                Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
+                ## Args:
+                    - Ds: diâmetro do casco
+                    - classe: classe de pressão (150 ou 600 psi)
+                ## Return:
+                    - li: [m]
+                    - lo: [m]
+            """
+            self.li_lo = LiLo.objects.filter(
+                pressure_class_psi= self.pressure_class
+            ).annotate(
+                abs_difference=Abs(F('Dc_meters') - Value(self.Dc))
+            ).order_by('abs_difference').first()
+
+            lo = self.li_lo.lo_meters
+            li = self.li_lo.li_meters
+
+            return li, lo
+    def conveccao_casco(self):
+        """ ## Descrição:
+                - Função que faz o cálculo da convecção no casco.
+            ## Args:
+                - ls: Espaçamento das chicanas
+                - lc: Corte das chicanas  
+                - classe: classe de pressão (150 ou 600 psi)[psi] 
+        """
+        de = self.de.diameter_meters
+        Nt = self.Nt
+        Dotl = self.Dotl
+        Ds = self.Ds
+        layout = self.layout
+        L = self.L
+        p = self.pitch
+        Dc = self.Dc
+
+
+        if self.shell_fluid == "hot":
+            k = self.k_q
+            cp = self.cp_quente
+            mi = self.mi_q
+            w = self.wq
+        else:
+            k = self.k_f
+            cp = self.cp_frio
+            mi = self.mi_f
+            w = self.wf
+
+        # TODO -> verificar se é de mesmo 
+        # TODO -> analisar onde usa Dc ou Ds
+        # TODO -> analisar cálculo do diâmetro do casco
+        # TODO -> rever tabela dos passos
+        # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
 
         
-    #     def tabela_delta_sb(Dn):
-    #         """ ## Descrição:
-    #                 - Filtra delta_sb [m]
-    #             ## Args:
-    #                 - Dn: diâmetro nominal do caso
-    #             Return:
-    #                 -delta_sb: arbetura diametral casco chicana
-    #         """
-    #         stmt = select(DeltaSB).where(
-    #             DeltaSB.Dn_max > Dn,
-    #             DeltaSB.Dn_min <= Dn,
-    #         )
-            
-    #         with Session(engine()) as session:
-    #             selected_line = session.scalars(stmt).one()
-            
-    #         delta_sb = selected_line.Delta_sb
-    #         return delta_sb
+        
 
-    #     def diametro_bocal(Dc):
-    #         """ ## Descrição:
-    #             Cálculo o diâmetro do casco e filtra da tabela diâmetro do Bocal
-    #             ## Args:
-    #                 - Dc: diâmetro do casco
-    #             ## Return:
-    #                 - d_bocal: diâmetro do bocal [m]
-    #                 - Dc:   diâmetro do casco    [m]
-    #         """
-    #         stmt = select(NozzleDiameter).where(
-    #             NozzleDiameter.Dc_min < Dc,
-    #             NozzleDiameter.Dc_max >= Dc
-    #         )
-
-    #         with Session(engine()) as session:
-    #             selected_line = session.scalars(stmt).one()
-
-    #         d_bocal = selected_line.d_nozzle
-            
-    #         return d_bocal
-
-    #     def li_lo_tabela(Dc, classe_psi):
-    #         """ ## Descrição:
-    #             Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
-    #             ## Args:
-    #                 - Ds: diâmetro do casco
-    #                 - classe: classe de pressão (150 ou 600 psi)
-    #             ## Return:
-    #                 - li: [m]
-    #                 - lo: [m]
-    #         """
-    #         stmt = select(li_lo).where(
-    #             li_lo.pressure_class_psi == classe_psi,
-    #         ).order_by(
-    #             func.abs(li_lo.Dc - Dc)
-    #         )
-
-    #         with Session(engine()) as session:
-    #             selected_line = session.scalars(stmt).first()
-
-
-    #         lo = selected_line.lo
-    #         li = selected_line.li
-
-    #         return li, lo
+        
             
 
-    #     #================= Cálculo para feixe de tubos ideal =====================
-    #     pn, pp = tabela_passo(layout, de, p)
-    #     self.pp = pp
-    #     self.pn = pn
+        #================= Cálculo para feixe de tubos ideal =====================
+        pn, pp = tabela_passo(layout, de, p)
+        self.pp = pp
+        self.pn = pn
         
-    #     if layout == TubeLayout.TRIANGULAR:
-    #         Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
-    #     else:
-    #         Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
-    #     print("Sm", Sm)
-    #     self.Sm = Sm
+        if layout == TubeLayout.TRIANGULAR:
+            Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
+        else:
+            Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
+        print("Sm", Sm)
+        self.Sm = Sm
 
-    #     Res = de * w / (mi * Sm)
+        Res = de * w / (mi * Sm)
         
-    #     self.Res =Res
+        self.Res = Res
 
-    #     angulo_tubos = layout.value
+        angulo_tubos = layout.value
 
 
-    #     ji = fator_ji(Res, de, layout, p)
-    #     self.ji = ji
+        ji = self._fator_ji()
+        self.ji = ji
 
-    #     h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) 
-    #     self.h_ideal = h_ideal
+        h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) 
+        self.h_ideal = h_ideal
 
-    #     #================= Fator de correção para os efeitos da configuração da chicana =====================
+        #================= Fator de correção para os efeitos da configuração da chicana =====================
 
-    #     Fc = 1/math.pi * (math.pi + 2 * (Ds - 2 * lc) / Dotl * math.sin( math.acos((Ds - 2 * lc) / Dotl)) - 2 * math.acos((Ds - 2 * lc) / Dotl))    #   Nº tubos seção de escoamento cruzado
+        Fc = 1/math.pi * (math.pi + 2 * (Ds - 2 * lc) / Dotl * math.sin( math.acos((Ds - 2 * lc) / Dotl)) - 2 * math.acos((Ds - 2 * lc) / Dotl))    #   Nº tubos seção de escoamento cruzado
         
-    #     jc = Fc + 0.54 * (1 - Fc) ** 0.345
+        jc = Fc + 0.54 * (1 - Fc) ** 0.345
         
-    #     self.Fc = Fc
-    #     self.jc = jc
-    #     #================= Fator de correção para os efeitos dos vazamentos da chicana =====================
+        self.Fc = Fc
+        self.jc = jc
+        #================= Fator de correção para os efeitos dos vazamentos da chicana =====================
         
-    #     delta_sb  = tabela_delta_sb(Ds)  #   Folga diametral casco chicana
-    #     Ssb = Ds * delta_sb / 2 * (math.pi - math.acos(1 - 2 * lc / Ds))    #   Área de seção de vazamento casco chicana 
-    #     delta_tb = 7.938 * 10 ** - 4       #    [m] - Folga diametral tubo chicana- TEMA - Classe R - Verificar valor
-    #     Stb = math.pi * de * delta_tb * Nt * (Fc + 1) / 4   #   Área da seção de vazamento tubo-chicana
-    #     alpha = 0.44 * (1 - Ssb / (Ssb + Stb))
-    #     jl = alpha + (1 - alpha) * math.exp(-2.2 * (Stb + Ssb) / Sm)
+        delta_sb_meters  = self._tabela_delta_sb()  #   Folga diametral casco chicana
+        self.delta_sb_meters = delta_sb_meters
+
+        Ssb = Ds * delta_sb_meters / 2 * (math.pi - math.acos(1 - 2 * lc / Ds))    #   Área de seção de vazamento casco chicana 
+        delta_tb = 7.938 * 10 ** - 4       #    [m] - Folga diametral tubo chicana- TEMA - Classe R - Verificar valor
+        Stb = math.pi * de * delta_tb * Nt * (Fc + 1) / 4   #   Área da seção de vazamento tubo-chicana
+        alpha = 0.44 * (1 - Ssb / (Ssb + Stb))
+        jl = alpha + (1 - alpha) * math.exp(-2.2 * (Stb + Ssb) / Sm)
         
-    #     self.delta_sb = delta_sb
-    #     self.Ssb = Ssb
-    #     self.delta_tb = delta_tb
-    #     self.Stb =Stb
-    #     self.jl = jl
-
-    #     #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
         
-    #     Fbp = (Ds - Dotl) * ls / Sm     #   Fração da área de escoamento cruzado em que pode ocorrer a corrente C
-    #     Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
+        self.Ssb = Ssb
+        self.delta_tb = delta_tb
+        self.Stb =Stb
+        self.jl = jl
 
-    #     if Res <= 100:
-    #         Cbh = 1.35
-    #     else:
-    #         Cbh = 1.25
+        #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
         
-    #     Nc = Ds * (1 - 2 * (lc / Ds)) / pp   #   N° de fileiras de tubos cruzados pelo escoamento numa seção de escoamento cruzado
-    #     Nc = Nc // 1        #   Nº Inteiro      
-    #     folga = (Ds - Dotl)
+        Fbp = (Ds - Dotl) * ls / Sm     #   Fração da área de escoamento cruzado em que pode ocorrer a corrente C
+        Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
 
-    #     if  folga > 1.5 * POL2M or (folga > 0.5 * POL2M and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
-    #         Nss = Nc // 5       #   Nº de pares de tiras selantes. Costuma-se utilizar umq par de tiras selantes para cada 5 a 7 filas de tubos na seção de escoamento cruzado.
-    #     else:
-    #         Nss = 0
-
-    #     jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** (1/3)))
-
-    #     self.Fbp = Fbp
-    #     self.Sbp = Sbp
-    #     self.Nc = Nc
-    #     self.Nss = Nss
-    #     self.jb = jb
-
-    #     #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
+        if Res <= 100:
+            Cbh = 1.35
+        else:
+            Cbh = 1.25
         
-    #     jr_ = 1.51 / (Nc ** 0.18)
+        Nc = Ds * (1 - 2 * (lc / Ds)) / pp   #   N° de fileiras de tubos cruzados pelo escoamento numa seção de escoamento cruzado
+        Nc = Nc // 1        #   Nº Inteiro      
+        folga = (Ds - Dotl)
+
+        if  folga > 1.5 * POL2M or (folga > 0.5 * POL2M and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
+            Nss = Nc // 5       #   Nº de pares de tiras selantes. Costuma-se utilizar umq par de tiras selantes para cada 5 a 7 filas de tubos na seção de escoamento cruzado.
+        else:
+            Nss = 0
+
+        jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** (1/3)))
+
+        self.Fbp = Fbp
+        self.Sbp = Sbp
+        self.Nc = Nc
+        self.Nss = Nss
+        self.jb = jb
+
+        #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
         
-    #     if Res > 100:
-    #         jr = 1
-    #     elif Res <= 20:
-    #         jr = jr_
-    #     elif 20<= Res <100:
-    #         jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
+        jr_ = 1.51 / (Nc ** 0.18)
         
-    #     self.jr = jr
-    #     #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
-    #     d_bocal = diametro_bocal(Dc)
-    #     li, lo = li_lo_tabela(Dc, classe)
-
-    #     lsi = li + d_bocal
-    #     lso = lo + d_bocal
-
-    #     if Res > 100:
-    #         n = 0.6
-    #     elif Res <= 100:
-    #         n = 1/3
+        if Res > 100:
+            jr = 1
+        elif Res <= 20:
+            jr = jr_
+        elif 20<= Res <100:
+            jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
         
-    #     lsi_ = lsi / ls
-    #     lso_ = lso / ls
+        self.jr = jr
+        #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
+        d_bocal = self._diametro_bocal()
+        li, lo = self._li_lo_tabela()
 
-    #     Nb = (L - lsi - lso) / ls + 1 #TODO verificar isso
-    #     Nb  = Nb // 1
-    #     self.Nb = Nb
+        lsi = li + d_bocal
+        lso = lo + d_bocal
 
-    #     num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
-    #     den = (Nb - 1) + (lsi_) + (lso_)
-
-    #     js = num / den
-
-    #     self.d_bocal = d_bocal
-    #     self.li = li
-    #     self.lo = lo
-    #     self.lsi = lsi
-    #     self.lso = lso
-    #     self.lsi_ = lsi_
-    #     self.lso_ = lso_
-    #     self.js = js
-    #     #   Cálculo coeficiente de transmissão de calor para o lado do casco
-    #     hs = h_ideal * jc * jl * jb * jr * js
+        if Res > 100:
+            n = 0.6
+        elif Res <= 100:
+            n = 1/3
         
-    #     self.hs = hs
+        lsi_ = lsi / ls
+        lso_ = lso / ls
+
+        Nb = (L - lsi - lso) / ls + 1 #TODO verificar isso
+        Nb  = Nb // 1
+        self.Nb = Nb
+
+        num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
+        den = (Nb - 1) + (lsi_) + (lso_)
+
+        js = num / den
+
+        self.d_bocal = d_bocal
+        self.li = li
+        self.lo = lo
+        self.lsi = lsi
+        self.lso = lso
+        self.lsi_ = lsi_
+        self.lso_ = lso_
+        self.js = js
+        #   Cálculo coeficiente de transmissão de calor para o lado do casco
+        hs = h_ideal * jc * jl * jb * jr * js
+        
+        self.hs = hs
     
     # def calculo_temp_parede(self):
     #     """ ## Descrição:

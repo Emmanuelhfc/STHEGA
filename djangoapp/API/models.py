@@ -56,6 +56,8 @@ class LiLo(models.Model):
     lo_meters = models.FloatField()
     li_inch = models.FloatField()
     lo_inch = models.FloatField()
+    Dc_meters = models.FloatField(null=True)
+    Dc_inch = models.FloatField(null=True)
 
 class Pitch(models.Model):
     de = models.ForeignKey(TubeDiameter, on_delete=models.CASCADE)
@@ -181,5 +183,7 @@ class InputsShellAndTube(models.Model):
     shell_thickness_meters = models.FloatField(null=True)
 
     tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE)
+
+    pressure_class = models.FloatField(choices=[(150.0, '150 psi'), (600.0, "600 psi")], null=True)
 
     reference = models.TextField(default="")
