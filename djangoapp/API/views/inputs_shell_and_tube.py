@@ -24,6 +24,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
         shell_and_tube.coef_global_min()
         shell_and_tube.conveccao_tubo()
         shell_and_tube.espacamento_defletor()
+        shell_and_tube.corte_defletor()
 
         
         data = shell_and_tube.__dict__

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0.0), MaxValueValidator(1.0)]
+CORTE_DEFLETOR = [MinValueValidator(0.15), MaxValueValidator(0.4)]
 
 
 class Layout(models.Model):
@@ -160,7 +161,22 @@ class InputsShellAndTube(models.Model):
 
     shell_fluid = models.CharField(choices=[("hot", "hot"), ("cold", "cold")], null=True, max_length=4)
 
-    ls_percent = models.DecimalField(max_digits=4, decimal_places=3, validators=PERCENTAGE_VALIDATOR, null=True, help_text="Espaçamento entre defletores em funçao do comprimento (L) do trocador (%)")
+    ls_percent = models.DecimalField(
+        max_digits=4, 
+        decimal_places=3, 
+        validators=PERCENTAGE_VALIDATOR, 
+        null=True, 
+        help_text="Espaçamento entre defletores em funçao do comprimento (L) do trocador (%)"
+    )
+
+    lc_percent = models.DecimalField(
+        max_digits=4, 
+        decimal_places=3, 
+        validators=CORTE_DEFLETOR, 
+        null=True, 
+        help_text="Corte defeltor em funçao do comprimento do diâmetro  (L) do trocador (%)"
+    )
+
 
     tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE)
 
