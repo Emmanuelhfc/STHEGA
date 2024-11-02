@@ -1,0 +1,17 @@
+services:      
+  heatexga-api:
+    container_name: heatexga-api
+    build:
+      context: .
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./djangoapp:/djangoapp
+      - ./data/web/static:/data/web/static/
+      - ./data/web/media:/data/web/media/
+      - ./.env:/.env
+    
+    env_file:
+      - ./.env
+    
+  
