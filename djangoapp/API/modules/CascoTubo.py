@@ -393,6 +393,8 @@ class CascoTubo:
                     - li: [m]
                     - lo: [m]
             """
+
+            
             self.li_lo = LiLo.objects.filter(
                 pressure_class_psi= self.pressure_class
             ).annotate(
@@ -417,9 +419,9 @@ class CascoTubo:
         Ds = self.Ds
         layout = self.layout
         L = self.L
-        p = self.pitch
-        Dc = self.Dc
-
+        p = self.pitch.pitch_meters
+        ls = self.ls
+        lc = self.lc
 
         if self.shell_fluid == "hot":
             k = self.k_q
@@ -438,30 +440,21 @@ class CascoTubo:
         # TODO -> rever tabela dos passos
         # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
 
-        
-        
-
-        
-            
-
         #================= Cálculo para feixe de tubos ideal =====================
-        pn, pp = tabela_passo(layout, de, p)
+        pn, pp = self.pitch.pn_meters, self.pitch.pp_meters
         self.pp = pp
         self.pn = pn
         
-        if layout == TubeLayout.TRIANGULAR:
+        if layout.name == NamesLayouts.TRIANGULAR:
             Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
         else:
             Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
-        print("Sm", Sm)
+        
         self.Sm = Sm
 
         Res = de * w / (mi * Sm)
         
         self.Res = Res
-
-        angulo_tubos = layout.value
-
 
         ji = self._fator_ji()
         self.ji = ji

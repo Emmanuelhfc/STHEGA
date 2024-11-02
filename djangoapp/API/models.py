@@ -4,9 +4,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 PERCENTAGE_VALIDATOR = [MinValueValidator(0.0), MaxValueValidator(1.0)]
 CORTE_DEFLETOR = [MinValueValidator(0.15), MaxValueValidator(0.4)]
 
+class NamesLayouts(models.TextChoices):
+    TRIANGULAR = "triangular"
+    ROTATED = "rotated"
+    SQUARE = "square"
+        
 
 class Layout(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, choices=NamesLayouts)
     angle = models.FloatField()
     description = models.CharField(max_length=256)
 

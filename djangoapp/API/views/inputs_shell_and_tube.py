@@ -14,6 +14,15 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
     serializer_class = InputsShellAndTubeSerializer
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
 
+    def pop_state_key(self, data:dict):
+        list_models = [TubeCount, TubeDiameter, Pitch, DeltaSB, Pitch, LiLo, TubeInternDiameter, TubeMaterial, Layout, ConstantsA, ConstantsB, NozzleDiameter]
+        for item in data:
+            if type(data[item]) in list_models:
+                data[item] = data[item].__dict__
+                data[item].pop('_state')
+                
+        return data
+
     @extend_schema(tags=['SHELL AND TUBE CALCULATION'])
     def shell_and_tube_avaliation(self, request, pk):
         input = InputsShellAndTube.objects.get(id=pk)
@@ -26,23 +35,28 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
         shell_and_tube.espacamento_defletor()
         shell_and_tube.corte_defletor()
         shell_and_tube.diametro_casco()
+        shell_and_tube.conveccao_casco()
 
         data = shell_and_tube.__dict__
 
-        data['de'] = data['de'].__dict__
-        data['de'].pop('_state')
+        logger.debug(type(data['de']) == models)
 
-        data['pitch'] = data['pitch'].__dict__
-        data['pitch'].pop('_state')
+        data = self.pop_state_key(data)
 
-        data['layout'] = data['layout'].__dict__
-        data['layout'].pop('_state')
+        # data['de'] = data['de'].__dict__
+        # data['de'].pop('_state')
 
-        data['di'] = data['di'].__dict__
-        data['di'].pop('_state')
+        # data['pitch'] = data['pitch'].__dict__
+        # data['pitch'].pop('_state')
 
-        data['tube_material'] = data['tube_material'].__dict__
-        data['tube_material'].pop('_state')
+        # data['layout'] = data['layout'].__dict__
+        # data['layout'].pop('_state')
+
+        # data['di'] = data['di'].__dict__
+        # data['di'].pop('_state')
+
+        # data['tube_material'] = data['tube_material'].__dict__
+        # data['tube_material'].pop('_state')
         
         return Response(data)
         
