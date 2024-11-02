@@ -76,7 +76,7 @@ class Pitch(models.Model):
     description = models.CharField(max_length=256,null=True)
 
     def __str__(self) -> str:
-        return f'{self.description}'
+        return f'{self.description}-{self.layout}'
     
 class TubeCount(models.Model):
     Ds_meters = models.FloatField()
@@ -173,7 +173,7 @@ class InputsShellAndTube(models.Model):
         decimal_places=3, 
         validators=PERCENTAGE_VALIDATOR, 
         null=True, 
-        help_text="Espaçamento entre defletores em funçao do comprimento (L) do trocador (%)"
+        help_text="Espaçamento entre defletores em funçao do diametro interno do trocador (Ds) (%)"
     )
 
     lc_percent = models.DecimalField(

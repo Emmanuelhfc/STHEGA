@@ -282,7 +282,7 @@ class CascoTubo:
 
     def espacamento_defletor(self):
 
-        ls = self.L * float(self.ls_percent)
+        ls = self.Ds * float(self.ls_percent)
 
         espacamento_min = 1/5 *self.Ds
         
@@ -587,6 +587,10 @@ class CascoTubo:
         else:
             tw = tc + hio/(hio + hs) * (Tc - tc)
         
+        
+        self.Tc = Tc
+        self.tc = tc
+
         self.tw = tw
 
     # def correcao_temp_parede(self):
