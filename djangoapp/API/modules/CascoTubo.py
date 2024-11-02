@@ -563,33 +563,31 @@ class CascoTubo:
         
         self.hs = hs
     
-    # def calculo_temp_parede(self):
-    #     """ ## Descrição:
-    #         Cálcula a temperatura da parede.
-    #         ## Args
-    #             - fluido_frio:bool Se o fluído frio estiver no interior do tubo - True
-    #     """
+    def calculo_temp_parede(self):
+        """ ## Descrição:
+            Cálcula a temperatura da parede.
+            ## Args
+                - fluido_frio:bool Se o fluído frio estiver no interior do tubo - True
+        """
 
-    #     if self.shell_fluid == "hot":
-    #         fluido_frio = True
-    #     elif self.shell_fluid == "cold":
-    #         fluido_frio = False
+        if self.shell_fluid == "hot":
+            fluido_frio = True
+        else:
+            fluido_frio = False
 
-    #     hs = self.hs
-    #     hio = self.hio
+        hs = self.hs
+        hio = self.hio
         
-    #     Tc = (self.T1 + self.T2)/2
-    #     tc = (self.t2 + self.t1)/2
+        Tc = (self.T1 + self.T2)/2
+        tc = (self.t2 + self.t1)/2
         
-    #     print(Tc)
-    #     print(tc)
 
-    #     if fluido_frio:
-    #         tw = tc + hs/ (hio + hs) * (Tc - tc) 
-    #     else:
-    #         tw = tc + hio/(hio + hs) * (Tc - tc)
+        if fluido_frio:
+            tw = tc + hs/ (hio + hs) * (Tc - tc) 
+        else:
+            tw = tc + hio/(hio + hs) * (Tc - tc)
         
-    #     self.tw = tw
+        self.tw = tw
 
     # def correcao_temp_parede(self):
     #     """Corrige hs e hio de acordo com temperatura da parede
