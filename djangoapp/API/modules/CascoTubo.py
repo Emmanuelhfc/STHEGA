@@ -619,69 +619,69 @@ class CascoTubo:
     #     self.hio = hio
     #     self.hs = hs
 
-    # def coef_global_limpo(self):
-    #     """ Cálcula o coeficiente global limpo com base nos cefientes de transmissão de calor cálculados  
-    #     """
-    #     hio = self.hio
-    #     hs = self.hs
-    #     Uc = hio * hs / (hio + hs)
+    def coef_global_limpo(self):
+        """ Cálcula o coeficiente global limpo com base nos cefientes de transmissão de calor cálculados  
+        """
+        hio = self.hio
+        hs = self.hs
+        Uc = hio * hs / (hio + hs)
         
-    #     self.Uc = Uc
+        self.Uc = Uc
     
-    # def excesso_area(self):
-    #     """## Descrição:
-    #         Cálcula do fator de inscrustação e excesso da área de troca
-    #     """
-    #     #   Rd calculados deve ser maior que verdadeiro
-    #     self.Rd_verd = self.Rd_f + self.Rd_q
-    #     Rd_verd = self.Rd_verd
-    #     Ud = self.Ud_min
-    #     Uc = self.Uc
-    #     delta_t = self.deltaT
-    #     q = self.q
-    #     A_proj = self.A_proj
+    def excesso_area(self):
+        """## Descrição:
+            Cálcula do fator de inscrustação e excesso da área de troca
+        """
+        #   Rd calculados deve ser maior que verdadeiro
+        self.Rd_verd = self.Rd_f + self.Rd_q
+        Rd_verd = self.Rd_verd
+        Ud = self.Ud_min
+        Uc = self.Uc
+        delta_t = self.deltaT
+        q = self.q
+        A_proj = self.A_proj
 
-    #     Rd = (Uc - Ud) / (Uc * Ud)
+        Rd = (Uc - Ud) / (Uc * Ud)
         
-    #     Ud_ = 1 / (1 / Uc + Rd_verd)
+        Ud_ = 1 / (1 / Uc + Rd_verd)
 
-    #     A_nec = q / (Ud_ * delta_t)
-    #     Ea = (A_proj - A_nec)/A_nec * 100
+        A_nec = q / (Ud_ * delta_t)
+        Ea = (A_proj - A_nec)/A_nec * 100
 
-    #     self.Rd_calc = Rd
-    #     self.A_nec = A_nec
-    #     self.Ea = Ea
-    #     self.Ud = Ud_
+        self.Rd_calc = Rd
+        self.A_nec = A_nec
+        self.Ea = Ea
+        self.Ud = Ud_
 
-    # def perda_carga_tubo(self, phi_t = 1):
-    #     """ ## Descrição:
-    #         - Cálculo da perda de carga do lado do tubo.
-    #         ## Args:
-    #             - phi_t: termo (mi/miw) ^ 0.14 para lado do tubo
-    #     """
-    #     Re_t = self.Re_t
-    #     di = self.di.intern_diameter_meters
-    #     G_t = self.Gt
-    #     L = self.L
-    #     n = self.n
-    #     v = self.tube_velocity
+    def perda_carga_tubo(self, phi_t = 1):
+        """ ## Descrição:
+            - Cálculo da perda de carga do lado do tubo.
+            ## Args:
+                - phi_t: termo (mi/miw) ^ 0.14 para lado do tubo
+        """
+        Re_t = self.Re_t
+        di = self.di.intern_diameter_meters
+        G_t = self.Gt
+        L = self.L
+        n = self.n
+        v = self.tube_velocity
 
-    #     if self.shell_fluid == "hot":
-    #         rho = self.rho_f
-    #     elif self.shell_fluid == "cold":
-    #         rho = self.rho_q
+        if self.shell_fluid == "hot":
+            rho = self.rho_f
+        else:
+            rho = self.rho_q
 
-    #     delta_Pr = (4 * n * rho * v ** 2) / 2       #   Perda de carga de retorno 
+        delta_Pr = (4 * n * rho * v ** 2) / 2       #   Perda de carga de retorno 
 
-    #     f = (1.58 * math.log(Re_t) - 3.28) ** -2    #   Fator de atrito de Fanning
+        f = (1.58 * math.log(Re_t) - 3.28) ** -2    #   Fator de atrito de Fanning
 
-    #     delta_Pt = (4 * f * G_t ** 2 * L * n) / (di * 2 * rho * phi_t) 
+        delta_Pt = (4 * f * G_t ** 2 * L * n) / (di * 2 * rho * phi_t) 
 
-    #     delta_PT = delta_Pt + delta_Pr
+        delta_PT = delta_Pt + delta_Pr
 
-    #     self.delta_Pr = delta_Pr
-    #     self.delta_Pt = delta_Pt
-    #     self.delta_PT = delta_PT
+        self.delta_Pr = delta_Pr
+        self.delta_Pt = delta_Pt
+        self.delta_PT = delta_PT
         
 
     # def perda_carga_casco(self):
