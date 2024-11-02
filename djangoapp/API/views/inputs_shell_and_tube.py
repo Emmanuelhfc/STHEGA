@@ -40,6 +40,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
         shell_and_tube.coef_global_limpo()
         shell_and_tube.excesso_area()
         shell_and_tube.perda_carga_tubo()
+        shell_and_tube.perda_carga_casco()
 
         data = shell_and_tube.__dict__
 

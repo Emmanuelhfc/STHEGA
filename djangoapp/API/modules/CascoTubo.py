@@ -682,189 +682,145 @@ class CascoTubo:
         self.delta_Pr = delta_Pr
         self.delta_Pt = delta_Pt
         self.delta_PT = delta_PT
-        
-
-    # def perda_carga_casco(self):
-    #     """ ## Descrição:
-    #         - Cálculo da perda de carga do lado do caso.
-    #         ## Args:
-    #             - Fc: Nº tubos seção de escoamento cruzado
-    #             - Nt: Nº de tubos
-    #             - ls: espaçamento das chicanas
-    #             - lsi_: razão entre espaçamento da chicana de entrada e espaçamento das chicanas
-    #             - lso_: razão entre espaçamento da chicana de saída e espaçamento das chicanas
-    #             - a_tubo: arranjo de tubos
-    #         ## Return
-    #             - delta_Ps: perda de carga do lado do casco   
-    #     """
-    #     #  TODO -> correção miw
-    #     Nb = self.Nb
-    #     de = self.de.diameter_meters
-    #     Res = self.Res
-    #     Nc = self.Nc
-    #     Stb = self.Stb
-    #     Ssb = self.Ssb
-    #     Sm = self.Sm
-    #     Nss = self.Nss
-    #     Fbp = self.Fbp
-    #     p = self.pitch
-    #     pp = self.pp
-    #     lc = self.lc
-    #     Ds = self.Ds
-    #     Fc = self.Fc
-    #     Nt = self.Nt
-    #     ls = self.ls
-    #     lsi_ = self.lsi_
-    #     lso_ = self.lso_
-    #     layout = self.layout
-
-
-
-    #     if self.shell_fluid == "hot":
-    #         mi = self.mi_q
-    #         W = self.wq
-    #         rho = self.rho_q
-    #     elif self.shell_fluid == "cold":
-    #         mi = self.mi_f
-    #         W = self.wf
-    #         rho = self.rho_f
-
-
-    #     def constantes_b(Res:float, layout: TubeLayout) -> list:
-    #         stmt = select(ConstantsAB).where(
-    #             ConstantsAB.layout == layout,
-    #             ConstantsAB.Re_min < Res,
-    #             ConstantsAB.Re_max >= Res,
-    #         )
-
-    #         with Session(engine()) as session:
-    #             selected_line = session.scalars(stmt).one()
-            
-    #         b1 = selected_line.b1
-    #         b2 = selected_line.b2
-    #         b3 = selected_line.b3
-    #         b4 = selected_line.b4
-
-    #         return [b1, b2, b3, b4]
-        
-    #     #================ Perda de carga na seção de escoamento cruzado ======================
-    #     if Res <= 100:
-    #         Cbp = 4.5
-    #     elif Res > 100:
-    #         Cbp = 3.7
-
-    #     Rb_a = (1 - (2 * Nss / Nc) ** (1/3))
-    #     Rb = math.exp(-Cbp * Fbp * Rb_a)        #   Fator de correção para efeito do contorno do feixe    
-
-    #     m = 0.15 * (1 + Ssb / (Stb + Ssb)) + 0.8
-    #     Rl_b = ((Stb + Ssb) / Sm) ** m 
-    #     Rl_a = (1 + Ssb / (Stb + Ssb)) * -1.33
-
-    #     Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
-        
-    #     angulo_tubo = layout.value
-       
-
-    #     b1, b2, b3, b4 = constantes_b(Res, layout)
-    #     b = b3 / (1 + 0.14 * Res ** b4)
-    #     fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
-    #     delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
-        
-    #     print("deltat_Pb1",delta_Pbi)
-        
-    #     delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
-        
     
-    #     #================= Perda de carga nas janelas ==============================================
-    #     Swg_a = 1 - 2 * lc / Ds 
-    #     Swg_b = (1-(Swg_a ** 2)) ** (1/2)
-    #     Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
-    #     self.Swg= Swg
+    def _constantes_b(self) -> list:
+
+        self.constantB = ConstantsB.objects.get(
+            layout= self.layout,
+            reynolds_max__gte= self.Res,
+            reynolds_min__lt= self.Res
+        )
+        
+        b1 = self.constantB.b1
+        b2 = self.constantB.b2
+        b3 = self.constantB.b3
+        b4 = self.constantB.b4
+
+        return [b1, b2, b3, b4]
+
+    def perda_carga_casco(self):
+        """ ## Descrição:
+            - Cálculo da perda de carga do lado do caso.
+            ## Args:
+                - Fc: Nº tubos seção de escoamento cruzado
+                - Nt: Nº de tubos
+                - ls: espaçamento das chicanas
+                - lsi_: razão entre espaçamento da chicana de entrada e espaçamento das chicanas
+                - lso_: razão entre espaçamento da chicana de saída e espaçamento das chicanas
+                - a_tubo: arranjo de tubos
+            ## Return
+                - delta_Ps: perda de carga do lado do casco   
+        """
+        #  TODO -> correção miw
+        Nb = self.Nb
+        de = self.de.diameter_meters
+        Res = self.Res
+        Nc = self.Nc
+        Stb = self.Stb
+        Ssb = self.Ssb
+        Sm = self.Sm
+        Nss = self.Nss
+        Fbp = self.Fbp
+        p = self.pitch.pitch_meters
+        pp = self.pp
+        lc = self.lc
+        Ds = self.Ds
+        Fc = self.Fc
+        Nt = self.Nt
+        ls = self.ls
+        lsi_ = self.lsi_
+        lso_ = self.lso_
+
+        if self.shell_fluid == "hot":
+            mi = self.mi_q
+            W = self.wq
+            rho = self.rho_q
+        elif self.shell_fluid == "cold":
+            mi = self.mi_f
+            W = self.wf
+            rho = self.rho_f
+
+        #================ Perda de carga na seção de escoamento cruzado ======================
+        if Res <= 100:
+            Cbp = 4.5
+        elif Res > 100:
+            Cbp = 3.7
+
+        Rb_a = (1 - (2 * Nss / Nc) ** (1/3))
+        Rb = math.exp(-Cbp * Fbp * Rb_a)        #   Fator de correção para efeito do contorno do feixe    
+
+        m = 0.15 * (1 + Ssb / (Stb + Ssb)) + 0.8
+        Rl_b = ((Stb + Ssb) / Sm) ** m 
+        Rl_a = (1 + Ssb / (Stb + Ssb)) * -1.33
+
+        Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
+        
+        b1, b2, b3, b4 = self._constantes_b()
+
+        b = b3 / (1 + 0.14 * Res ** b4)
+        fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
+        delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
+
+        self.delta_Pbi = delta_Pbi
+        
+        delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
+        
+        #================= Perda de carga nas janelas ==============================================
+        Swg_a = 1 - 2 * lc / Ds 
+        Swg_b = (1-(Swg_a ** 2)) ** (1/2)
+        Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
+        self.Swg= Swg
 
         
 
-    #     Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
+        Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
 
-    #     Sw = Swg - Swt      #   Área da seção de escoamento da janela
+        Sw = Swg - Swt      #   Área da seção de escoamento da janela
+
+        Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
+
+        # TODO -> verificar isso, se arredonda pra baixo
+        Ncw = Ncw // 1
+
+
+        if Res >= 100:      #   Escoamento turbulento
+            delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
         
-    #     print("Sw", Sw)
+        elif Res < 100:     #   Escoamento laminar
+            theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
+            Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
 
-    #     Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
-
-    #     # TODO -> verificar isso, se arredonda pra baixo
-    #     Ncw = Ncw // 1
-
-
-    #     if Res >= 100:      #   Escoamento turbulento
-            
-
-    #         delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
+            delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
+            delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
+            delta_Pwi_c = 2 * W ** 2 / (2 * Sm * Sw * rho)
+            delta_Pwi = delta_Pwi_a * delta_Pwi_b + delta_Pwi_c
         
-    #     elif Res < 100:     #   Escoamento laminar
-    #         theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
-    #         Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
+        delta_Pw = Nb * delta_Pwi * Rl
 
-    #         delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
-    #         delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
-    #         delta_Pwi_c = 2 * W ** 2 / (2 * Sm * Sw * rho)
-    #         delta_Pwi = delta_Pwi_a * delta_Pwi_b + delta_Pwi_c
+        #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
+
+        if Res <= 100:
+            n = 1
+        elif Res > 100:
+            n = 0.2
         
-    #     print(Nb, delta_Pwi, Rl)
-    #     delta_Pw = Nb * delta_Pwi * Rl
+        # TODO-> conferir contas que envolve valores em pol
+        Rs = (1 / 2) * (((lsi_ / POL2M) ** (n - 2)) + ((lso_/POL2M) ** (n-2)))      #   Fator de correção devido o espaçamento desigual das chicanas
 
-    #     #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
-
-    #     if Res <= 100:
-    #         n = 1
-    #     elif Res > 100:
-    #         n = 0.2
-        
-    #     # TODO-> conferir contas que envolve valores em pol
-    #     print(n)
-    #     print(lsi_)
-    #     print(lso_)
-    #     print(POL2M)
-
-    #     Rs = (1 / 2) * (((lsi_ / POL2M) ** (n - 2)) + ((lso_/POL2M) ** (n-2)))      #   Fator de correção devido o espaçamento desigual das chicanas
-
-    #     print("Rb", Rb)
-    #     print("Rs", Rs)
-
-    #     delta_Pe = 2 * delta_Pbi * (1 + Ncw / Nc) * Rb * Rs
+        delta_Pe = 2 * delta_Pbi * (1 + Ncw / Nc) * Rb * Rs
 
         
-    #     #================ Perda de carga do lado do casco ===============================================
-    #     delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
+        #================ Perda de carga do lado do casco ===============================================
+        delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
 
-    #     self.delta_Ps = delta_Ps
-    #     self.delta_Pw = delta_Pw
-    #     self.delta_Pe = delta_Pe
-    #     self.delta_Pc = delta_Pc
+        
+        self.delta_Pw = delta_Pw
+        self.delta_Pe = delta_Pe
+        self.delta_Pc = delta_Pc
+        self.delta_Ps = delta_Ps
 
 if __name__ == "__main__":
-    str_dados = ""
-    with open("public\\json\\comparacoes.json", "r", encoding="utf-8", ) as file:
-        str_dados = file.read()
-
-    dados = json.loads(str_dados)["comp_5"]
-
-    a = CascoTubo(**dados["input"])
-    
-    a.filtro_tubos(dados["n"], dados["Ds"], dados["de_pol"], dados["layout"], dados["passo_pol"])
-    a.Nt = 36
-    a.area_projeto(dados["L"])
-    # a.q = a.q * 1.1
-    a.coef_global_min()
-
-    a.diametro_interno_tubo(dados["tube_thickness"])
-    a.conveccao_tubo(dados["hot_fluid_tube"])
-
-    # a.caract_chicana(1)
-
-    # a.diametro_casco(dados["shell_thickness"])
-    
-
-    
+   ...
 
 
 
