@@ -102,6 +102,10 @@ class CascoTubo:
             num = ((self.T1 - self.t2)-(self.T2 - self.t1))
             den = math.log(((self.T1 - self.t2)/(self.T2 - self.t1)))
             self.mldt = num / den
+
+
+            logger.debug(f'({self.T1} - {self.t2})-({self.T2} - {self.t1})')
+            logger.debug(f'ln(({self.T1} - {self.t2})/({self.T2} - {self.t1})')
         
         def calculo_R_S():
             self.R = (self.T1 - self.T2)/(self.t2 - self.t1)
@@ -246,7 +250,7 @@ class CascoTubo:
             # Como não temos tw
             a = 1   #   (mi/miw) ** 0.14
 
-            Nu = 0.027 * (di*Gt/mi)**0.8 * (cp*mi/k)**(1/3) * a
+            Nu = 0.027 * (Re_t)**0.8 * (cp*mi/k)**(1/3) * a
             hi = Nu * k/di
         
         elif Re_t < 2100:
@@ -678,8 +682,12 @@ class CascoTubo:
         delta_Pr = (4 * n * rho * v ** 2) / 2       #   Perda de carga de retorno 
 
         f = (1.58 * math.log(Re_t) - 3.28) ** -2    #   Fator de atrito de Fanning
+        self.f = f
 
         delta_Pt = (4 * f * G_t ** 2 * L * n) / (di * 2 * rho * phi_t) 
+        # delta_Pt = (4 * f  * v ** 2 * L * n) / (di * 2 * phi_t) 
+
+        logger.debug(f"(4 * {f} * {G_t} ** 2 * {L} * {n}) / ({di} * 2 * {rho} * {phi_t})") 
 
         delta_PT = delta_Pt + delta_Pr
 

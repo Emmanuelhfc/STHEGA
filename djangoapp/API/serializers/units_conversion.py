@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 
 units_list = [
+    'si',
     'degF', 'degC', 'degK',                # Temperaturas (Fahrenheit, Celsius, Kelvin)
     'Btu/(lb*degF)', 'J/(kg*degK)',        # Capacidade calorífica específica (Btu/lb.F, J/kg.K)
     'cP', 'kg/(m*s)', "lb/(ft*h)",                      # Viscosidade (cP, kg/(m.s))
@@ -9,7 +10,13 @@ units_list = [
     'Btu/(h*ft*degF)', 'W/degK',           # Condutividade térmica (Btu/(h.ft.F), W/K)
     'lb/ft^3', 'kg/m^3',                   # Densidade (lb/ft^3, kg/m^3)
     'lb/h', 'kg/s',                         # Fluxo de massa (lb/h, kg/s)
-    'si',
+    'BTU/h',
+    'ft',
+    'inch',
+    'ft^2',
+    'ft/s',
+    'BTU/(degF*h*ft^2)',
+    'lbf/(inch^2)',
 ]
 
 class UnitConversionSerializer(serializers.Serializer):
