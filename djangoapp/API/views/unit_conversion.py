@@ -9,10 +9,8 @@ import pint
 logger = logging.getLogger('API')
 class UnitConversionViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, ]
+    serializer_class = UnitConversionSerializer
     
-    @extend_schema(
-            request = UnitConversionSerializer
-    )
     def conversion(self, request):
         
         data = UnitConversionSerializer(data=request.data)

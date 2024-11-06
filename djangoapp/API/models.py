@@ -1,8 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 
-PERCENTAGE_VALIDATOR = [MinValueValidator(0.0), MaxValueValidator(1.0)]
-CORTE_DEFLETOR = [MinValueValidator(0.15), MaxValueValidator(0.4)]
+PERCENTAGE_VALIDATOR = [MinValueValidator(Decimal(0.0)), MaxValueValidator(Decimal(1.0))]
+CORTE_DEFLETOR = [MinValueValidator(Decimal(0.15)), MaxValueValidator(Decimal(0.4))]
 
 class NamesLayouts(models.TextChoices):
     TRIANGULAR = "triangular"
