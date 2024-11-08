@@ -2,8 +2,11 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
-PERCENTAGE_VALIDATOR = [MinValueValidator(Decimal(0.0)), MaxValueValidator(Decimal(1.0))]
-CORTE_DEFLETOR = [MinValueValidator(Decimal(0.15)), MaxValueValidator(Decimal(0.4))]
+DISTANCIA_DEFLETOR_VALUES = (0.0, 1.0)
+CORTE_DEFLETOR_VALUES = (0.15, 0.4)
+
+DISTANCIA_DEFLETOR = [MinValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[0])), MaxValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[1]))]
+CORTE_DEFLETOR = [MinValueValidator(Decimal(CORTE_DEFLETOR_VALUES[0])), MaxValueValidator(Decimal(CORTE_DEFLETOR_VALUES[1]))]
 
 class NamesLayouts(models.TextChoices):
     TRIANGULAR = "triangular"
@@ -116,16 +119,21 @@ class TubeMaterial(models.Model):
 
     def __str__(self) -> str:
         return f'{self.material}-{self.group}'
+    
 
-
-class InputsShellAndTube(models.Model):
-    class TubePasses(models.IntegerChoices):
+class TubePasses(models.IntegerChoices):
         ONE = 1, "Uma Passagem nos tubos"
         TWO = 2, "Duas Passagem nos tubos"
         FOUR = 4, "Quatro Passagem nos tubos"
         SIX = 6, "Seis Passagem nos tubos"
         EIGHT = 8, "Oito Passagem nos tubos"
 
+class ShellFluid(models.TextChoices):
+    hot = ("hot", "hot")
+    cold = ("cold", "cold")
+    
+class InputsShellAndTube(models.Model):
+    
     def get_ds_inch_choices():
         choices = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
         return choices
@@ -167,12 +175,12 @@ class InputsShellAndTube(models.Model):
     
     L = models.FloatField(null=True)
 
-    shell_fluid = models.CharField(choices=[("hot", "hot"), ("cold", "cold")], null=True, max_length=4)
+    shell_fluid = models.CharField(choices=ShellFluid.choices, null=True, max_length=4)
 
     ls_percent = models.DecimalField(
         max_digits=4, 
         decimal_places=3, 
-        validators=PERCENTAGE_VALIDATOR, 
+        validators=DISTANCIA_DEFLETOR, 
         null=True, 
         help_text="Espaçamento entre defletores em funçao do diametro interno do trocador (Ds) (%)"
     )
