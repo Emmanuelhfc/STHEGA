@@ -131,73 +131,62 @@ class TubePasses(models.IntegerChoices):
 class ShellFluid(models.TextChoices):
     hot = ("hot", "hot")
     cold = ("cold", "cold")
-    
+
 class InputsShellAndTube(models.Model):
     
     def get_ds_inch_choices():
         choices = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
         return choices
     
+    calculation_id = models.UUIDField(null=True, blank=True)
+
     T1_hot = models.FloatField()
     T2_hot = models.FloatField()
-
     t1_cold = models.FloatField()
     t2_cold = models.FloatField()
-
     wq = models.FloatField()
     wf = models.FloatField()
-    
     cp_quente = models.FloatField()
     cp_frio = models.FloatField()
-
-    casco_passagens = models.IntegerField()
-
+    casco_passagens = models.IntegerField(default=1)
     rho_q = models.FloatField()
     rho_f = models.FloatField()
-
     mi_q = models.FloatField()
     mi_f = models.FloatField()
-
     k_q = models.FloatField()
     k_f = models.FloatField()
-
     Rd_q = models.FloatField()
     Rd_f = models.FloatField()
-    
     tipo_q = models.CharField(max_length=256)
     tipo_f = models.CharField(max_length=256)
 
-    n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True)
-    di = models.ForeignKey(TubeInternDiameter, null=True, on_delete=models.CASCADE)
-    pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE)
-
-    Ds_inch = models.FloatField(null=True, choices=get_ds_inch_choices)
-    
-    L = models.FloatField(null=True)
-
-    shell_fluid = models.CharField(choices=ShellFluid.choices, null=True, max_length=4)
-
+    n = models.IntegerField(choices=TubePasses.choices, help_text='Número de passagens nos tubos', null=True, blank=True)
+    di = models.ForeignKey(TubeInternDiameter, null=True, on_delete=models.CASCADE, blank=True)
+    pitch = models.ForeignKey(Pitch, null=True, on_delete=models.CASCADE, blank=True)
+    Ds_inch = models.FloatField(null=True, choices=get_ds_inch_choices, blank=True)
+    L = models.FloatField(null=True, blank=True)
+    shell_fluid = models.CharField(choices=ShellFluid.choices, null=True, max_length=4, blank=True)
     ls_percent = models.DecimalField(
         max_digits=4, 
         decimal_places=3, 
         validators=DISTANCIA_DEFLETOR, 
         null=True, 
-        help_text="Espaçamento entre defletores em funçao do diametro interno do trocador (Ds) (%)"
+        help_text="Espaçamento entre defletores em funçao do diametro interno do trocador (Ds) (%)",
+        blank=True
     )
-
     lc_percent = models.DecimalField(
         max_digits=4, 
         decimal_places=3, 
         validators=CORTE_DEFLETOR, 
         null=True, 
-        help_text="Corte defeltor em funçao do comprimento do diâmetro  (L) do trocador (%)"
+        help_text="Corte defeltor em funçao do comprimento do diâmetro  (L) do trocador (%)",
+        blank=True,
     )
+    shell_thickness_meters = models.FloatField(null=True, blank=True)
+    tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE, blank=True)
+    pressure_class = models.FloatField(choices=[(150.0, '150 psi'), (600.0, "600 psi")], null=True, blank=True)
 
 
-    shell_thickness_meters = models.FloatField(null=True)
 
-    tube_material = models.ForeignKey(TubeMaterial, null=True, on_delete=models.CASCADE)
 
-    pressure_class = models.FloatField(choices=[(150.0, '150 psi'), (600.0, "600 psi")], null=True)
-
-    reference = models.TextField(default="")
+    reference = models.TextField(default="", blank=True)
