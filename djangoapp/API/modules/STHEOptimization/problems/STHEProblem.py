@@ -84,3 +84,21 @@ class STHEProblem(ElementwiseProblem):
 
         return inputs_sthe
     
+    def STHE_calculte(self, input:InputsShellAndTube):
+
+        shell_and_tube = CascoTubo(input)
+        shell_and_tube.filtro_tubos()
+        shell_and_tube.area_projeto()
+        shell_and_tube.coef_global_min()
+        shell_and_tube.conveccao_tubo()
+        shell_and_tube.espacamento_defletor()
+        shell_and_tube.corte_defletor()
+        shell_and_tube.diametro_casco()
+        shell_and_tube.conveccao_casco()
+        shell_and_tube.calculo_temp_parede()
+        shell_and_tube.coef_global_limpo()
+        shell_and_tube.excesso_area()
+        shell_and_tube.perda_carga_tubo()
+        shell_and_tube.perda_carga_casco()
+
+        return shell_and_tube

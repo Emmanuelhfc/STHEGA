@@ -831,6 +831,11 @@ class CascoTubo:
         self.delta_Pc = delta_Pc
         self.delta_Ps = delta_Ps
 
+    def objective_GA_EA_and_pressure_drop(self):
+        F = self.Ea + self.delta_Ps + self.delta_PT
+
+        return F
+
 if __name__ == "__main__":
    ...
 
