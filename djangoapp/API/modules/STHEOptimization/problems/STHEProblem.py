@@ -68,7 +68,7 @@ class STHEProblem(ElementwiseProblem):
             L = X["L"],
             Ds_inch = X["Ds_inch"],
             n = X["n"],
-            tube_material= X["tube_material_id"],
+            tube_material= TubeMaterial.objects.get(id=X["tube_material_id"]),
             
         )
         pitch = Pitch.objects.get(id= X["pitch_id"])
@@ -77,7 +77,7 @@ class STHEProblem(ElementwiseProblem):
         di = TubeInternDiameter.objects.filter(
             tube_diameter = de.id,
             standard = X["di_standard"]
-        )
+        ).first()
         inputs_sthe.di = di
         inputs_sthe.pitch = pitch
         inputs_sthe.save()

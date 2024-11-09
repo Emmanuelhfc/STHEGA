@@ -151,7 +151,7 @@ class CascoTubo:
             layout=self.layout,
             Ds_inch = self.Ds_inch
         ).first()
-        
+                                                   
         self.Ds = tube_count.Ds_meters
 
         match self.n:
