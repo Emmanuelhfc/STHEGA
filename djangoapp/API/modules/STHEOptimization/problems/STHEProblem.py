@@ -20,8 +20,8 @@ class STHEProblem(ElementwiseProblem):
 
         vars = {
             "shell_thickness_meters": Real(bounds=(0, 0.50)),
-            "lc_percent": Real(bounds=DISTANCIA_DEFLETOR_VALUES),
-            "ls_percent": Real(bounds=CORTE_DEFLETOR_VALUES),
+            "ls_percent": Real(bounds=DISTANCIA_DEFLETOR_VALUES),
+            "lc_percent": Real(bounds=CORTE_DEFLETOR_VALUES),
             "L": Real(bounds=(0, 20)),
 
             "pressure_class": Choice(options=[150.0, 600.0]),
