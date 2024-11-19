@@ -797,9 +797,11 @@ class CascoTubo:
 
         if Res >= 100:      #   Escoamento turbulento
             delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
+            logger.error(delta_Pwi)
         
         elif Res < 100:     #   Escoamento laminar
             theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
+            logger.error(theta_b)
             Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
 
             delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))

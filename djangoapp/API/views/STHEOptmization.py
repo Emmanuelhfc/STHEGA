@@ -25,7 +25,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
         res = minimize(problem,
                algorithm,
-               termination=('n_evals', 50),
+               termination=('n_evals', 100),
                seed=1,
                verbose=True)
 
