@@ -388,27 +388,31 @@ class CascoTubo:
         return self.nozzle_diameter.nozzle_diameter_meters
     
     def _li_lo_tabela(self):
-            """ ## Descrição:
-                Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
-                ## Args:
-                    - Ds: diâmetro do casco
-                    - classe: classe de pressão (150 ou 600 psi)
-                ## Return:
-                    - li: [m]
-                    - lo: [m]
-            """
+        """ ## Descrição:
+            Filtra da tabela a li e lo com base no diâmetro do casco e classe de pressão [Pesquisar mais sobre isso]
+            ## Args:
+                - Ds: diâmetro do casco
+                - classe: classe de pressão (150 ou 600 psi)
+            ## Return:
+                - li: [m]
+                - lo: [m]
+        """
+        diam_bocal = self.nozzle_diameter.nozzle_diameter_meters
 
-            
-            self.li_lo = LiLo.objects.filter(
+        if self.ls < diam_bocal:
+            li_lo = LiLo.objects.filter(
                 pressure_class_psi= self.pressure_class
             ).annotate(
                 abs_difference=Abs(F('Dc_meters') - Value(self.Dc))
             ).order_by('abs_difference').first()
 
-            lo = self.li_lo.lo_meters
-            li = self.li_lo.li_meters
+            lo = li_lo.lo_meters
+            li = li_lo.li_meters
+        
+        li = self.ls
+        lo = self.ls
 
-            return li, lo
+        return li, lo
     def conveccao_casco(self):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
