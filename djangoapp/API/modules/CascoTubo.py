@@ -413,6 +413,24 @@ class CascoTubo:
         lo = self.ls
 
         return li, lo
+
+    def _calculo_area_fluxo_cruzado(self):
+
+        angle = self.layout.angle
+        ls = self.ls
+        Ds = self.Dotl
+        de = self.de.diameter_meters
+        Dotl = self.Dotl
+        p = self.pitch.pitch_meters
+        pn = self.pn
+
+        if angle == 30 or angle == 90:
+            Sm = ls * (Ds - Dotl + ((Dotl - de) / p )* (p - de))
+        else:
+            Sm = ls * (Ds - Dotl + ((Dotl - de) / pn) * (p - de))
+        
+        return Sm
+
     def conveccao_casco(self):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
@@ -453,11 +471,7 @@ class CascoTubo:
         self.pp = pp
         self.pn = pn
         
-        if layout.name == NamesLayouts.TRIANGULAR:
-            Sm = ls * (Ds - Dotl + (Dotl - de) / p * (p - de))
-        else:
-            Sm = ls * (Ds - Dotl + (Dotl - de) / pn * (p - de))
-        
+        Sm = self._calculo_area_fluxo_cruzado()
         self.Sm = Sm
 
         Res = de * w / (mi * Sm)
