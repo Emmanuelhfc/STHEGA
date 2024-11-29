@@ -324,34 +324,7 @@ class CascoTubo:
         Dc = self.Ds + 2 * self.shell_thickness_meters
         self.Dc = Dc
 
-    def _fator_ji(self):
-        """ ## Descrição:
-                - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
-            ## Args:
-                - Res: nº de Re lado do casco
-                - de: diâmetro externo do casco
-                - angulo_tubos: angulo dos tubos dependendo do arranjo
-                - p: passo dos tubos
-            ## Return:
-                - ji:
-        """
-        self.constantA = ConstantsA.objects.get(
-            layout= self.layout,
-            reynolds_max__gte= self.Res,
-            reynolds_min__lt= self.Res
-        )
-
-        a4 = self.constantA.a4
-        a3 = self.constantA.a3
-        a2 = self.constantA.a2
-        a1 = self.constantA.a1
-        
-        a = a3 / (1 + 0.14 * self.Res ** a4)
-
-
-        ji = a1 *((1.33 / (self.pitch.pitch_meters / self.de.diameter_meters)) ** a )* self.Res ** a2
-
-        return ji
+    
 
     def _tabela_folga_diametral_casco_defletor(self):
         """ ## Descrição:
@@ -437,7 +410,7 @@ class CascoTubo:
         return theta_b
 
     def _calculo_area_vazamento_casco_defletor(self):
-        Scd = math.pi * self.Ds * self.delta_sb/2 *(1 - (self.theta_b/(2*math.pi)))
+        Scd = math.pi * self.Ds * self.delta_sb_meters/2 *(1 - (self.theta_b/(2*math.pi)))
         return Scd
 
     def _folga_tubo_defletor(self):
@@ -449,8 +422,84 @@ class CascoTubo:
         return Dctl
 
     def _angulo_interseccao_corte_defletor_com_Dctl(self):
-        delta_ctl = 2 * math.acos((self.Ds - 2*self.lc)/self.Dctl)
+        theta_ctl = 2 * math.acos((self.Ds - 2*self.lc)/self.Dctl)
+        return theta_ctl
 
+    def _fracao_tubos_janela_defletor(self):
+        Fw = (self.theta_ctl/(2*math.pi)) - (math.sin(self.theta_ctl)/(2*math.pi))
+        return Fw
+
+
+    def _numero_tubos_defletor(self):
+        Ntb = (1 - self.Fw) * self.Nt
+        return Ntb
+    
+    def _area_vazamento_tubo_defletor(self):
+        de = self.de.diameter_meter
+        Stb = (math.pi/4)((self.delta_tb + de)**2 - de**2) * self.Ntb
+        return Stb
+    
+    def _area_bypass_tubo_parede_casco(self):
+        Sbp = (self.Ds - self.Dotl) * self.ls
+        return Sbp
+
+    def _area_total_janela_defletor(self):
+        ...
+    
+    def _area_tubos_janela_defletor(self):
+        ...
+
+    def _area_escoamento_janela_defletor(self):
+        Sw = self.Swg - self.Swt
+        return Sw
+
+    def calculos_auxiliares(self):
+
+        self.delta_sb_meters = self._tabela_folga_diametral_casco_defletor()
+        self.d_bocal  = self._diametro_bocal()
+        self.li, self.lo = self._li_lo_tabela()
+        self.Sm = self._calculo_area_fluxo_cruzado()
+        self.theta_b = self._angulo_corte_defletor()
+        self.Scd = self._calculo_area_vazamento_casco_defletor()
+        self.delta_tb = self._folga_tubo_defletor()
+        self.Dctl = self._calculo_diam_feixe_tubos_centro_tubos()
+        self.theta_ctl = self._angulo_interseccao_corte_defletor_com_Dctl()
+        self.Fw = self._fracao_tubos_janela_defletor()
+        self.Ntb = self._numero_tubos_defletor()
+        self.Stb = self._area_vazamento_tubo_defletor()
+        self.Sbp = self._area_bypass_tubo_parede_casco()
+
+
+
+
+    def _fator_ji(self):
+        """ ## Descrição:
+                - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
+            ## Args:
+                - Res: nº de Re lado do casco
+                - de: diâmetro externo do casco
+                - angulo_tubos: angulo dos tubos dependendo do arranjo
+                - p: passo dos tubos
+            ## Return:
+                - ji:
+        """
+        self.constantA = ConstantsA.objects.get(
+            layout= self.layout,
+            reynolds_max__gte= self.Res,
+            reynolds_min__lt= self.Res
+        )
+
+        a4 = self.constantA.a4
+        a3 = self.constantA.a3
+        a2 = self.constantA.a2
+        a1 = self.constantA.a1
+        
+        a = a3 / (1 + 0.14 * self.Res ** a4)
+
+
+        ji = a1 *((1.33 / (self.pitch.pitch_meters / self.de.diameter_meters)) ** a )* self.Res ** a2
+
+        return ji
 
     def conveccao_casco(self):
         """ ## Descrição:
