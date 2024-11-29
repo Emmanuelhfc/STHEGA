@@ -353,7 +353,7 @@ class CascoTubo:
 
         return ji
 
-    def _tabela_delta_sb(self):
+    def _tabela_folga_diametral_casco_defletor(self):
         """ ## Descrição:
                 - Filtra delta_sb [m]
             ## Args:
@@ -361,6 +361,7 @@ class CascoTubo:
             Return:
                 -delta_sb: arbetura diametral casco chicana
         """
+        #TODO -> rever tavaela folga diametra
 
         self.delta_sb = DeltaSB.objects.get(
             Dn_min_meters__lte = self.Ds,
@@ -430,6 +431,26 @@ class CascoTubo:
             Sm = ls * (Ds - Dotl + ((Dotl - de) / pn) * (p - de))
         
         return Sm
+    
+    def _angulo_corte_defletor(self):
+        theta_b = 2 * math.acos(1 - 2 * self.lc / self.Ds) 
+        return theta_b
+
+    def _calculo_area_vazamento_casco_defletor(self):
+        Scd = math.pi * self.Ds * self.delta_sb/2 *(1 - (self.theta_b/(2*math.pi)))
+        return Scd
+
+    def _folga_tubo_defletor(self):
+        delta_tb = 7.938 * 10 ** - 4       #    [m] - Folga diametral tubo chicana- TEMA - Classe R - Verificar valor
+        return delta_tb
+
+    def _calculo_diam_feixe_tubos_centro_tubos(self):
+        Dctl = self.Dotl - self.de.diameter_meters
+        return Dctl
+
+    def _angulo_interseccao_corte_defletor_com_Dctl(self):
+        delta_ctl = 2 * math.acos((self.Ds - 2*self.lc)/self.Dctl)
+
 
     def conveccao_casco(self):
         """ ## Descrição:
@@ -460,19 +481,14 @@ class CascoTubo:
             mi = self.mi_f
             w = self.wf
 
-        # TODO -> verificar se é de mesmo 
-        # TODO -> analisar onde usa Dc ou Ds
-        # TODO -> analisar cálculo do diâmetro do casco
-        # TODO -> rever tabela dos passos
-        # TODO -> rever filtro li, lo - modo de filtrar - ver tabela outras referencias
-
-        #================= Cálculo para feixe de tubos ideal =====================
         pn, pp = self.pitch.pn_meters, self.pitch.pp_meters
         self.pp = pp
         self.pn = pn
-        
         Sm = self._calculo_area_fluxo_cruzado()
         self.Sm = Sm
+
+        #================= Cálculo para feixe de tubos ideal =====================
+        
 
         Res = de * w / (mi * Sm)
         
@@ -494,7 +510,7 @@ class CascoTubo:
         self.jc = jc
         #================= Fator de correção para os efeitos dos vazamentos da chicana =====================
         
-        delta_sb_meters  = self._tabela_delta_sb()  #   Folga diametral casco chicana
+        delta_sb_meters  = self._tabela_folga_diametral_casco_defletor()  #   Folga diametral casco chicana
         self.delta_sb_meters = delta_sb_meters
 
         Ssb = Ds * delta_sb_meters / 2 * (math.pi - math.acos(1 - 2 * lc / Ds))    #   Área de seção de vazamento casco chicana 
