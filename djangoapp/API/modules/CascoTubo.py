@@ -487,11 +487,12 @@ class CascoTubo:
         return Nb
 
     def calculos_auxiliares(self):
-        
+        pn, pp = self.pitch.pn_meters, self.pitch.pp_meters
+        self.pp = pp
+        self.pn = pn
         self.ls = self._espacamento_defletor()
         self.lc = self._corte_defletor()
         self.Dc = self._diametro_externo_casco()
-
         self.delta_sb_meters = self._tabela_folga_diametral_casco_defletor()
         self.d_bocal  = self._diametro_bocal()
         self.li, self.lo = self._li_lo_tabela()
@@ -513,18 +514,19 @@ class CascoTubo:
         self.Ncw = self._numero_efetivo_fileira_tubos_janela_defletor()
         self.Nb = self._numero_total_defletores()
         
-
-    def _fator_ji(self):
-        """ ## Descrição:
-                - Filtra da tabela os valores das constantes a e faz o cálculo do fator ji.
-            ## Args:
-                - Res: nº de Re lado do casco
-                - de: diâmetro externo do casco
-                - angulo_tubos: angulo dos tubos dependendo do arranjo
-                - p: passo dos tubos
-            ## Return:
-                - ji:
-        """
+    def _vazao_massica_unidade_area_casco(self, wc):
+        Gc = wc / self.Sm
+        return Gc   
+        
+    def _numero_reynolds_casco(self, mi_c):
+        Res = self.de.diameter_meters * self.Gc / mi_c
+        return Res
+    
+    def _numero_prandtl_casco(self, cp_c, mi_c, k_c):
+        Pr_s = cp_c * mi_c / k_c
+        return Pr_s
+    
+    def _fator_colburn_casco(self):
         self.constantA = ConstantsA.objects.get(
             layout= self.layout,
             reynolds_max__gte= self.Res,
@@ -543,6 +545,12 @@ class CascoTubo:
 
         return ji
 
+    def _trans_cal_ideal_casco(self, cp_c):
+        h_ideal = self.ji * cp_c * self.Gc * (self.Pr_s**(-2/3))
+        return h_ideal
+
+   
+
     def conveccao_casco(self):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
@@ -555,9 +563,7 @@ class CascoTubo:
         Nt = self.Nt
         Dotl = self.Dotl
         Ds = self.Ds
-        layout = self.layout
         L = self.L
-        p = self.pitch.pitch_meters
         ls = self.ls
         lc = self.lc
 
@@ -572,24 +578,12 @@ class CascoTubo:
             mi = self.mi_f
             w = self.wf
 
-        pn, pp = self.pitch.pn_meters, self.pitch.pp_meters
-        self.pp = pp
-        self.pn = pn
-        Sm = self._calculo_area_fluxo_cruzado()
-        self.Sm = Sm
-
-        #================= Cálculo para feixe de tubos ideal =====================
-        
-
-        Res = de * w / (mi * Sm)
-        
-        self.Res = Res
-
-        ji = self._fator_ji()
-        self.ji = ji
-
-        h_ideal = ji * cp * w/Sm * ((k/(cp * mi))**(2/3)) 
-        self.h_ideal = h_ideal
+        #================= Cálculo trans cal ideal =====================
+        self.Gc = self._vazao_massica_unidade_area_casco(w)
+        self.Res = self._numero_reynolds_casco(mi)
+        self.Pr_s = self._numero_prandtl_casco(cp, mi, k)
+        self.ji = self._fator_colburn_casco()
+        self.h_ideal = self._trans_cal_ideal_casco(cp)
 
         #================= Fator de correção para os efeitos da configuração da chicana =====================
 
