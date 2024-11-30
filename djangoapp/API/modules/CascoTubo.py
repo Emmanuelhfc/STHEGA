@@ -284,7 +284,7 @@ class CascoTubo:
         self.hi = hi
         self.hio = hio
 
-    def espacamento_defletor(self):
+    def _espacamento_defletor(self):
 
         ls = self.Ds * float(self.ls_percent)
 
@@ -308,13 +308,13 @@ class CascoTubo:
 
         self.min_ls = espacamento_max
         self.max_ls = espacamento_min
-        self.ls = ls
+        return ls
 
-    def corte_defletor(self):
-        self.lc = float(self.lc_percent) * self.Ds
+    def _corte_defletor(self):
+        return float(self.lc_percent) * self.Ds
 
     
-    def diametro_casco(self):
+    def _diametro_externo_casco(self):
         """Determinação do diâmetro externo do casco.
 
         Args:
@@ -322,7 +322,7 @@ class CascoTubo:
         """
         
         Dc = self.Ds + 2 * self.shell_thickness_meters
-        self.Dc = Dc
+        return Dc
 
     
 
@@ -444,16 +444,53 @@ class CascoTubo:
         return Sbp
 
     def _area_total_janela_defletor(self):
-        ...
+        Swg = (self.Ds**2/4)*((self.theta_b/2) - (math.sin(self.theta_b)/2))
+        return Swg
     
     def _area_tubos_janela_defletor(self):
-        ...
+        de = self.de.diameter_meters
+        Swt = math.pi/4 * (de**2) * self.Fw * self.Nt
+        return Swt
 
     def _area_escoamento_janela_defletor(self):
         Sw = self.Swg - self.Swt
         return Sw
 
+    def _numero_tubos_secao_escoamento_cruzado(self):
+        
+        Nc = self.Ds/self.pp * (1 - (2 * self.lc / self.Ds))
+
+        if Nc % 1 != 0:
+            Nc = Nc//1 + 1
+
+        return Nc
+
+    def _numero_pares_tiras_selantes(self):
+        
+        Nss = self.Nc / 5
+        if Nss % 1 != 0:
+            Nss = Nss//1 + 1
+
+        return Nss
+
+    def _numero_efetivo_fileira_tubos_janela_defletor(self):
+        Ncw = 0.8 / self.pp * (self.lc - ((self.Ds - self.Dctl)/2))
+        if Ncw % 1 != 0:
+            Ncw = Ncw//1 + 1
+
+        return Ncw
+
+    def _numero_total_defletores(self):
+        Nb = ((self.L - self.lsi - self.lso)/ self.ls) + 1
+        if Nb % 1 != 0:
+            Nb = Nb//1 + 1
+        return Nb
+
     def calculos_auxiliares(self):
+        
+        self.ls = self._espacamento_defletor()
+        self.lc = self._corte_defletor()
+        self.Dc = self._diametro_externo_casco()
 
         self.delta_sb_meters = self._tabela_folga_diametral_casco_defletor()
         self.d_bocal  = self._diametro_bocal()
@@ -468,9 +505,14 @@ class CascoTubo:
         self.Ntb = self._numero_tubos_defletor()
         self.Stb = self._area_vazamento_tubo_defletor()
         self.Sbp = self._area_bypass_tubo_parede_casco()
-
-
-
+        self.Swg = self._area_total_janela_defletor()
+        self.Swt = self._area_tubos_janela_defletor()
+        self.Sw = self._area_escoamento_janela_defletor()
+        self.Nc = self._numero_tubos_secao_escoamento_cruzado()
+        self.Nss = self._numero_pares_tiras_selantes()
+        self.Ncw = self._numero_efetivo_fileira_tubos_janela_defletor()
+        self.Nb = self._numero_total_defletores()
+        
 
     def _fator_ji(self):
         """ ## Descrição:
