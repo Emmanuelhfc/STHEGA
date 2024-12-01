@@ -561,6 +561,39 @@ class CascoTubo:
         jl = 0.44 * (1 - self.Rs) + (1 - 0.44 * (1 - self.Rs))*math.exp((-2.2*self.Rlm))
         return jl
 
+    def _fracao_escoamento_cruzado_que_pode_ocorrer_bypass(self):
+        Fbp = self.Sbp / self.Sm
+        return Fbp
+
+    def _fator_correcao_devido_fluxo_bypass(self):
+        if self.Res <= 100:
+            C = 1.35
+        elif self.Res > 100:
+            C = 1.25
+        
+        a = (2 * self.Nss / self.Nc)**(1/3)
+
+        jb = math.exp(-C * self.Fbp *(1 - a))
+        return jb
+
+
+    def _numero_total_fileiras_tubos_cruzado_pelo_fluxo(self):
+        Ntc = (self.Nc + self.Ncw) * (self.Nb + 1)
+        return Ntc
+
+    def _fator_correcao_devido_gradiente_adverso_temperatura_escoamento_laminar(self):
+        if self.Res > 100:
+            jr =1
+            return jr
+
+        jr_ = (10 / self.Ntc) ** 0.18
+        if self.Res <=20 :
+            return jr_
+
+        jr = jr_ + (20 - self.Res)/80 * (jr_ -1)
+
+        return jr
+
     def conveccao_casco(self):
         """ ## Descrição:
                 - Função que faz o cálculo da convecção no casco.
@@ -599,7 +632,16 @@ class CascoTubo:
         self.Rlm = self._razao_ambas_areas_vazamento_e_fluxo_cruzado()
         self.Rs = self._razao_area_vazamento_casco_defletor_e_soma_areas_vazamento()
         self.jl = self._fator_de_correcao_devido_vazamentos()
-        
+
+        #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
+        self.Fbp = self._fracao_escoamento_cruzado_que_pode_ocorrer_bypass()
+        self.jb = self._fator_correcao_devido_fluxo_bypass()
+
+
+        #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
+        self.Ntc = self._numero_total_fileiras_tubos_cruzado_pelo_fluxo()
+        self.jr = self._fator_correcao_devido_gradiente_adverso_temperatura_escoamento_laminar()
+
         #================= Fator de correção para os efeitos da configuração da chicana =====================
 
         Fc = 1/math.pi * (math.pi + 2 * (Ds - 2 * lc) / Dotl * math.sin( math.acos((Ds - 2 * lc) / Dotl)) - 2 * math.acos((Ds - 2 * lc) / Dotl))    #   Nº tubos seção de escoamento cruzado
@@ -610,45 +652,8 @@ class CascoTubo:
         self.jc = jc
 
 
-        #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
+       
         
-        Fbp = (Ds - Dotl) * ls / Sm     #   Fração da área de escoamento cruzado em que pode ocorrer a corrente C
-        Sbp = (Ds - Dotl) * ls      #   Área para desvio em torno do feixo 
-
-        if Res <= 100:
-            Cbh = 1.35
-        else:
-            Cbh = 1.25
-        
-        Nc = Ds * (1 - 2 * (lc / Ds)) / pp   #   N° de fileiras de tubos cruzados pelo escoamento numa seção de escoamento cruzado
-        Nc = Nc // 1        #   Nº Inteiro      
-        folga = (Ds - Dotl)
-
-        if  folga > 1.5 * POL2M or (folga > 0.5 * POL2M and Sbp/(Sm -Sbp) > 0.1 * POL2M) :
-            Nss = Nc // 5       #   Nº de pares de tiras selantes. Costuma-se utilizar umq par de tiras selantes para cada 5 a 7 filas de tubos na seção de escoamento cruzado.
-        else:
-            Nss = 0
-
-        jb = math.exp(-Cbh * Fbp * (1 - (2 * Nss / Nc) ** (1/3)))
-
-        self.Fbp = Fbp
-        self.Sbp = Sbp
-        self.Nc = Nc
-        self.Nss = Nss
-        self.jb = jb
-
-        #================= Fator de correção para o gradiente adverso de temperatura (Jr) =====================
-        
-        jr_ = 1.51 / (Nc ** 0.18)
-        
-        if Res > 100:
-            jr = 1
-        elif Res <= 20:
-            jr = jr_
-        elif 20<= Res <100:
-            jr = jr_ + ((20 - Res) / 80) * (jr_ - 1)
-        
-        self.jr = jr
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
         d_bocal = self._diametro_bocal()
         li, lo = self._li_lo_tabela()
