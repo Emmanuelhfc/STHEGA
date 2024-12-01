@@ -371,22 +371,39 @@ class CascoTubo:
                 - li: [m]
                 - lo: [m]
         """
-        diam_bocal = self.nozzle_diameter.nozzle_diameter_meters
-
-        if self.ls < diam_bocal:
-            li_lo = LiLo.objects.filter(
-                pressure_class_psi= self.pressure_class
-            ).annotate(
-                abs_difference=Abs(F('Dc_meters') - Value(self.Dc))
-            ).order_by('abs_difference').first()
-
-            lo = li_lo.lo_meters
-            li = li_lo.li_meters
         
-        li = self.ls
-        lo = self.ls
+        
+        li_lo = LiLo.objects.filter(
+            pressure_class_psi= self.pressure_class
+        ).annotate(
+            abs_difference=Abs(F('Dc_meters') - Value(self.Dc))
+        ).order_by('abs_difference').first()
+
+        lo = li_lo.lo_meters
+        li = li_lo.li_meters
 
         return li, lo
+
+    def _espacamento_defletor_entrada(self):
+        diam_bocal = self.nozzle_diameter.nozzle_diameter_meters
+
+        lsi = self.ls
+        if diam_bocal > self.ls:
+            lsi = self.li + diam_bocal
+
+        return lsi
+
+    def _espacamento_defletor_saida(self):
+
+        diam_bocal = self.nozzle_diameter.nozzle_diameter_meters
+
+        lso = self.ls
+        if diam_bocal > self.ls:
+            lso = self.lo + diam_bocal
+
+        return lso
+
+
 
     def _calculo_area_fluxo_cruzado(self):
 
@@ -496,6 +513,8 @@ class CascoTubo:
         self.delta_sb_meters = self._tabela_folga_diametral_casco_defletor()
         self.d_bocal  = self._diametro_bocal()
         self.li, self.lo = self._li_lo_tabela()
+        self.lsi = self._espacamento_defletor_entrada()
+        self.lso = self._espacamento_defletor_saida()
         self.Sm = self._calculo_area_fluxo_cruzado()
         self.theta_b = self._angulo_corte_defletor()
         self.Scd = self._calculo_area_vazamento_casco_defletor()
@@ -594,22 +613,36 @@ class CascoTubo:
 
         return jr
 
-    def conveccao_casco(self):
-        """ ## Descrição:
-                - Função que faz o cálculo da convecção no casco.
-            ## Args:
-                - ls: Espaçamento das chicanas
-                - lc: Corte das chicanas  
-                - classe: classe de pressão (150 ou 600 psi)[psi] 
-        """
-        de = self.de.diameter_meters
-        Nt = self.Nt
-        Dotl = self.Dotl
-        Ds = self.Ds
-        L = self.L
-        ls = self.ls
-        lc = self.lc
+    def _fracao_tubos_na_secao_escoamento_cruzado(self):
+        Fc = 1 - 2 * self.Fw
+        return Fc
 
+    def _fator_correcao_devido_configuracoes_defletor(self):
+        jc = 0.55 + 0.72 * self.Fc
+        return jc 
+
+    def _razao_espacamento_defletor_entrada_e_espacamento_normal(self):
+        lsi_s = self.lsi / self.ls
+        return lsi_s
+        
+    def _razao_espacamento_defletor_saida_e_espacamento_normal(self):
+        lso_s = self.lso / self.ls
+        return lso_s
+
+    def _fator_correcao_devido_a_espacamento_desigual(self):
+        n = 1/3
+        if self.Res > 100:
+            n = 0.6
+        
+        num = self.Nb + self.lsi_s **(1 - n) + self.lso_s ** (1 - n)
+        den = self.Nb - 1 + self.lsi_s + self.lso_s
+
+        js = num / den
+        return js
+
+        
+
+    def trans_cal_casco(self):
         if self.shell_fluid == "hot":
             k = self.k_q
             cp = self.cp_quente
@@ -643,52 +676,17 @@ class CascoTubo:
         self.jr = self._fator_correcao_devido_gradiente_adverso_temperatura_escoamento_laminar()
 
         #================= Fator de correção para os efeitos da configuração da chicana =====================
-
-        Fc = 1/math.pi * (math.pi + 2 * (Ds - 2 * lc) / Dotl * math.sin( math.acos((Ds - 2 * lc) / Dotl)) - 2 * math.acos((Ds - 2 * lc) / Dotl))    #   Nº tubos seção de escoamento cruzado
-        
-        jc = Fc + 0.54 * (1 - Fc) ** 0.345
-        
-        self.Fc = Fc
-        self.jc = jc
-
-
-       
-        
+        self.Fc = self._fracao_tubos_na_secao_escoamento_cruzado()
+        self.jc = self._fator_correcao_devido_configuracoes_defletor()
+    
         #================= Fator de correção devido ao espaçamento desigual das chicanas na entrada e na saída (Js) =====================
-        d_bocal = self._diametro_bocal()
-        li, lo = self._li_lo_tabela()
-
-        lsi = li + d_bocal
-        lso = lo + d_bocal
-
-        if Res > 100:
-            n = 0.6
-        elif Res <= 100:
-            n = 1/3
         
-        lsi_ = lsi / ls
-        lso_ = lso / ls
+        self.lsi_s = self._razao_espacamento_defletor_entrada_e_espacamento_normal()
+        self.lso_s = self._razao_espacamento_defletor_saida_e_espacamento_normal()
+        self.js = self._fator_correcao_devido_a_espacamento_desigual()
 
-        Nb = (L - lsi - lso) / ls + 1 #TODO verificar isso
-        Nb  = Nb // 1
-        self.Nb = Nb
-
-        num = (Nb - 1) + (lsi_ ** (1 - n)) + (lso_ ** (1 - n))
-        den = (Nb - 1) + (lsi_) + (lso_)
-
-        js = num / den
-
-        self.d_bocal = d_bocal
-        self.li = li
-        self.lo = lo
-        self.lsi = lsi
-        self.lso = lso
-        self.lsi_ = lsi_
-        self.lso_ = lso_
-        self.js = js
-        #   Cálculo coeficiente de transmissão de calor para o lado do casco
-        hs = h_ideal * jc * jl * jb * jr * js
-        
+        #================= coeficiente trans cal lado casco  =====================
+        hs = self.h_ideal * self.jc * self.jl * self.jb * self.jr * self.js
         self.hs = hs
     
     def calculo_temp_parede(self):

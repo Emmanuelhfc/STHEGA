@@ -35,7 +35,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
         shell_and_tube.espacamento_defletor()
         shell_and_tube.corte_defletor()
         shell_and_tube.diametro_casco()
-        shell_and_tube.conveccao_casco()
+        shell_and_tube.trans_cal_casco()
         shell_and_tube.calculo_temp_parede()
         shell_and_tube.coef_global_limpo()
         shell_and_tube.excesso_area()
