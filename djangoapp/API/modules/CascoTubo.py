@@ -549,7 +549,17 @@ class CascoTubo:
         h_ideal = self.ji * cp_c * self.Gc * (self.Pr_s**(-2/3))
         return h_ideal
 
-   
+    def _razao_ambas_areas_vazamento_e_fluxo_cruzado(self):
+        Rlm = (self.Scd + self.Stb) / self.Sm
+        return Rlm
+    
+    def _razao_area_vazamento_casco_defletor_e_soma_areas_vazamento(self):
+        Rs = self.Scd / (self.Scd + self.Stb)
+        return Rs
+    
+    def _fator_de_correcao_devido_vazamentos(self):
+        jl = 0.44 * (1 - self.Rs) + (1 - 0.44 * (1 - self.Rs))*math.exp((-2.2*self.Rlm))
+        return jl
 
     def conveccao_casco(self):
         """ ## Descrição:
@@ -585,6 +595,11 @@ class CascoTubo:
         self.ji = self._fator_colburn_casco()
         self.h_ideal = self._trans_cal_ideal_casco(cp)
 
+        #================= Fator de correção para os efeitos dos vazamentos da chicana =====================
+        self.Rlm = self._razao_ambas_areas_vazamento_e_fluxo_cruzado()
+        self.Rs = self._razao_area_vazamento_casco_defletor_e_soma_areas_vazamento()
+        self.jl = self._fator_de_correcao_devido_vazamentos()
+        
         #================= Fator de correção para os efeitos da configuração da chicana =====================
 
         Fc = 1/math.pi * (math.pi + 2 * (Ds - 2 * lc) / Dotl * math.sin( math.acos((Ds - 2 * lc) / Dotl)) - 2 * math.acos((Ds - 2 * lc) / Dotl))    #   Nº tubos seção de escoamento cruzado
@@ -593,22 +608,7 @@ class CascoTubo:
         
         self.Fc = Fc
         self.jc = jc
-        #================= Fator de correção para os efeitos dos vazamentos da chicana =====================
-        
-        delta_sb_meters  = self._tabela_folga_diametral_casco_defletor()  #   Folga diametral casco chicana
-        self.delta_sb_meters = delta_sb_meters
 
-        Ssb = Ds * delta_sb_meters / 2 * (math.pi - math.acos(1 - 2 * lc / Ds))    #   Área de seção de vazamento casco chicana 
-        delta_tb = 7.938 * 10 ** - 4       #    [m] - Folga diametral tubo chicana- TEMA - Classe R - Verificar valor
-        Stb = math.pi * de * delta_tb * Nt * (Fc + 1) / 4   #   Área da seção de vazamento tubo-chicana
-        alpha = 0.44 * (1 - Ssb / (Ssb + Stb))
-        jl = alpha + (1 - alpha) * math.exp(-2.2 * (Stb + Ssb) / Sm)
-        
-        
-        self.Ssb = Ssb
-        self.delta_tb = delta_tb
-        self.Stb =Stb
-        self.jl = jl
 
         #================= Fator de correção para os efeitos de contorno (“bypass” ) do feixe =====================
         
