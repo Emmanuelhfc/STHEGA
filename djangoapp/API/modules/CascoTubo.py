@@ -826,20 +826,62 @@ class CascoTubo:
 
         return [b1, b2, b3, b4]
 
+    def _fator_correcao_perda_carga_devido_correntes_vazamento(self):
+        Rcl = math.exp(-1.33 * (1 + self.Rs) * self.Rlm ** self.pitch.pitch_meters)
+        return Rcl
+
+    def _fator_correcao_perda_carga_devido_corrente_bypass(self):
+
+        nss_nc = self.Nss / self.Nc
+
+        D = 3.7
+        if self.Res <=100:
+            D = 4.5
+
+        if nss_nc >= (1/2):
+            Rcb = 1
+            return Rcb  
+        
+        a = (2 * self.Nss / self.Nc) ** (1/3)
+
+        Rcb = math.exp(-D * self.Fbp * (1 - a))
+
+        return Rcb
+    
+    def _fator_atrito_fluido_casco(self):
+        b1, b2, b3, b4 = self._constantes_b()
+
+        b = b3 / (1 + 0.14 * self.Res ** b4)
+        fi = b1 * (1.33 / (self.pitch.pitch_meters / self.de.diameter_meters)) ** b * (self.Res) ** b2 
+
+        return fi
+    
+    def _perda_carga_ideal(self, rho_c):
+        delta_Pbi = (4 * self.fi * self.Gc**2 * self.Nc / (2 * rho_c) )
+        return delta_Pbi
+
+    def _perda_carga_regiao_escoamento_cruzado(self):
+        delta_Pc = self.delta_Pbi * (self.Nb -1) * self.Rcl * self.Rcb
+        return delta_Pc
+    
+    def _correcao_perda_carga_para_espacamento_desigual_defletores(self):
+        n = 0.2
+        if self.Res <= 100:
+            n = 1
+
+        Rcs = self.lsi_s ** -(2-n) + self.lso_s ** -(2-n)
+
+        return Rcs
+    
+    def _perda_carga_regiao_entrada_e_saida(self):
+        delta_Pe = 2 * self.delta_Pbi * (1 + self.Ncw/self.Nc) * self.Rcb * self.Rcs
+        return delta_Pe
+    
+    def _perda_carga_ideal_para_janela_defletor(self, w_c, rho_c):
+        delta_Pwi = (2 + 0.6 * self.Ncw) * (w_c ** 2 / (self.Sm * self.Sw)) / (2 * rho_c)
+        return delta_Pwi
+
     def perda_carga_casco(self):
-        """ ## Descrição:
-            - Cálculo da perda de carga do lado do caso.
-            ## Args:
-                - Fc: Nº tubos seção de escoamento cruzado
-                - Nt: Nº de tubos
-                - ls: espaçamento das chicanas
-                - lsi_: razão entre espaçamento da chicana de entrada e espaçamento das chicanas
-                - lso_: razão entre espaçamento da chicana de saída e espaçamento das chicanas
-                - a_tubo: arranjo de tubos
-            ## Return
-                - delta_Ps: perda de carga do lado do casco   
-        """
-        #  TODO -> correção miw
         Nb = self.Nb
         de = self.de.diameter_meters
         Res = self.Res
@@ -868,32 +910,23 @@ class CascoTubo:
             W = self.wf
             rho = self.rho_f
 
+
+        self.fi = self._fator_atrito_fluido_casco()
+        self.delta_Pbi = self._perda_carga_ideal(rho)
+
         #================ Perda de carga na seção de escoamento cruzado ======================
-        if Res <= 100:
-            Cbp = 4.5
-        elif Res > 100:
-            Cbp = 3.7
-
-        Rb_a = (1 - (2 * Nss / Nc) ** (1/3))
-        Rb = math.exp(-Cbp * Fbp * Rb_a)        #   Fator de correção para efeito do contorno do feixe    
-
-        m = 0.15 * (1 + Ssb / (Stb + Ssb)) + 0.8
-        Rl_b = ((Stb + Ssb) / Sm) ** m 
-        Rl_a = (1 + Ssb / (Stb + Ssb)) * -1.33
-
-        Rl = math.exp(Rl_a * Rl_b)      #   Fator de correlção para efeitos de vazamento na chicana
+        self.Rcl = self._fator_correcao_perda_carga_devido_correntes_vazamento()
+        self.Rcb = self._fator_correcao_perda_carga_devido_corrente_bypass()
+        self.delta_Pc = self._perda_carga_regiao_escoamento_cruzado()
         
-        b1, b2, b3, b4 = self._constantes_b()
+        #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
 
-        b = b3 / (1 + 0.14 * Res ** b4)
-        fi = b1 * (1.33 / (p / de)) ** b * (Res) ** b2      #   Fator de atrito para um feixe de tubos ideal
-        delta_Pbi = (4 * fi * W **2 * Nc / (rho * Sm ** 2) ) # TODO -> implementar depois e verificar eq. (mi / miw) ** -0.14   #   Perda de carga para uma seção ideal de fluxo cruzado
+        self.Rcs = self._correcao_perda_carga_para_espacamento_desigual_defletores()
+        self.delta_Pe = self._perda_carga_regiao_entrada_e_saida()
 
-        self.delta_Pbi = delta_Pbi
-        
-        delta_Pc = delta_Pbi * (Nb -1) * Rb * Rl
-        
         #================= Perda de carga nas janelas ==============================================
+        self.delta_Pwi = self._perda_carga_ideal_para_janela_defletor(W, rho)
+        
         Swg_a = 1 - 2 * lc / Ds 
         Swg_b = (1-(Swg_a ** 2)) ** (1/2)
         Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
@@ -927,17 +960,7 @@ class CascoTubo:
         
         delta_Pw = Nb * delta_Pwi * Rl
 
-        #================== Perda de carga nas regiões de entrada e saída do casco delta_Pe ============
-
-        if Res <= 100:
-            n = 1
-        elif Res > 100:
-            n = 0.2
-        
-        # TODO-> conferir contas que envolve valores em pol
-        Rs = (1 / 2) * (((lsi_ / POL2M) ** (n - 2)) + ((lso_/POL2M) ** (n-2)))      #   Fator de correção devido o espaçamento desigual das chicanas
-
-        delta_Pe = 2 * delta_Pbi * (1 + Ncw / Nc) * Rb * Rs
+       
 
         
         #================ Perda de carga do lado do casco ===============================================
