@@ -877,30 +877,34 @@ class CascoTubo:
         delta_Pe = 2 * self.delta_Pbi * (1 + self.Ncw/self.Nc) * self.Rcb * self.Rcs
         return delta_Pe
     
-    def _perda_carga_ideal_para_janela_defletor(self, w_c, rho_c):
-        delta_Pwi = (2 + 0.6 * self.Ncw) * (w_c ** 2 / (self.Sm * self.Sw)) / (2 * rho_c)
+    def _numero_tubos_janela_defletor(self):
+        Ntw = self.Nt * self.Fw
+        return Ntw
+    def _diametro_hidraulico_janela_defletor(self):
+        de = self.de.diameter_meters
+        Dw = 4 * self.Sw / (math.pi * de * self.Ntw + self.theta_b * self.Ds / 2)
+        return Dw
+
+    def _perda_carga_ideal_para_janela_defletor(self, w_c, rho_c, mi_c):
+        de = self.de.diameter_meters
+        if self.Res > 100:
+            delta_Pwi = (2 + 0.6 * self.Ncw) * (w_c ** 2 / (self.Sm * self.Sw)) / (2 * rho_c)
+
+        else: 
+            a1 = (26 * mi_c * w_c) / (math.sqrt(self.Sm * self.Sw))
+            a2 = (self.Ncw / (self.pitch.pitch_meters - de)) + self.ls / (self.Dw ** 2)
+            a3 = w_c ** 2 / (self.Sm * self.Sw * rho_c)
+
+            delta_Pwi = a1 * a2 + a3
+        
         return delta_Pwi
 
-    def perda_carga_casco(self):
-        Nb = self.Nb
-        de = self.de.diameter_meters
-        Res = self.Res
-        Nc = self.Nc
-        Stb = self.Stb
-        Ssb = self.Ssb
-        Sm = self.Sm
-        Nss = self.Nss
-        Fbp = self.Fbp
-        p = self.pitch.pitch_meters
-        pp = self.pp
-        lc = self.lc
-        Ds = self.Ds
-        Fc = self.Fc
-        Nt = self.Nt
-        ls = self.ls
-        lsi_ = self.lsi_
-        lso_ = self.lso_
+    def _perda_carga_janela_defletor(self):
+        delta_Pw = self.delta_Pwi * self.Nb * self.Rcl
+        return delta_Pw
 
+
+    def perda_carga_casco(self):
         if self.shell_fluid == "hot":
             mi = self.mi_q
             W = self.wq
@@ -925,51 +929,14 @@ class CascoTubo:
         self.delta_Pe = self._perda_carga_regiao_entrada_e_saida()
 
         #================= Perda de carga nas janelas ==============================================
-        self.delta_Pwi = self._perda_carga_ideal_para_janela_defletor(W, rho)
-        
-        Swg_a = 1 - 2 * lc / Ds 
-        Swg_b = (1-(Swg_a ** 2)) ** (1/2)
-        Swg = ((Ds ** 2) / 4 ) * (math.acos(1 - 2 * lc / Ds) - Swg_a * Swg_b)      #   Área total da janela
-        self.Swg= Swg
-
-        
-
-        Swt = Nt / 8 * (1 - Fc) * math.pi * de ** 2     # Área ocupada pelos tubos na janela
-
-        Sw = Swg - Swt      #   Área da seção de escoamento da janela
-
-        Ncw = 0.8 * lc / pp     #   Nº de fileiras de tubos efetivamente cruzados em cada janela
-
-        # TODO -> verificar isso, se arredonda pra baixo
-        Ncw = Ncw // 1
-
-
-        if Res >= 100:      #   Escoamento turbulento
-            delta_Pwi = W ** 2 * (2 + 0.6 * Ncw) / (2 * Sm * Sw * rho)  #   Perda de carga em uma seção de janela ideal
-            logger.error(delta_Pwi)
-        
-        elif Res < 100:     #   Escoamento laminar
-            theta_b = 2 * math.acos(1 - 2 * lc / Ds)        #   Ângulo de corte da chicana em radianos
-            logger.error(theta_b)
-            Dw = 4 * Sw / ((math.pi / 2) * Nt * (1 - Fc) * de + Ds * theta_b)       #   Diâmetro equivalente da janela
-
-            delta_Pwi_a = 26 * mi * W / (rho * ((Sm * Sw) ** (1/2)))
-            delta_Pwi_b = (Ncw / (p - de) + ls / (Dw ** 2))
-            delta_Pwi_c = 2 * W ** 2 / (2 * Sm * Sw * rho)
-            delta_Pwi = delta_Pwi_a * delta_Pwi_b + delta_Pwi_c
-        
-        delta_Pw = Nb * delta_Pwi * Rl
-
-       
-
+        self.Ntw = self._numero_tubos_janela_defletor()
+        self.Dw = self._diametro_hidraulico_janela_defletor()
+        self.delta_Pwi = self._perda_carga_ideal_para_janela_defletor(W, rho, mi)
+        self.delta_Pw = self._perda_carga_janela_defletor()
         
         #================ Perda de carga do lado do casco ===============================================
-        delta_Ps = delta_Pc + delta_Pw + delta_Pe       #   Perda de carga lado do casco excluindo os bocais
+        delta_Ps = self.delta_Pc + self.delta_Pw + self.delta_Pe       #   Perda de carga lado do casco excluindo os bocais
 
-        
-        self.delta_Pw = delta_Pw
-        self.delta_Pe = delta_Pe
-        self.delta_Pc = delta_Pc
         self.delta_Ps = delta_Ps
 
     def objective_GA_EA_and_pressure_drop(self):
