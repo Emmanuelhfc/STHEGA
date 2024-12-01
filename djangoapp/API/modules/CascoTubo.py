@@ -640,8 +640,6 @@ class CascoTubo:
         js = num / den
         return js
 
-        
-
     def trans_cal_casco(self):
         if self.shell_fluid == "hot":
             k = self.k_q
@@ -757,31 +755,27 @@ class CascoTubo:
         Uc = hio * hs / (hio + hs)
         
         self.Uc = Uc
+
+    def coef_global_sujo(self):
+        Us = self.Uc + self.Rd_f + self.Rd_q
+        self.Us = Us
     
     def excesso_area(self):
-        """## Descrição:
-            Cálcula do fator de inscrustação e excesso da área de troca
-        """
-        #   Rd calculados deve ser maior que verdadeiro
-        self.Rd_verd = self.Rd_f + self.Rd_q
-        Rd_verd = self.Rd_verd
         Ud = self.Ud_min
         Uc = self.Uc
         delta_t = self.deltaT
         q = self.q
         A_proj = self.A_proj
+        Us = self.Us
 
         Rd = (Uc - Ud) / (Uc * Ud)
         
-        Ud_ = 1 / (1 / Uc + Rd_verd)
-
-        A_nec = q / (Ud_ * delta_t)
+        A_nec = q / (Us * delta_t)
         Ea = (A_proj - A_nec)/A_nec * 100
 
         self.Rd_calc = Rd
         self.A_nec = A_nec
         self.Ea = Ea
-        self.Ud = Ud_
 
     def perda_carga_tubo(self, phi_t = 1):
         """ ## Descrição:
