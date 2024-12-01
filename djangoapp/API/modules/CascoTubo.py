@@ -452,8 +452,8 @@ class CascoTubo:
         return Ntb
     
     def _area_vazamento_tubo_defletor(self):
-        de = self.de.diameter_meter
-        Stb = (math.pi/4)((self.delta_tb + de)**2 - de**2) * self.Ntb
+        de = self.de.diameter_meters
+        Stb = (math.pi/4) * ((self.delta_tb + de)**2 - de**2) * self.Ntb
         return Stb
     
     def _area_bypass_tubo_parede_casco(self):
