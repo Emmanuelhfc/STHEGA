@@ -21,4 +21,5 @@ RUN python -m venv /venv && \
 # RUN chmod +x /djangoapp/scripts/commands.sh
 ENV PATH="/scripts:/venv/bin:$PATH"
 
+RUN ["chmod", "+x", "/scripts/commands.sh"]
 CMD ["commands.sh"]
