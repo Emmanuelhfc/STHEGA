@@ -7,13 +7,27 @@ import logging
 from pymoo.core.mixed import MixedVariableGA
 from pymoo.optimize import minimize
 from API.modules.STHEOptimization.problems import*
+from pymoo.core.callback import Callback
 
 logger = logging.getLogger('API')
+
+
+class MyCallback(Callback):
+    def __init__(self):
+        super().__init__()
+        self.generation = 0
+
+    def notify(self, algorithm):
+        self.generation += 1
+        # logger.info(f"Geração: {self.generation}")
+        # logger.info("População atual:")
+        # for ind in algorithm.pop.get("X"):
+        #     logger.info(ind)
 class STHEOptmizationViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     serializer_class = OptimizationInputsSerializer
     
-
+    
     def sthe_optimization(self, request):
         serializer = OptimizationInputsSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -23,11 +37,14 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         problem = STHEProblemGA(input_id)
         algorithm = MixedVariableGA(pop_size=5)
 
+        callback = MyCallback()
+
         res = minimize(problem,
                algorithm,
-               termination=('n_evals', 100),
+               termination=('n_evals', 300),
                seed=1,
-               verbose=True)
+               verbose=True,
+               callback=callback)
 
         return Response({'msg': f"BEST: F {res.F} - res X= {res.X}"})
 

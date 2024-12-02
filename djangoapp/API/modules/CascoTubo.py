@@ -104,8 +104,8 @@ class CascoTubo:
             self.mldt = num / den
 
 
-            logger.debug(f'({self.T1} - {self.t2})-({self.T2} - {self.t1})')
-            logger.debug(f'ln(({self.T1} - {self.t2})/({self.T2} - {self.t1})')
+            # logger.debug(f'({self.T1} - {self.t2})-({self.T2} - {self.t1})')
+            # logger.debug(f'ln(({self.T1} - {self.t2})/({self.T2} - {self.t1})')
         
         def calculo_R_S():
             self.R = (self.T1 - self.T2)/(self.t2 - self.t1)
@@ -803,7 +803,7 @@ class CascoTubo:
         delta_Pt = (4 * f * G_t ** 2 * L * n) / (di * 2 * rho * phi_t) 
         # delta_Pt = (4 * f  * v ** 2 * L * n) / (di * 2 * phi_t) 
 
-        logger.debug(f"(4 * {f} * {G_t} ** 2 * {L} * {n}) / ({di} * 2 * {rho} * {phi_t})") 
+        # logger.debug(f"(4 * {f} * {G_t} ** 2 * {L} * {n}) / ({di} * 2 * {rho} * {phi_t})") 
 
         delta_PT = delta_Pt + delta_Pr
 
@@ -941,6 +941,7 @@ class CascoTubo:
 
     def objective_GA_EA_and_pressure_drop(self):
         F = self.Ea + self.delta_Ps + self.delta_PT
+        logger.info(f'{self.Ea} + {self.delta_Ps} + {self.delta_PT}')
 
         return F
 

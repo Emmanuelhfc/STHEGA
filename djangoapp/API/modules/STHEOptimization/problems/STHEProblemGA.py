@@ -1,6 +1,9 @@
 
 from API.modules.STHEOptimization.problems import STHEProblem
 
+import logging
+
+logger = logging.getLogger('API')
 
 class STHEProblemGA(STHEProblem):
     def _evaluate(self, X, out, *args, **kwargs):

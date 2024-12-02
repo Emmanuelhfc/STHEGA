@@ -22,7 +22,7 @@ class STHEProblem(ElementwiseProblem):
             "shell_thickness_meters": Real(bounds=(0, 0.50)),
             "ls_percent": Real(bounds=DISTANCIA_DEFLETOR_VALUES),
             "lc_percent": Real(bounds=CORTE_DEFLETOR_VALUES),
-            "L": Real(bounds=(0, 20)),
+            "L_percent": Real(bounds=(5, 10)),
 
             "pressure_class": Choice(options=[150.0, 600.0]),
             "tube_material_id": Choice(options=tube_material_ids),
@@ -65,7 +65,7 @@ class STHEProblem(ElementwiseProblem):
             lc_percent = X["lc_percent"],
             ls_percent = X["ls_percent"],
             shell_fluid = X["shell_fluid"],
-            L = X["L"],
+            L = X["L_percent"] * X["Ds_inch"] * 0.0254,
             Ds_inch = X["Ds_inch"],
             n = X["n"],
             tube_material= TubeMaterial.objects.get(id=X["tube_material_id"]),
@@ -91,12 +91,11 @@ class STHEProblem(ElementwiseProblem):
         shell_and_tube.area_projeto()
         shell_and_tube.coef_global_min()
         shell_and_tube.conveccao_tubo()
-        shell_and_tube.espacamento_defletor()
-        shell_and_tube.corte_defletor()
-        shell_and_tube.diametro_casco()
+        shell_and_tube.calculos_auxiliares()
         shell_and_tube.trans_cal_casco()
         shell_and_tube.calculo_temp_parede()
         shell_and_tube.coef_global_limpo()
+        shell_and_tube.coef_global_sujo()
         shell_and_tube.excesso_area()
         shell_and_tube.perda_carga_tubo()
         shell_and_tube.perda_carga_casco()
