@@ -6,6 +6,11 @@ from API.models import *
 from django.db.models import F, Value
 from django.db.models.functions import Abs
 
+class TubeCountError(Exception):
+    """Exceção personalizada para erros relacionados à contagem de tubos."""
+    def __init__(self, message="O número de tubos (Nt) é zero."):
+        self.message = message
+        super().__init__(self.message)
 
 # TODO -> Rever tipos de arranjos dos tubos por tabelas da norma;
 # TODO -> Update - arredondar valores das tabelas
@@ -51,6 +56,8 @@ class CascoTubo:
         self.tube_material:TubeMaterial = input.tube_material
         self.shell_thickness_meters = input.shell_thickness_meters
         self.pressure_class = input.pressure_class
+        self.perda_carga_admissivel_casco = input.perda_carga_admissivel_casco
+        self.perda_carga_admissivel_tubo = input.perda_carga_admissivel_tubo
 
         self._balaco_de_energia()
         self._diferenca_temp_deltaT()
@@ -167,6 +174,9 @@ class CascoTubo:
                 Nt = tube_count.n8
 
         self.Nt = Nt
+
+        if self.Nt == 0:
+            raise TubeCountError("O número de tubos (Nt) é zero.")
         self.Dotl = tube_count.Dotl_meters
         
         return self.Nt
@@ -181,6 +191,7 @@ class CascoTubo:
         # TODO -> Confirmar se não deveria multiplicar pelo número de passes
         Nt = self.Nt
         de = self.de.diameter_meters
+
         A_proj = Nt * math.pi * de * self.L  
         self.A_proj = A_proj
 
@@ -1033,9 +1044,24 @@ class CascoTubo:
         return results
 
     def objective_GA_EA_and_pressure_drop(self):
-        F = self.Ea + self.delta_Ps + self.delta_PT
-        logger.info(f'{self.Ea} + {self.delta_Ps} + {self.delta_PT}')
+        if self.Ea >= 10 and self.Ea <= 20:
+            ea_avaliation = 0
+        elif self.Ea < 10 and self.Ea >= 2:
+            ea_avaliation = 500
+        elif self.Ea < 2 and self.Ea >=0:
+            ea_avaliation = 10000
+        elif self.Ea < 0:
+            ea_avaliation = 100000
+        elif self.Ea >20 and self.Ea <30:
+            ea_avaliation = 500
+        else:
+            ea_avaliation = 10000
 
+        aval_delta_PT = math.fabs(self.delta_PT - self.perda_carga_admissivel_tubo)
+        aval_delta_Ps = math.fabs(self.delta_Ps - self.perda_carga_admissivel_casco)
+
+        F = ea_avaliation + aval_delta_PT + aval_delta_Ps
+    
         return F
 
 if __name__ == "__main__":

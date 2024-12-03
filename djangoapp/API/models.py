@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from django.utils import timezone
 
-DISTANCIA_DEFLETOR_VALUES = (0.0, 1.0)
+DISTANCIA_DEFLETOR_VALUES = (0.4, 2)
 CORTE_DEFLETOR_VALUES = (0.15, 0.4)
 
 DISTANCIA_DEFLETOR = [MinValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[0])), MaxValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[1]))]
@@ -187,6 +187,9 @@ class InputsShellAndTube(models.Model):
     pressure_class = models.FloatField(choices=[(150.0, '150 psi'), (600.0, "600 psi")], null=True, blank=True)
 
     reference = models.TextField(default="", blank=True)
+
+    perda_carga_admissivel_casco = models.FloatField(default=0, blank=True)
+    perda_carga_admissivel_tubo = models.FloatField(default=0, blank=True)
 
 class Results(models.Model):
     calculation_id = models.UUIDField(null=True, blank=True)

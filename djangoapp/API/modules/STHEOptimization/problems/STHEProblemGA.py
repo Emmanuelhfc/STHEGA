@@ -11,5 +11,6 @@ class STHEProblemGA(STHEProblem):
         sthe_calculate = self.STHE_calculte(sthe)
         f = sthe_calculate['objective_function_1']
 
+        X['results_id'] = sthe_calculate['id']
         out["F"] = f
         

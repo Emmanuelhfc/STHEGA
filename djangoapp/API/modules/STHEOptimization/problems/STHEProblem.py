@@ -1,6 +1,6 @@
 
 
-from API.modules.CascoTubo import CascoTubo
+from API.modules.CascoTubo import CascoTubo, TubeCountError
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.variable import Real, Integer, Choice, Binary
 from API.models import*
@@ -59,7 +59,9 @@ class STHEProblem(ElementwiseProblem):
             tipo_f = self.initial_inputs["tipo_f"],
             reference = self.initial_inputs["reference"],
             calculation_id = self.calculation_id,
-            
+            perda_carga_admissivel_casco= self.initial_inputs['perda_carga_admissivel_casco'],
+            perda_carga_admissivel_tubo= self.initial_inputs['perda_carga_admissivel_tubo'],
+
             pressure_class = X["pressure_class"],
             shell_thickness_meters = X["shell_thickness_meters"],
             lc_percent = X["lc_percent"],
@@ -85,29 +87,37 @@ class STHEProblem(ElementwiseProblem):
         return inputs_sthe
     
     def STHE_calculte(self, input:InputsShellAndTube):
+        try:
+            shell_and_tube = CascoTubo(input)
+            shell_and_tube.filtro_tubos()
+            shell_and_tube.area_projeto()
+            shell_and_tube.coef_global_min()
+            shell_and_tube.conveccao_tubo()
+            shell_and_tube.calculos_auxiliares()
+            shell_and_tube.trans_cal_casco()
+            shell_and_tube.calculo_temp_parede()
+            shell_and_tube.coef_global_limpo()
+            shell_and_tube.coef_global_sujo()
+            shell_and_tube.excesso_area()
+            shell_and_tube.perda_carga_tubo()
+            shell_and_tube.perda_carga_casco()
+            shell_and_tube.results()
+            results_args = shell_and_tube.results()
+            objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
+            error = False
+        
+        except TubeCountError:
+            results_args = {}
+            objective_function_1 = 10**6
+            error = True
 
-        shell_and_tube = CascoTubo(input)
-        shell_and_tube.filtro_tubos()
-        shell_and_tube.area_projeto()
-        shell_and_tube.coef_global_min()
-        shell_and_tube.conveccao_tubo()
-        shell_and_tube.calculos_auxiliares()
-        shell_and_tube.trans_cal_casco()
-        shell_and_tube.calculo_temp_parede()
-        shell_and_tube.coef_global_limpo()
-        shell_and_tube.coef_global_sujo()
-        shell_and_tube.excesso_area()
-        shell_and_tube.perda_carga_tubo()
-        shell_and_tube.perda_carga_casco()
-        shell_and_tube.results()
-
-        results_args = shell_and_tube.results()
-        objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
+        
 
         result = Results.objects.create(
             inputs = input,
             calculation_id = self.calculation_id,
             objective_function_1 = objective_function_1,
+            error = error,
             **results_args
         )
 

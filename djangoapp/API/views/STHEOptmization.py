@@ -30,7 +30,10 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     serializer_class = OptimizationInputsSerializer
     
-    @extend_schema(tags=['GA OPTIMIZATION'])
+    @extend_schema(
+        tags=['GA OPTIMIZATION'],
+        responses=ResultsSerializer
+    )
     def ga_sthe_optimization(self, request):
         serializer = OptimizationInputsSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -44,12 +47,15 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
         res = minimize(problem,
                algorithm,
-               termination=('n_evals', 300),
+               termination=('n_evals', 600),
                seed=1,
                verbose=True,
                callback=callback)
+        
+       
+        results = Results.objects.get(id=res.X['results_id'])
 
-        return Response({'msg': f"BEST: F {res.F} - res X= {res.X}"})
+        return Response(ResultsSerializer(results).data)
 
 
 
