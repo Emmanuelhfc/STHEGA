@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from django.utils import timezone
 
 DISTANCIA_DEFLETOR_VALUES = (0.0, 1.0)
 CORTE_DEFLETOR_VALUES = (0.15, 0.4)
@@ -280,6 +281,8 @@ class Results(models.Model):
     objective_function_1 = models.FloatField(blank=True, null=True)
     objective_function_2 = models.FloatField(blank=True, null=True)
     error = models.BooleanField(default=False)
+    
+    created_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Results {self.id}"

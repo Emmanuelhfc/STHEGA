@@ -546,6 +546,7 @@ class CascoTubo:
         return Pr_s
     
     def _fator_colburn_casco(self):
+
         self.constantA = ConstantsA.objects.get(
             layout= self.layout,
             reynolds_max__gte= self.Res,

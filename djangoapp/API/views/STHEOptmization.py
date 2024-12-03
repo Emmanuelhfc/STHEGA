@@ -23,12 +23,15 @@ class MyCallback(Callback):
         # logger.info("População atual:")
         # for ind in algorithm.pop.get("X"):
         #     logger.info(ind)
+
+
+
 class STHEOptmizationViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     serializer_class = OptimizationInputsSerializer
     
-    
-    def sthe_optimization(self, request):
+    @extend_schema(tags=['GA OPTIMIZATION'])
+    def ga_sthe_optimization(self, request):
         serializer = OptimizationInputsSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
 

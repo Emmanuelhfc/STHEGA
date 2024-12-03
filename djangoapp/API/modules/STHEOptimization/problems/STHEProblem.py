@@ -4,6 +4,7 @@ from API.modules.CascoTubo import CascoTubo
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.core.variable import Real, Integer, Choice, Binary
 from API.models import*
+from API.serializers import*
 from uuid import uuid4
 
 class STHEProblem(ElementwiseProblem):
@@ -14,7 +15,6 @@ class STHEProblem(ElementwiseProblem):
 
         tube_material_ids = tuple(TubeMaterial.objects.values_list('id', flat=True))
         ds_inch_options = tuple(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())
-        layout_ids = tuple(Layout.objects.values_list('id', flat=True))
         pitch_ids = tuple(Pitch.objects.values_list('id', flat=True))
         di_standard = tuple(TubeInternDiameter.objects.values_list('standard', flat=True).distinct())
 
@@ -99,5 +99,19 @@ class STHEProblem(ElementwiseProblem):
         shell_and_tube.excesso_area()
         shell_and_tube.perda_carga_tubo()
         shell_and_tube.perda_carga_casco()
+        shell_and_tube.results()
 
-        return shell_and_tube
+        results_args = shell_and_tube.results()
+        objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
+
+        result = Results.objects.create(
+            inputs = input,
+            calculation_id = self.calculation_id,
+            objective_function_1 = objective_function_1,
+            **results_args
+        )
+
+        
+
+
+        return ResultsSerializer(result).data

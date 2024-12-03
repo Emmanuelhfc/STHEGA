@@ -74,7 +74,7 @@ urlpatterns = [
     path('unit_conversion/', UnitConversionViewSet.as_view({'post':'conversion'}), name='conversion'),
 
     # Optmization
-    path('sthe/optmization/', STHEOptmizationViewSet.as_view({'post':'sthe_optimization'}), name='sthe_optmization_nsga2'),
+    path('sthe/optmization/GA/', STHEOptmizationViewSet.as_view({'post':'ga_sthe_optimization'}), name='ga_sthe_optimization'),
 
     # Results
     path('results/', results_list, name='results_list'),

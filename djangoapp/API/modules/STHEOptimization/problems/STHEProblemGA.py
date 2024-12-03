@@ -7,12 +7,9 @@ logger = logging.getLogger('API')
 
 class STHEProblemGA(STHEProblem):
     def _evaluate(self, X, out, *args, **kwargs):
-        try:
-            sthe = self.set_shte_inputs(X)
-            sthe_calculate = self.STHE_calculte(sthe)
-            f = sthe_calculate.objective_GA_EA_and_pressure_drop()
-        except:
-            f = 1000
+        sthe = self.set_shte_inputs(X)
+        sthe_calculate = self.STHE_calculte(sthe)
+        f = sthe_calculate['objective_function_1']
 
         out["F"] = f
         
