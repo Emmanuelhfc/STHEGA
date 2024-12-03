@@ -6,6 +6,7 @@ from API.models import Results
 import logging
 
 logger = logging.getLogger('API')
+@extend_schema(tags=['RESULTS'])
 class ResultsViewSet(viewsets.ModelViewSet):
     queryset = Results.objects.all().order_by('id')
     serializer_class = ResultsSerializer

@@ -36,6 +36,13 @@ inputs_shell_and_tube_list = InputsShellAndTubeViewSet.as_view({
     'post': 'create'
 })
 
+inputs_shell_and_tube_detail = InputsShellAndTubeViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 results_list = ResultsViewSet.as_view({
     'get': 'list',
     'post': 'create'
@@ -53,8 +60,11 @@ results_detail = ResultsViewSet.as_view({
 app_name = 'API'
 urlpatterns = [
     # Shell And Tube Inputs
-    path('shell_and_tube/avaliation/<int:pk>/', InputsShellAndTubeViewSet.as_view({'get':'shell_and_tube_avaliation'}), name='shell_and_tube_avaliation'),
-    path('shell_and_tube/', inputs_shell_and_tube_list, name='inputs_shell_and_tube_list'),
+    path('STHECalculation/<int:pk>/', STHECalcultionViewSet.as_view({'post':'shell_and_tube_avaliation'}), name='shell_and_tube_avaliation'),
+
+
+    path('inputs/', inputs_shell_and_tube_list, name='inputs_shell_and_tube_list'),
+    path('inputs/<int:pk>/', inputs_shell_and_tube_detail, name='inputs_shell_and_tube_detail'),
 
     # Tube Diameter
     path('tube_diameter/', tube_diameter_list, name='tube_diameter_list'),
