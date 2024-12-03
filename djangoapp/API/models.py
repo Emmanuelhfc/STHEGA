@@ -279,7 +279,7 @@ class Results(models.Model):
 
     objective_function_1 = models.FloatField(blank=True, null=True)
     objective_function_2 = models.FloatField(blank=True, null=True)
-    error = models.BooleanField(default=True)
+    error = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Results {self.id}"

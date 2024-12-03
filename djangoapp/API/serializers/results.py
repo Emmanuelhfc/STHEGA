@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from API.models import InputsShellAndTube
+from API.models import Results
 from pymoo.core.mixed import MixedVariableGA
 
-class InputsShellAndTubeSerializer(serializers.ModelSerializer):
+class ResultsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = InputsShellAndTube
+        model = Results
         fields = '__all__'
 
     

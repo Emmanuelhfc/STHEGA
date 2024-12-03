@@ -36,6 +36,18 @@ inputs_shell_and_tube_list = InputsShellAndTubeViewSet.as_view({
     'post': 'create'
 })
 
+results_list = ResultsViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+results_detail = ResultsViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 
 
 app_name = 'API'
@@ -53,4 +65,8 @@ urlpatterns = [
 
     # Optmization
     path('sthe/optmization/', STHEOptmizationViewSet.as_view({'post':'sthe_optimization'}), name='sthe_optmization_nsga2'),
+
+    # Results
+    path('results/', results_list, name='results_list'),
+    path('results/<int:pk>/', results_detail, name='results_detail'),
 ]
