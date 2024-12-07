@@ -9,6 +9,7 @@ from pymoo.core.mixed import MixedVariableGA
 from pymoo.optimize import minimize
 from API.modules.STHEOptimization.problems import*
 from API.modules.STHEOptimization.callback import MyCallback
+import numpy as np
 
 
 
@@ -19,6 +20,98 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     serializer_class = GAInputsSerializer
     
+
+    def create_shte_inputs(self, inputs_id, input_data, calculation_id) -> InputsShellAndTube:
+        initial_inputs = InputsShellAndTube.objects.get(id=inputs_id).__dict__
+        inputs_sthe = InputsShellAndTube(
+            T1_hot = initial_inputs["T1_hot"],
+            T2_hot = initial_inputs["T2_hot"],
+            t1_cold = initial_inputs["t1_cold"],
+            t2_cold = initial_inputs["t2_cold"],
+            wq = initial_inputs["wq"],
+            wf = initial_inputs["wf"],
+            cp_quente = initial_inputs["cp_quente"],
+            cp_frio = initial_inputs["cp_frio"],
+            casco_passagens = initial_inputs["casco_passagens"],
+            rho_q = initial_inputs["rho_q"],
+            rho_f = initial_inputs["rho_f"],
+            mi_q = initial_inputs["mi_q"],
+            mi_f = initial_inputs["mi_f"],
+            k_q = initial_inputs["k_q"],
+            k_f = initial_inputs["k_f"],
+            Rd_q = initial_inputs["Rd_q"],
+            Rd_f = initial_inputs["Rd_f"],
+            tipo_q = initial_inputs["tipo_q"],
+            tipo_f = initial_inputs["tipo_f"],
+            reference = initial_inputs["reference"],
+            perda_carga_admissivel_casco= initial_inputs['perda_carga_admissivel_casco'],
+            perda_carga_admissivel_tubo= initial_inputs['perda_carga_admissivel_tubo'],
+            calculation_id = calculation_id,
+
+            pressure_class = input_data["pressure_class"],
+            shell_thickness_meters = input_data["shell_thickness_meters"],
+            lc_percent = input_data["lc_percent"],
+            ls_percent = input_data["ls_percent"],
+            shell_fluid = input_data["shell_fluid"],
+            L = input_data["L_percent"] * input_data["Ds_inch"] * 0.0254,
+            Ds_inch = input_data["Ds_inch"],
+            n = input_data["n"],
+            tube_material= TubeMaterial.objects.get(id=input_data["tube_material_id"]),
+            
+        )
+        pitch = Pitch.objects.get(id= input_data["pitch_id"])
+        de = pitch.de
+
+        di = TubeInternDiameter.objects.filter(
+            tube_diameter = de.id,
+            standard = input_data["di_standard"]
+        ).first()
+        inputs_sthe.di = di
+        inputs_sthe.pitch = pitch
+
+        
+        inputs_sthe.save()
+
+        return inputs_sthe
+    
+    def STHE_save_results(self, input:InputsShellAndTube, calculation_id, isNSGA=False, ) -> ResultsSerializer:
+        try:
+            shell_and_tube = CascoTubo(input)
+            shell_and_tube.filtro_tubos()
+            shell_and_tube.area_projeto()
+            shell_and_tube.coef_global_min()
+            shell_and_tube.conveccao_tubo()
+            shell_and_tube.calculos_auxiliares()
+            shell_and_tube.trans_cal_casco()
+            shell_and_tube.calculo_temp_parede()
+            shell_and_tube.coef_global_limpo()
+            shell_and_tube.coef_global_sujo()
+            shell_and_tube.excesso_area()
+            shell_and_tube.perda_carga_tubo()
+            shell_and_tube.perda_carga_casco()
+            shell_and_tube.results()
+            results_args = shell_and_tube.results()
+            objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
+            error = False
+        
+        except TubeCountError:
+            results_args = {}
+            objective_function_1 = 10**6
+            error = True
+
+        result = Results(
+            inputs = input,
+            calculation_id = calculation_id,
+            objective_function_1 = objective_function_1,
+            error = error,
+            **results_args
+        )
+
+        
+        result.save()
+
+        return ResultsSerializer(result)
+
     @extend_schema(
         tags=['GA OPTIMIZATION'],
         responses=ResultsSerializer
@@ -31,7 +124,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         pop_size = serializer.validated_data.get('pop_size')
         n_max_gen = serializer.validated_data.get('n_max_gen')
         n_max_evals = serializer.validated_data.get('n_max_evals')
-        save_results = serializers.validated_data.get('save_results')
+        save_results = serializer.validated_data.get('save_results')
 
         termination = DefaultSingleObjectiveTermination(
             xtol=1e-8,
@@ -44,6 +137,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
 
         problem = STHEProblemGA(input_id, save=save_results)
+        calculation_id = problem.calculation_id
         algorithm = MixedVariableGA(pop_size=pop_size)
 
         callback = MyCallback()
@@ -54,12 +148,27 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                seed=1,
                verbose=True,
                callback=callback)
-        
-       
-        results = Results.objects.get(id=res.X['results_id'])
 
-        return Response(ResultsSerializer(results).data)
+        if save_results:    
+            results = Results.objects.get(id=res.X['results_id'])
+            return Response(ResultsSerializer(results).data)
 
+        input_data = {
+            'shell_thickness_meters': float(res.X['shell_thickness_meters']),
+            'ls_percent': float(res.X['ls_percent']),
+            'lc_percent': float(res.X['lc_percent']),
+            'L_percent': float(res.X['shell_thickness_meters']),
+            'pressure_class': float(res.X['pressure_class']),
+            'tube_material_id': int(res.X['tube_material_id']),
+            'shell_fluid': str(res.X['shell_fluid']),
+            'Ds_inch': float(res.X['Ds_inch']),
+            'n': int(res.X['n']),
+            'pitch_id': int(res.X['pitch_id']),
+            'di_standard': str(res.X['di_standard']),
+        }
+
+        inputs_sthe = self.create_shte_inputs(input_id, input_data,calculation_id)
+        return Response(self.STHE_save_results(inputs_sthe,calculation_id).data)
 
 
 

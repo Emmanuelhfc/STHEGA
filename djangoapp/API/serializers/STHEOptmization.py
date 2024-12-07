@@ -44,16 +44,16 @@ class GAInputsSerializer(serializers.Serializer):
     n_max_gen = serializers.IntegerField(default=1000)
     save_results = serializers.BooleanField(default=False)
     
-    crossover_choice_type = serializers.ChoiceField(
-        CrossoverChoiceOption.choices, 
-        default=CrossoverChoiceOption.ux,
-        help_text = "Crossover que será aplicados para tipo Choice"
-    )
-    crossover_real_type = serializers.ChoiceField(
-        CrossoverRealOption.choices, 
-        default=CrossoverRealOption.sbx,
-        help_text = "Crossover que será aplicados para tipo Real"
-    )
+    # crossover_choice_type = serializers.ChoiceField(
+    #     CrossoverChoiceOption.choices, 
+    #     default=CrossoverChoiceOption.ux,
+    #     help_text = "Crossover que será aplicados para tipo Choice"
+    # )
+    # crossover_real_type = serializers.ChoiceField(
+    #     CrossoverRealOption.choices, 
+    #     default=CrossoverRealOption.sbx,
+    #     help_text = "Crossover que será aplicados para tipo Real"
+    # )
 
 
 
