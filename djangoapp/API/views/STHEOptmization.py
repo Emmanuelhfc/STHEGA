@@ -43,7 +43,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         )
 
 
-        problem = STHEProblemGA(input_id)
+        problem = STHEProblemGA(input_id, save=save_results)
         algorithm = MixedVariableGA(pop_size=pop_size)
 
         callback = MyCallback()
