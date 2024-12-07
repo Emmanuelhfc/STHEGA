@@ -76,10 +76,12 @@ class NozzleDiameterAdmin(admin.ModelAdmin):
     
 @admin.register(InputsShellAndTube)
 class InputsShellAndTubeAdmin(admin.ModelAdmin):
-    def get_list_display(self, request):
-        return [field.name for field in self.model._meta.fields]
-    def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
-        return [field.name for field in self.model._meta.fields]
+    list_display = ('id', 'calculation_id', 'T1_hot', 'T2_hot', 't1_cold', 't2_cold', 'n', 'Ds_inch', 'pitch', 'di')
+    list_display_links = ('id', 'calculation_id', 'T1_hot', 'T2_hot', 't1_cold', 't2_cold', 'n', 'Ds_inch', 'pitch', 'di')
+    # def get_list_display(self, request):
+    #     return [field.name for field in self.model._meta.fields]
+    # def get_list_display_links(self, request: HttpRequest, list_display: Sequence[str]) -> Sequence[str] | None:
+    #     return [field.name for field in self.model._meta.fields]
 
     def formfield_for_choice_field(self, db_field, request: HttpRequest | None, **kwargs: Any) -> TypedChoiceField:
         if db_field.name == "Ds_inch":
