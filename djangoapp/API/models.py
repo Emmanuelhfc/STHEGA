@@ -3,10 +3,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from django.utils import timezone
 
-DISTANCIA_DEFLETOR_VALUES = (0.4, 2)
+
 CORTE_DEFLETOR_VALUES = (0.15, 0.4)
 
-DISTANCIA_DEFLETOR = [MinValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[0])), MaxValueValidator(Decimal(DISTANCIA_DEFLETOR_VALUES[1]))]
 CORTE_DEFLETOR = [MinValueValidator(Decimal(CORTE_DEFLETOR_VALUES[0])), MaxValueValidator(Decimal(CORTE_DEFLETOR_VALUES[1]))]
 
 class NamesLayouts(models.TextChoices):
@@ -168,8 +167,7 @@ class InputsShellAndTube(models.Model):
     shell_fluid = models.CharField(choices=ShellFluid.choices, null=True, max_length=4, blank=True)
     ls_percent = models.DecimalField(
         max_digits=4, 
-        decimal_places=3, 
-        validators=DISTANCIA_DEFLETOR, 
+        decimal_places=3,  
         null=True, 
         help_text="Espaçamento entre defletores em funçao do diametro interno do trocador (Ds) (%)",
         blank=True

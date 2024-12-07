@@ -1048,7 +1048,7 @@ class CascoTubo:
             ea_avaliation = 0
         elif self.Ea < 10 and self.Ea >= 2:
             ea_avaliation = 500
-        elif self.Ea < 2 and self.Ea >=0:
+        elif self.Ea < 2:
             ea_avaliation = 10000
         elif self.Ea < 0:
             ea_avaliation = 100000

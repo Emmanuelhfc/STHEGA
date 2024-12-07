@@ -7,11 +7,15 @@ from API.models import*
 from API.serializers import*
 from uuid import uuid4
 
+DISTANCIA_DEFLETOR_VALUES = (0.4, 2)
+COMPRIMENTO_CASCO_POR_DIAMETRO_INTERNO = (5, 12)
+
 class STHEProblem(ElementwiseProblem):
 
-    def __init__(self, inputs_shell_and_tube_id, **kwargs):
+    def __init__(self, inputs_shell_and_tube_id, save=False, **kwargs):
         self.calculation_id = uuid4()
         self.initial_inputs = InputsShellAndTube.objects.get(id=inputs_shell_and_tube_id).__dict__
+        self.save = save
 
         tube_material_ids = tuple(TubeMaterial.objects.values_list('id', flat=True))
         ds_inch_options = tuple(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())
@@ -22,14 +26,13 @@ class STHEProblem(ElementwiseProblem):
             "shell_thickness_meters": Real(bounds=(0, 0.50)),
             "ls_percent": Real(bounds=DISTANCIA_DEFLETOR_VALUES),
             "lc_percent": Real(bounds=CORTE_DEFLETOR_VALUES),
-            "L_percent": Real(bounds=(5, 10)),
+            "L_percent": Real(bounds=COMPRIMENTO_CASCO_POR_DIAMETRO_INTERNO),
 
             "pressure_class": Choice(options=[150.0, 600.0]),
             "tube_material_id": Choice(options=tube_material_ids),
             "shell_fluid": Choice(options=tuple(ShellFluid.values)),
             "Ds_inch": Choice(options=ds_inch_options),
             "n": Choice(options=tuple(TubePasses.values)),
-            # "layout_id": Choice(options=layout_ids),
             "pitch_id": Choice(options=pitch_ids),
             "di_standard": Choice(options=di_standard)
         }
@@ -37,7 +40,7 @@ class STHEProblem(ElementwiseProblem):
 
 
     def set_shte_inputs(self, X) -> InputsShellAndTube:
-        inputs_sthe = InputsShellAndTube.objects.create(
+        inputs_sthe = InputsShellAndTube(
             T1_hot = self.initial_inputs["T1_hot"],
             T2_hot = self.initial_inputs["T2_hot"],
             t1_cold = self.initial_inputs["t1_cold"],
@@ -82,46 +85,10 @@ class STHEProblem(ElementwiseProblem):
         ).first()
         inputs_sthe.di = di
         inputs_sthe.pitch = pitch
-        inputs_sthe.save()
+
+        if self.save:
+            inputs_sthe.save()
 
         return inputs_sthe
     
-    def STHE_calculte(self, input:InputsShellAndTube):
-        try:
-            shell_and_tube = CascoTubo(input)
-            shell_and_tube.filtro_tubos()
-            shell_and_tube.area_projeto()
-            shell_and_tube.coef_global_min()
-            shell_and_tube.conveccao_tubo()
-            shell_and_tube.calculos_auxiliares()
-            shell_and_tube.trans_cal_casco()
-            shell_and_tube.calculo_temp_parede()
-            shell_and_tube.coef_global_limpo()
-            shell_and_tube.coef_global_sujo()
-            shell_and_tube.excesso_area()
-            shell_and_tube.perda_carga_tubo()
-            shell_and_tube.perda_carga_casco()
-            shell_and_tube.results()
-            results_args = shell_and_tube.results()
-            objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
-            error = False
-        
-        except TubeCountError:
-            results_args = {}
-            objective_function_1 = 10**6
-            error = True
-
-        
-
-        result = Results.objects.create(
-            inputs = input,
-            calculation_id = self.calculation_id,
-            objective_function_1 = objective_function_1,
-            error = error,
-            **results_args
-        )
-
-        
-
-
-        return ResultsSerializer(result).data
+    
