@@ -10,6 +10,7 @@ from pymoo.core.mixed import MixedVariableGA
 from pymoo.optimize import minimize
 from API.modules.STHEOptimization.problems import*
 from API.modules.STHEOptimization.callback import MyCallback
+from API.modules.STHEOptimization.DataProcessor import DataProcessor
 import pandas as pd
 
 
@@ -227,8 +228,11 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                callback=callback,
                save_history=True
                )
+
+        # Results
+        data_processor = DataProcessor(callback.data, calculation_id)
+        data_processor.process_all_graphs()
         
-        data_frame = pd.DataFrame(data=callback.data)
         
         results = []
         for inputs in res.X:
@@ -248,7 +252,6 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
             }
 
             inputs_sthe = self.create_shte_inputs(input_id, input_data,calculation_id)
-
             results.append(self.STHE_save_results(inputs_sthe,calculation_id,isNSGA=True))
         return Response(ResultsSerializer(results, many=True).data)
 
