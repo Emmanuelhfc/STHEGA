@@ -10,7 +10,7 @@ from pymoo.core.mixed import MixedVariableGA
 from pymoo.optimize import minimize
 from API.modules.STHEOptimization.problems import*
 from API.modules.STHEOptimization.callback import MyCallback
-import numpy as np
+import pandas as pd
 
 
 
@@ -218,8 +218,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         problem = STHEProblemNSGAII(input_id)
         calculation_id = problem.calculation_id
         algorithm = MixedVariableGA(pop_size=pop_size, survival=RankAndCrowding())
-
-        callback = MyCallback()
+        callback = MyCallback(isNSGA2=True)
 
         res = minimize(problem,
                algorithm,
@@ -228,7 +227,9 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                callback=callback,
                save_history=True
                )
-
+        
+        data_frame = pd.DataFrame(data=callback.data)
+        
         results = []
         for inputs in res.X:
 

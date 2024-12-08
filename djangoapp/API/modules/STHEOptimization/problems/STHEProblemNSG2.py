@@ -53,8 +53,9 @@ class STHEProblemNSGAII(STHEProblem):
         f1 = sthe_calculate['objective_function_1']
         f2 = sthe_calculate['objective_function_2']
         g1 = sthe_calculate['constraint_ea_min']
-
         
-        X['results_id'] = sthe_calculate['id']
+        X['results'] = sthe_calculate
+        X['results']['L'] = sthe.L
+
         out["F"] = [f1, f2]
         out['G'] = g1

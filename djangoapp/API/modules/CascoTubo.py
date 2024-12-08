@@ -1039,6 +1039,7 @@ class CascoTubo:
             'delta_Pwi': self.delta_Pwi,
             'delta_Pw': self.delta_Pw,
             'delta_Ps': self.delta_Ps,
+            'Res': self.Res
         }
 
         return results

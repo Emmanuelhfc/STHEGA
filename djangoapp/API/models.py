@@ -207,6 +207,7 @@ class Results(models.Model):
     area_tube = models.FloatField(blank=True, null=True)
     Gt = models.FloatField(blank=True, null=True)
     Re_t = models.FloatField(blank=True, null=True)
+    Res = models.FloatField(blank=True, null=True)
     tube_velocity = models.FloatField(blank=True, null=True)
     hi = models.FloatField(blank=True, null=True)
     hio = models.FloatField(blank=True, null=True)
