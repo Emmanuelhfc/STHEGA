@@ -1043,26 +1043,22 @@ class CascoTubo:
 
         return results
 
-    def objective_GA_EA_and_pressure_drop(self):
-        if self.Ea >= 10 and self.Ea <= 20:
-            ea_avaliation = 0
-        elif self.Ea < 10 and self.Ea >= 2:
-            ea_avaliation = 500
-        elif self.Ea < 2:
-            ea_avaliation = 10000
-        elif self.Ea < 0:
-            ea_avaliation = 100000
-        elif self.Ea >20 and self.Ea <30:
-            ea_avaliation = 500
-        else:
-            ea_avaliation = 10000
 
+    def objective_function_GA(self, fator_area_proj=1):
         aval_delta_PT = math.fabs(self.delta_PT - self.perda_carga_admissivel_tubo)
         aval_delta_Ps = math.fabs(self.delta_Ps - self.perda_carga_admissivel_casco)
 
-        F = ea_avaliation + aval_delta_PT + aval_delta_Ps
+        F = self.A_proj*fator_area_proj + aval_delta_PT + aval_delta_Ps 
     
         return F
+    
+    def restricao_EA_min(self):
+        return 5 - self.Ea
+    
+    def restricao_EA_max(self):
+        return self.Ea - 25
+        
+    
 
 if __name__ == "__main__":
    ...

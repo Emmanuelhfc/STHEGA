@@ -282,6 +282,9 @@ class Results(models.Model):
     objective_function_1 = models.FloatField(blank=True, null=True)
     objective_function_2 = models.FloatField(blank=True, null=True)
     error = models.BooleanField(default=False)
+
+    constraint_ea_max = models.FloatField(blank=True, null=True)
+    constraint_ea_min = models.FloatField(blank=True, null=True)
     
     created_date = models.DateTimeField(default=timezone.now)
 

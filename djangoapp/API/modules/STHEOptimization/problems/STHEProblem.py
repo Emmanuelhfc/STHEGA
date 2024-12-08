@@ -12,10 +12,11 @@ COMPRIMENTO_CASCO_POR_DIAMETRO_INTERNO = (5, 12)
 
 class STHEProblem(ElementwiseProblem):
 
-    def __init__(self, inputs_shell_and_tube_id, save=False, **kwargs):
+    def __init__(self, inputs_shell_and_tube_id, save=False, fator_area_proj=1, n_ieq_constr=0, **kwargs):
         self.calculation_id = uuid4()
         self.initial_inputs = InputsShellAndTube.objects.get(id=inputs_shell_and_tube_id).__dict__
         self.save = save
+        self.fator_area_proj = fator_area_proj
 
         tube_material_ids = tuple(TubeMaterial.objects.values_list('id', flat=True))
         ds_inch_options = tuple(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())
@@ -36,7 +37,7 @@ class STHEProblem(ElementwiseProblem):
             "pitch_id": Choice(options=pitch_ids),
             "di_standard": Choice(options=di_standard)
         }
-        super().__init__(vars=vars, n_obj=1, **kwargs)
+        super().__init__(vars=vars, n_obj=1, n_ieq_constr=n_ieq_constr, **kwargs)
 
 
     def set_shte_inputs(self, X) -> InputsShellAndTube:

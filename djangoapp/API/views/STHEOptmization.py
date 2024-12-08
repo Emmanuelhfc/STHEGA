@@ -91,18 +91,24 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
             shell_and_tube.perda_carga_casco()
             shell_and_tube.results()
             results_args = shell_and_tube.results()
-            objective_function_1 = shell_and_tube.objective_GA_EA_and_pressure_drop()
+            objective_function_1 = shell_and_tube.objective_function_GA()
+            constraint_ea_max = shell_and_tube.restricao_EA_max()
+            constraint_ea_min = shell_and_tube.restricao_EA_min()
             error = False
         
         except TubeCountError:
             results_args = {}
             objective_function_1 = 10**6
+            constraint_ea_max = 10**6
+            constraint_ea_min = 10**6
             error = True
 
         result = Results(
             inputs = input,
             calculation_id = calculation_id,
             objective_function_1 = objective_function_1,
+            constraint_ea_max = constraint_ea_max,
+            constraint_ea_min = constraint_ea_min,
             error = error,
             **results_args
         )
@@ -125,6 +131,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         n_max_gen = serializer.validated_data.get('n_max_gen')
         n_max_evals = serializer.validated_data.get('n_max_evals')
         save_results = serializer.validated_data.get('save_results')
+        fator_area_proj = serializer.validated_data.get('fator_area_proj')
 
         termination = DefaultSingleObjectiveTermination(
             xtol=1e-8,
@@ -136,7 +143,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         )
 
 
-        problem = STHEProblemGA(input_id, save=save_results)
+        problem = STHEProblemGA(input_id, save=save_results, fator_area_proj=fator_area_proj)
         calculation_id = problem.calculation_id
         algorithm = MixedVariableGA(pop_size=pop_size)
 
@@ -147,7 +154,13 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                termination= termination,
                seed=1,
                verbose=True,
-               callback=callback)
+               callback=callback,
+               save_history=True
+               )
+
+
+        logger.debug(res.X)
+        logger.debug(res.F)
 
         if save_results:    
             results = Results.objects.get(id=res.X['results_id'])
@@ -157,7 +170,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
             'shell_thickness_meters': float(res.X['shell_thickness_meters']),
             'ls_percent': float(res.X['ls_percent']),
             'lc_percent': float(res.X['lc_percent']),
-            'L_percent': float(res.X['shell_thickness_meters']),
+            'L_percent': float(res.X['L_percent']),
             'pressure_class': float(res.X['pressure_class']),
             'tube_material_id': int(res.X['tube_material_id']),
             'shell_fluid': str(res.X['shell_fluid']),
