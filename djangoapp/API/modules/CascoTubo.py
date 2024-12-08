@@ -1052,6 +1052,14 @@ class CascoTubo:
     
         return F
     
+    def objective_function_perda_carga_total(self):
+        aval_delta_PT = math.fabs(self.delta_PT - self.perda_carga_admissivel_tubo)
+        aval_delta_Ps = math.fabs(self.delta_Ps - self.perda_carga_admissivel_casco)
+
+        F = aval_delta_PT + aval_delta_Ps 
+    
+        return F
+    
     def restricao_EA_min(self):
         return 5 - self.Ea
     

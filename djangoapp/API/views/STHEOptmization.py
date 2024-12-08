@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from pymoo.termination.default import DefaultSingleObjectiveTermination
+from pymoo.algorithms.moo.nsga2 import RankAndCrowding
 from drf_spectacular.utils import extend_schema
 import logging
 from pymoo.core.mixed import MixedVariableGA
@@ -74,7 +75,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
         return inputs_sthe
     
-    def STHE_save_results(self, input:InputsShellAndTube, calculation_id, isNSGA=False, ) -> ResultsSerializer:
+    def STHE_save_results(self, input:InputsShellAndTube, calculation_id, isNSGA=False, ) -> Results:
         try:
             shell_and_tube = CascoTubo(input)
             shell_and_tube.filtro_tubos()
@@ -91,7 +92,12 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
             shell_and_tube.perda_carga_casco()
             shell_and_tube.results()
             results_args = shell_and_tube.results()
-            objective_function_1 = shell_and_tube.objective_function_GA()
+            if isNSGA:
+                objective_function_1 = shell_and_tube.A_proj
+                objective_function_2 = shell_and_tube.objective_function_perda_carga_total()
+            else:
+                objective_function_1 = shell_and_tube.objective_function_GA()
+                objective_function_2 = None
             constraint_ea_max = shell_and_tube.restricao_EA_max()
             constraint_ea_min = shell_and_tube.restricao_EA_min()
             error = False
@@ -99,6 +105,10 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         except TubeCountError:
             results_args = {}
             objective_function_1 = 10**6
+            if isNSGA:
+                objective_function_2 = 10**6
+            else:
+                objective_function_2 = None
             constraint_ea_max = 10**6
             constraint_ea_min = 10**6
             error = True
@@ -107,6 +117,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
             inputs = input,
             calculation_id = calculation_id,
             objective_function_1 = objective_function_1,
+            objective_function_2 = objective_function_2,
             constraint_ea_max = constraint_ea_max,
             constraint_ea_min = constraint_ea_min,
             error = error,
@@ -116,7 +127,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         
         result.save()
 
-        return ResultsSerializer(result)
+        return result
 
     @extend_schema(
         tags=['GA OPTIMIZATION'],
@@ -143,7 +154,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         )
 
 
-        problem = STHEProblemGA(input_id, save=save_results, fator_area_proj=fator_area_proj)
+        problem = STHEProblemNSGAII(input_id, save=save_results, fator_area_proj=fator_area_proj)
         calculation_id = problem.calculation_id
         algorithm = MixedVariableGA(pop_size=pop_size)
 
@@ -159,8 +170,6 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                )
 
 
-        logger.debug(res.X)
-        logger.debug(res.F)
 
         if save_results:    
             results = Results.objects.get(id=res.X['results_id'])
@@ -181,7 +190,65 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         }
 
         inputs_sthe = self.create_shte_inputs(input_id, input_data,calculation_id)
-        return Response(self.STHE_save_results(inputs_sthe,calculation_id).data)
+        return Response(ResultsSerializer(self.STHE_save_results(inputs_sthe,calculation_id)).data)
 
+    @extend_schema(
+        tags=['NSGAII OPTIMIZATION'],
+        request=NSGA2InputsSerializer,
+        responses=ResultsSerializer(many=True)
+    )
+    def nsga2_sthe_optimization(self, request):
+        serializer = NSGA2InputsSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+
+        input_id = serializer.validated_data.get('inputs_shell_and_tube')
+        pop_size = serializer.validated_data.get('pop_size')
+        n_max_gen = serializer.validated_data.get('n_max_gen')
+        n_max_evals = 10**6
+        
+        termination = DefaultSingleObjectiveTermination(
+            xtol=1e-8,
+            cvtol=1e-6,
+            ftol=1e-6,
+            period=20,
+            n_max_gen=n_max_gen,
+            n_max_evals=n_max_evals
+        )
+
+        problem = STHEProblemNSGAII(input_id)
+        calculation_id = problem.calculation_id
+        algorithm = MixedVariableGA(pop_size=pop_size, survival=RankAndCrowding())
+
+        callback = MyCallback()
+
+        res = minimize(problem,
+               algorithm,
+               termination= termination,
+               verbose=True,
+               callback=callback,
+               save_history=True
+               )
+
+        results = []
+        for inputs in res.X:
+
+            input_data = {
+                'shell_thickness_meters': float(inputs['shell_thickness_meters']),
+                'ls_percent': float(inputs['ls_percent']),
+                'lc_percent': float(inputs['lc_percent']),
+                'L_percent': float(inputs['L_percent']),
+                'pressure_class': float(inputs['pressure_class']),
+                'tube_material_id': int(inputs['tube_material_id']),
+                'shell_fluid': str(inputs['shell_fluid']),
+                'Ds_inch': float(inputs['Ds_inch']),
+                'n': int(inputs['n']),
+                'pitch_id': int(inputs['pitch_id']),
+                'di_standard': str(inputs['di_standard']),
+            }
+
+            inputs_sthe = self.create_shte_inputs(input_id, input_data,calculation_id)
+
+            results.append(self.STHE_save_results(inputs_sthe,calculation_id,isNSGA=True))
+        return Response(ResultsSerializer(results, many=True).data)
 
 

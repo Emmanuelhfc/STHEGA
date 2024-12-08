@@ -12,7 +12,7 @@ COMPRIMENTO_CASCO_POR_DIAMETRO_INTERNO = (5, 12)
 
 class STHEProblem(ElementwiseProblem):
 
-    def __init__(self, inputs_shell_and_tube_id, save=False, fator_area_proj=1, n_ieq_constr=0, **kwargs):
+    def __init__(self, inputs_shell_and_tube_id, save=False, fator_area_proj=1, n_ieq_constr=0, n_obj=1, **kwargs):
         self.calculation_id = uuid4()
         self.initial_inputs = InputsShellAndTube.objects.get(id=inputs_shell_and_tube_id).__dict__
         self.save = save
@@ -37,7 +37,7 @@ class STHEProblem(ElementwiseProblem):
             "pitch_id": Choice(options=pitch_ids),
             "di_standard": Choice(options=di_standard)
         }
-        super().__init__(vars=vars, n_obj=1, n_ieq_constr=n_ieq_constr, **kwargs)
+        super().__init__(vars=vars, n_obj=n_obj, n_ieq_constr=n_ieq_constr, **kwargs)
 
 
     def set_shte_inputs(self, X) -> InputsShellAndTube:
@@ -92,4 +92,20 @@ class STHEProblem(ElementwiseProblem):
 
         return inputs_sthe
     
-    
+    def default_calculate_sthe(self, input):
+        shell_and_tube = CascoTubo(input)
+        shell_and_tube.filtro_tubos()
+        shell_and_tube.area_projeto()
+        shell_and_tube.coef_global_min()
+        shell_and_tube.conveccao_tubo()
+        shell_and_tube.calculos_auxiliares()
+        shell_and_tube.trans_cal_casco()
+        shell_and_tube.calculo_temp_parede()
+        shell_and_tube.coef_global_limpo()
+        shell_and_tube.coef_global_sujo()
+        shell_and_tube.excesso_area()
+        shell_and_tube.perda_carga_tubo()
+        shell_and_tube.perda_carga_casco()
+        shell_and_tube.results()
+
+        return shell_and_tube
