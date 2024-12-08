@@ -290,3 +290,11 @@ class Results(models.Model):
 
     def __str__(self):
         return f"Results {self.id}"
+
+
+class File(models.Model):
+    file = models.FileField()
+
+class Charts(models.Model):
+    calculation_id = models.UUIDField(null=True, blank=True)
+    files = models.ManyToManyField(File)
