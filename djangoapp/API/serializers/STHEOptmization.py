@@ -37,14 +37,14 @@ class CrossoverChoiceOption(models.TextChoices):
 
 
 class GAInputsSerializer(serializers.Serializer):
-    inputs_shell_and_tube = serializers.IntegerField(help_text="ID do modelo InputsShellAndTube")
-    pop_size = serializers.IntegerField(help_text='Inputs shell and tubo')
+    inputs_shell_and_tube = serializers.IntegerField(help_text="ID do InputsShellAndTube")
+    pop_size = serializers.IntegerField(help_text='Tamanho da população')
     n_max_gen = serializers.IntegerField(default=1000)
 
 class NSGA2InputsSerializer(serializers.Serializer):
     inputs_shell_and_tube = serializers.IntegerField(help_text="ID do modelo InputsShellAndTube")
-    pop_size = serializers.IntegerField(help_text='Inputs shell and tubo')
-    n_max_gen = serializers.IntegerField(default=1000)
+    pop_size = serializers.IntegerField(help_text='Tamanho da população')
+    n_max_gen = serializers.IntegerField(default=1000, help_text='Número máximo de gerações')
     
     # crossover_choice_type = serializers.ChoiceField(
     #     CrossoverChoiceOption.choices, 
