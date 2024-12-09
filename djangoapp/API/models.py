@@ -138,7 +138,6 @@ class InputsShellAndTube(models.Model):
         return choices
     
     calculation_id = models.UUIDField(null=True, blank=True)
-
     T1_hot = models.FloatField()
     T2_hot = models.FloatField()
     t1_cold = models.FloatField()
