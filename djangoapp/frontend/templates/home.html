@@ -1,0 +1,137 @@
+{% extends "partials/layout.html" %}
+{% load static %}
+
+{% block head_imports %}
+<!--Home - CSS-->
+<link rel="stylesheet" href="{% static "css/home.css" %}">
+
+{% endblock head_imports %}
+
+{% block btns_aside %}
+
+{% endblock btns_aside %}
+
+{% block page_content %}
+    <div class="h-100 w-100 d-flex flex-column">
+        <div class="row flex-shrink-0 home-row-1">
+            <div class="col d-flex align-items-center justify-content-center" onclick='showPageDimensions()'>
+                <h2><b>Features</b></h2>
+            </div>
+        </div>
+        
+        <div class="row flex-grow-1 home-row-2 h-auto pb-5">
+            <div class="col-lg-3 col-md-4  h-100">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
+                            <img src="{% static 'libs/google-material-icons/visibility.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>Viewer</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify h-100 w-100">
+                            The DYSSE Viewer allows for the visualization of the 3D model along with a dynamic dimension table, as well as offering configuration options and detailed document information. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 h-100">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">
+                            <img src="{% static 'libs/google-material-icons/assignment.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>IMS Viewer</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify">
+                            The IMS Viewer displays the values filled in via IMS, integrating them with the DYSSE 3D model for comprehensive analysis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md d-lg-flex d-md-none h-100" >
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                    <div class="feat-header d-flex align-items-center pe-3 justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
+                            <img src="{% static 'libs/google-material-icons/arrow_selector_tool.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>Control Dimension Selection</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify">
+                            A tool for selecting the control dimensions that will be used in IMS test, ensuring precision and efficiency in the manufacturing process.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4  h-100">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">
+                            <img src="{% static 'libs/google-material-icons/cable.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>Connection 3D</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify">
+                            The Connection3D is designed to assist operators in making the connections of a wound stator.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row flex-grow-1 home-row-3 h-auto d-lg-flex d-md-none pb-5">
+            <div class="col-3 h-100">
+                
+            </div>
+            
+            <div class="col-3 h-100">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">
+                            <img src="{% static 'libs/google-material-icons/list.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>List of Characteristics</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify">
+                            A window for registering characteristics and components
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 h-100">
+            </div>
+            <div class="col-3 h-100">
+            </div>
+        </div> 
+        <div class="row flex-shrink-0 home-row-4">
+            <div class="col copyrigth d-flex align-items-center justify-content-center">
+                © DYSSE - Developed by Dev. and Tech. Innovation Dept. - WEN
+            </div>
+        </div>
+        
+        
+        
+    </div>
+
+{% endblock page_content %} 
+{% block scripts %}   
+
+{% endblock scripts %} 

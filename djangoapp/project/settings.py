@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     
     # APPS - startapp
     'API',
+    'frontend',
 
     #Libs 
     "rest_framework",
@@ -77,6 +78,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
