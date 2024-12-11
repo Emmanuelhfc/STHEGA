@@ -82,4 +82,13 @@
 
 }
 
+.modal-header{
+    background-color: #ba8e23;
+    color: white;
+    height: 60px;
+}
+.custom-modal-size{
+    width: 800px !important;
+
+}
 

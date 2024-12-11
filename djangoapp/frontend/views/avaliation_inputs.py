@@ -1,9 +1,12 @@
 from django.shortcuts import render
+from frontend.forms import*
 
 
 def avaliation_inputs(request):
+    sthe_form = STHEForm(request.POST or None)
     context = {
-        'form_title': "Avaliação"
+        'form_title': "Avaliação",
+        'form': sthe_form
     }
 
-    return render(request, 'partials/generic_form.html', context=context)
+    return render(request, 'filter_new.html', context=context)
