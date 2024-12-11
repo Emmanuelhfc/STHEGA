@@ -55,7 +55,17 @@ results_detail = ResultsViewSet.as_view({
     'delete': 'destroy'
 })
 
+chart_list = ChartViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
 
+chart_detail = ChartViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
 
 app_name = 'API'
 urlpatterns = [
@@ -80,4 +90,8 @@ urlpatterns = [
     # Results
     path('results/', results_list, name='results_list'),
     path('results/<int:pk>/', results_detail, name='results_detail'),
+
+    # Chart
+    path('charts/', chart_list, name='chart_list'),
+    path('charts/<int:pk>/', chart_detail, name='chart_detail'),
 ]

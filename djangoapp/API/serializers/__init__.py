@@ -3,3 +3,4 @@ from API.serializers.tube_diameter import*
 from API.serializers.units_conversion import*
 from API.serializers.STHEOptmization import*
 from API.serializers.results import*
+from API.serializers.chart import*
