@@ -6,7 +6,7 @@ def avaliation_inputs(request):
     sthe_form = STHEForm(request.POST or None)
     context = {
         'form_title': "Avaliação",
-        'form': sthe_form
+        'new_calculate_form': sthe_form
     }
 
     return render(request, 'filter_new.html', context=context)

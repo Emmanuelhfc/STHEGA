@@ -1,1 +1,1 @@
-from frontend.forms.avaliation_inputs import*
+from frontend.forms.sthe import*

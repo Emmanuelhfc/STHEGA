@@ -80,7 +80,7 @@ class Pitch(models.Model):
     description = models.CharField(max_length=256,null=True)
 
     def __str__(self) -> str:
-        return f'{self.description}-{self.layout}'
+        return f'[{self.de.description}] [{self.layout.name}] [{self.description}]'
     
 class TubeCount(models.Model):
     Ds_meters = models.FloatField()
@@ -123,10 +123,10 @@ class TubeMaterial(models.Model):
 
 class TubePasses(models.IntegerChoices):
         ONE = 1, "Uma Passagem nos tubos"
-        TWO = 2, "Duas Passagem nos tubos"
-        FOUR = 4, "Quatro Passagem nos tubos"
-        SIX = 6, "Seis Passagem nos tubos"
-        EIGHT = 8, "Oito Passagem nos tubos"
+        TWO = 2, "Duas Passagens nos tubos"
+        FOUR = 4, "Quatro Passagens nos tubos"
+        SIX = 6, "Seis Passagens nos tubos"
+        EIGHT = 8, "Oito Passagens nos tubos"
 
 class ShellFluid(models.TextChoices):
     hot = ("hot", "hot")
