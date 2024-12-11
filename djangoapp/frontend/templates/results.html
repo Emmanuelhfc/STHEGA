@@ -1,0 +1,217 @@
+{% extends "partials/generic_list.html" %}
+{% load static %}
+
+{% block btns_aside %}
+
+{% endblock btns_aside %}
+
+{% block list_title %}
+    <div class="row w-100">
+        <div class="col h-100 w-100">
+            <h2 class="h-100 w-100 d-flex align-content-center justify-content-center h1 fw-bold">RESULTADOS</h2>
+        </div>
+    </div>
+    
+{% endblock list_title %}
+
+{% block t_head %}
+    <th class="text-center">Variável</th>
+    <th class="text-center">Descrição</th>
+    <th class="text-center">Valor</th>
+    <th class="text-center">Unidade</th>
+{% endblock t_head %}
+
+{% block rows %}      
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center fw-bolder">
+            Dados de Entrada - Fluido Casco
+        </td>
+    </tr> 
+    {% for item in input_casco %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Dados de Entrada - Fluido Tubos
+        </td>
+    </tr> 
+    {% for item in input_tubos %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Outros dados de Entrada
+        </td>
+    </tr> 
+    {% for item in other_inputs %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Balanço de Energia 
+        </td>
+    </tr> 
+    {% for item in energy_balance %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Cálculos Auxiliares e Características Geométricas
+        </td>
+    </tr> 
+    {% for item in aux_calc %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Coeficiente de Transferência de Calor para o lado dos Tubos
+        </td>
+    </tr> 
+    {% for item in trans_cal_tubes %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row table-primary text-center tf">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Perda de Carga Lado dos Tubos
+        </td>
+    </tr> 
+    {% for item in perda_carga_tubos %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Transferência de Calor Casco
+        </td>
+    </tr> 
+    {% for item in tans_cal_casco %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+    <tr class="table-row  table-primary text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Resultados - Perda de carga Casco
+        </td>
+    </tr> 
+    {% for item in perda_carga_casco %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+
+    
+
+{% endblock rows %}

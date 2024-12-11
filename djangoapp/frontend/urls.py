@@ -27,5 +27,6 @@ urlpatterns = [
     path('nsga2/inputs/', nsga2_inputs, name='nsga2_inputs'),
     path('ga/inputs/', ga_inputs, name='ga_inputs'),
     path('calculate/sthe/', calculate_avaliation, name='calculate_avaliation'),
+    path('results/<int:pk>/', results, name='results'),
     
 ]

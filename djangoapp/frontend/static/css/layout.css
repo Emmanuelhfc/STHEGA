@@ -10,9 +10,9 @@
     /* background: #ba8e23; */
     background: #001529;
 }
-/* .main-div-aside{
+.main-div-aside{
     height: 92.34%;
-} */
+}
 
 
 .main-header--info{
@@ -94,3 +94,7 @@
 
 }
 
+.main-content{
+    max-height: 100%;
+    overflow-y: auto;
+}
