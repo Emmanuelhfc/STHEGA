@@ -76,27 +76,10 @@
     max-width: 4rem;
 }
 
-#btn-extend-aside{
-    background-color: #183f64;
-    font-size: 1rem;
-}
 
 #aside-col, span, h1, h2, p{
     transition: width 1s ease;
 
 }
 
-.modal-header-connection{
-    background-color: rgb(0, 87, 157);;
-    color: white;
-}
-
-.modal-header{
-    background-color: rgb(0, 87, 157);;
-    color: white;
-}
-.custom-modal-size{
-    width: 800px !important;
-
-}
 
