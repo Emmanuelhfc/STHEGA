@@ -1,0 +1,59 @@
+{% extends "partials/layout.html" %}
+{% load static %}
+{% block head_imports %}
+
+<link rel="stylesheet" href="{% static "css/generic_form.css" %}">    
+{% endblock head_imports %}
+
+{% block page_content %}
+
+    <div class="form-row row w-100 h-100">
+        <div class="col w-100 h-100 d-flex align-items-top justify-content-center">
+            <div class="form-wrapper w-50">
+
+                <h2 class="text-center"><b>{{form_title}}</b></h2>
+                <hr>
+            
+                <form 
+                   
+                    action="{{ form_action }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                > {% csrf_token %}
+                    
+                    <div class="form-content pt-3 mb-3">
+                        {% for field in form %}
+                            <div class="form-group">
+                                <label for="{{ form.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {{ field.errors }}
+                            </div>
+                        {% endfor %}
+                    
+                        
+                    {% if form.non_field_errors %}
+                        <div class="form-content">
+                          <div class="form-group">
+                            <div class="message error d-flex align-items-center justify-content-center mt-0 mb-0">
+                              {{ form.non_field_errors }}
+                            </div>
+                          </div>
+                        </div>
+                    {% endif %}
+            
+                    </div>
+            
+                    <div class="form-content">            
+                    <div class="form-group d-flex align-middle justify-content-start">
+                        <button class="btn btn-warning w-100" type="submit">Enviar</button>
+                    </div>
+                    </div>
+            
+                </form>
+            </div>
+
+        </div>
+      
+    </div>
+    
+{% endblock page_content %}

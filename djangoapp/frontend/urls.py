@@ -23,4 +23,7 @@ from frontend.views import*
 app_name = 'frontend'
 urlpatterns = [
     path('', home_page, name='home'),
+    path('avaliation/inputs/', avaliation_inputs, name='avaliation_inputs'),
+    path('nsga2/inputs/', nsga2_inputs, name='nsga2_inputs'),
+    path('ga/inputs/', ga_inputs, name='ga_inputs'),
 ]
