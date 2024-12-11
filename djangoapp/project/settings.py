@@ -164,7 +164,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'APIs Documentation',
-    'DESCRIPTION': "Documentação das API's do DYSSE web",
+    'DESCRIPTION': "Documentação das API's do STHEGA",
     'VERSION': '1.0.0',
     'COMPONENT_SPLIT_REQUEST': True,
     'SERVE_INCLUDE_SCHEMA': False,

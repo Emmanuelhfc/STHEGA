@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema
 from API.models import InputsShellAndTube, TubeDiameter, Pitch
 from rest_framework.response import Response
 import logging
+from API.pagination import*
 
 logger = logging.getLogger('API')
 
@@ -15,6 +16,7 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
     queryset = InputsShellAndTube.objects.all().order_by('id')
     serializer_class = InputsShellAndTubeSerializer
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
+    pagination_class = GenericPagination
 
     # def pop_state_key(self, data:dict):
     #     list_models = [TubeCount, TubeDiameter, Pitch, DeltaSB, Pitch, LiLo, TubeInternDiameter, TubeMaterial, Layout, ConstantsA, ConstantsB, NozzleDiameter]
