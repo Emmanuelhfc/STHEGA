@@ -1,6 +1,18 @@
 from django import forms
 from API.models import TubePasses, TubeInternDiameter, Pitch, TubeCount, ShellFluid, TubeMaterial
 
+
+class FilterInputForm(forms.Form):
+    id = forms.IntegerField(
+        required=True,
+        label=r"ID do input do cálculo",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+
+
 class STHEForm(forms.Form):
     T1_hot = forms.FloatField(
         required=True,

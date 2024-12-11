@@ -1,10 +1,10 @@
 {% load static %}
-<div class="modal" role="dialog" id="new-calculate-form-modal" tabindex="-1" aria-labelledby="new-calculate-form-modalLabel">
+<div class="modal" role="dialog" id="filter-input-form-modal" tabindex="-1" aria-labelledby="filter-input-form-modalLabel">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content modal-content-new-calculate-form">
-            <div class="modal-header modal-header-new-calculate-form p-0 d-flex flex-row align-items-center justify-content-center">
+        <div class="modal-content modal-content-filter-input-form">
+            <div class="modal-header modal-header-filter-input-form p-0 d-flex flex-row align-items-center justify-content-center">
                 
-                <h3 class="modal-title" id="new-calculate-formModalLabel"><b>New Calculate</b></h3>
+                <h3 class="modal-title" id="filter-input-formModalLabel"><b>Buscar</b></h3>
             </div>
             <div class="modal-body" style="max-height:700px">
                 <div class="form-row row w-100 h-100">
@@ -16,7 +16,7 @@
                                 enctype="multipart/form-data"
                             > {% csrf_token %}
                                 <div class="form-content pt-3 mb-3" style="max-height: 500px; overflow-y: auto;">
-                                    {% for field in new_calculate_form %}
+                                    {% for field in filter_input_form %}
                                         <div class="form-group m-3 h-75 mh-75">
                                             <label for="{{ form.id_for_label }}">{{ field.label }}</label>
                                             {{ field }}

@@ -142,6 +142,8 @@ STATIC_URL = 'static/'
 DATA_DIR = BASE_DIR.parent / 'data' / 'web'
 STATIC_ROOT = DATA_DIR / 'static'
 
+MEDIA_URL = 'media/'
+
 MEDIA_ROOT = DATA_DIR / 'media'
 
 

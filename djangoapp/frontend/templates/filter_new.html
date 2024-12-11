@@ -23,7 +23,7 @@
         <div class="row flex-grow-1 home-row-2 h-auto pb-5">
             <div class="col"></div>
             <div class="col-3  h-100 me-5">
-                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="open_modal('filter-input-form-modal')">
                     <div class="feat-header d-flex align-items-center justify-content-center">
                         
                         <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
@@ -35,7 +35,7 @@
                     <hr class="ms-3 me-3">
                     <div class="feat-des ms-3 me-3">
                         <p class="text-justify h-100 w-100">
-                            Buscar no banco de dados.
+                            Buscar no inputs do banco de dados e realizar o cálculo.
                         </p>
                     </div>
                 </div>
@@ -74,6 +74,7 @@
         
     </div>
     {% include "modals/new_calculate.html" %}
+    {% include "modals/filter_input.html" %}
 {% endblock page_content %} 
 {% block scripts %}   
 
