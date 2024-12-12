@@ -3,6 +3,17 @@
 
 {% block btns_aside %}
 
+    <button
+        class="btn-default-ligth w-100 border-0"
+        onclick="open_modal('charts-carousel-modal')" 
+        data-bs-toggle="tooltip" 
+        data-bs-placement="right" 
+        title="Gráficos" 
+    >
+        <span class="btn-symbol material-symbols-outlined h-100 d-flex align-items-center justify-content-center">
+            <img src="{% static 'libs/google-material-icons/home.svg' %}" alt="home icon" class="material-icon">
+        </span>
+    </button>
 {% endblock btns_aside %}
 
 {% block list_title %}
