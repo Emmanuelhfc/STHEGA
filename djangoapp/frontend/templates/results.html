@@ -85,7 +85,7 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row  table-primary text-center">
+    <tr class="table-row  table-success text-center">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Balanço de Energia 
         </td>
@@ -106,7 +106,7 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row  table-primary text-center">
+    <tr class="table-row  table-success text-center">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Cálculos Auxiliares e Características Geométricas
         </td>
@@ -127,7 +127,7 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row  table-primary text-center">
+    <tr class="table-row  table-success text-center">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Coeficiente de Transferência de Calor para o lado dos Tubos
         </td>
@@ -148,7 +148,7 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row table-primary text-center tf">
+    <tr class="table-row table-success text-center tf">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Perda de Carga Lado dos Tubos
         </td>
@@ -169,7 +169,7 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row  table-primary text-center">
+    <tr class="table-row  table-success text-center">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Transferência de Calor Casco
         </td>
@@ -190,12 +190,34 @@
             </td>
         </tr>
     {% endfor %}
-    <tr class="table-row  table-primary text-center">
+    <tr class="table-row  table-success text-center">
         <td colspan="4" class="table-row text-center  fw-bolder">
             Resultados - Perda de carga Casco
         </td>
     </tr> 
     {% for item in perda_carga_casco %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                {{item.var}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.description}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.value}}
+            </td>
+            <td class="table-cel text-center">
+                {{item.unity}}
+            </td>
+        </tr>
+    {% endfor %}
+
+    <tr class="table-row  table-success text-center">
+        <td colspan="4" class="table-row text-center  fw-bolder">
+            Outros Resultados
+        </td>
+    </tr> 
+    {% for item in other_results %}
         <tr class="table-row text-center">
             <td class="table-cel">
                 {{item.var}}
