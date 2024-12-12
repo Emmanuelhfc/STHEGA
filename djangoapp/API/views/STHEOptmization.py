@@ -3,11 +3,10 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from pymoo.termination.default import DefaultSingleObjectiveTermination, DefaultMultiObjectiveTermination
-from pymoo.operators.crossover.sbx import SBX
-from pymoo.algorithms.moo.nsga2 import RankAndCrowding
 from drf_spectacular.utils import extend_schema
 import logging
-from pymoo.core.mixed import MixedVariableGA
+# from pymoo.core.mixed import MixedVariableGA
+from API.modules.STHEOptimization.algorithm import CustomMixedVariableGA, CustomMixedVariableNSGAII
 from pymoo.optimize import minimize
 from API.modules.STHEOptimization.problems import*
 from API.modules.STHEOptimization.callback import MyCallback
@@ -22,7 +21,6 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     serializer_class = GAInputsSerializer
     
-
     def create_shte_inputs(self, inputs_id, input_data, calculation_id) -> InputsShellAndTube:
         initial_inputs = InputsShellAndTube.objects.get(id=inputs_id).__dict__
         inputs_sthe = InputsShellAndTube(
@@ -157,7 +155,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
         problem = STHEProblemNSGAII(input_id, save=save_results, fator_area_proj=fator_area_proj)
         calculation_id = problem.calculation_id
-        algorithm = MixedVariableGA(pop_size=pop_size)
+        algorithm = CustomMixedVariableGA(pop_size=pop_size)
 
         callback = MyCallback()
 
@@ -218,7 +216,7 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
 
         problem = STHEProblemNSGAII(input_id)
         calculation_id = problem.calculation_id
-        algorithm = MixedVariableGA(pop_size=pop_size, survival=RankAndCrowding())
+        algorithm = CustomMixedVariableNSGAII(pop_size=pop_size)
         callback = MyCallback(isNSGA2=True)
 
         res = minimize(problem,
