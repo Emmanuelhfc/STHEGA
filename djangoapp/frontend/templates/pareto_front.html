@@ -1,0 +1,73 @@
+{% extends "partials/generic_list.html" %}
+{% load static %}
+
+{% block btns_aside %}
+
+{% endblock btns_aside %}
+
+{% block list_title %}
+    <div class="row w-100">
+        <div class="col h-100 w-100">
+            <h2 class="h-100 w-100 d-flex align-content-center justify-content-center h1 fw-bold">RESULTADOS</h2>
+        </div>
+    </div>
+    
+{% endblock list_title %}
+
+{% block t_head %}
+    <th class="text-center">ID</th>
+    <th class="text-center">\(F_{1} = A_{proj}\)</th>
+    <th class="text-center">\(F_{2} = \Delta P_{total} -  \Delta P_{adimissível}\)</th>
+    <th class="text-center">EA [%]</th>
+    <th class="text-center">L [m]</th>
+    <th class="text-center">\(L_{s}\) [m]</th>
+    <th class="text-center">\(L_{c}\) [m]</th>
+    <th class="text-center">\(D_{s}\) [Pol]</th>
+    <th class="text-center">\(d_{e}\) [Pol]</th>
+    <th class="text-center">\(n\)</th>
+    <th class="text-center">\(P_{t}\) [Pol]</th>
+{% endblock t_head %}
+
+{% block rows %}       
+    {% for item in solutions %}
+        <tr class="table-row text-center">
+            <td class="table-cel">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.inputs}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.objective_function_1}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.objective_function_2}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.Ea}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.L}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.ls}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.lc}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.Ds_inch}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.de}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.n}}</a>
+            </td>
+            <td class="table-cel text-center">
+                <a href="{% url "frontend:results" item.id %}" class="table-link">{{item.pitch}}</a>
+            </td>
+        </tr>
+    {% endfor %}
+        
+    {% include "modals/charts_carousel.html" %}
+    
+
+{% endblock rows %}

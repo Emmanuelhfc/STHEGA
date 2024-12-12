@@ -28,5 +28,6 @@ urlpatterns = [
     path('ga/inputs/', ga_inputs, name='ga_inputs'),
     path('calculate/sthe/', calculate_avaliation, name='calculate_avaliation'),
     path('results/<int:pk>/', results, name='results'),
+    path('pareto/front/<str:calculation_id>/', pareto_front, name='pareto_front'),
     
 ]

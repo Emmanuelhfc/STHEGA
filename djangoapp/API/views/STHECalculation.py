@@ -6,11 +6,13 @@ from django.http import FileResponse, Http404
 from drf_spectacular.utils import extend_schema
 from API.models import InputsShellAndTube, Results
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 import logging
 
 logger = logging.getLogger('API')
 class STHECalcultionViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
+    serializer_class = Serializer
 
     @extend_schema(
         tags=['SHELL AND TUBE CALCULATION'],
