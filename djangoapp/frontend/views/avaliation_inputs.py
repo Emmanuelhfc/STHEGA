@@ -12,4 +12,4 @@ def avaliation_inputs(request):
         'filter_input_form': filter_input_form
     }
 
-    return render(request, 'filter_new.html', context=context)
+    return render(request, 'filter_new_avaliation.html', context=context)

@@ -2,9 +2,9 @@ from django.shortcuts import render
 from frontend.forms import*
 
 
-def nsga2_inputs(request):
+def avaliation_inputs(request):
     sthe_form = STHEForm(request.POST or None)
-    filter_input_form = FilterInputNSGA2Form(request.POST or None)
+    filter_input_form = FilterInputForm(request.POST or None)
 
     context = {
         'form_title': "Avaliação",
@@ -13,4 +13,3 @@ def nsga2_inputs(request):
     }
 
     return render(request, 'filter_new_nsga2.html', context=context)
-
