@@ -764,12 +764,22 @@ class CascoTubo:
         """
         hio = self.hio
         hs = self.hs
-        Uc = hio * hs / (hio + hs)
+        # Uc = hio * hs / (hio + hs)
+        Uc = (1/hio + 1/hs)**(-1)
         
         self.Uc = Uc
 
     def coef_global_sujo(self):
-        Us = self.Uc + self.Rd_f + self.Rd_q
+
+        if self.shell_fluid == 'hot':
+            rd_e = self.Rd_q
+            rd_i = self.Rd_f
+        else:
+            rd_e = self.Rd_f
+            rd_i = self.Rd_q
+
+
+        Us = (1/self.Uc + rd_e + rd_i*(self.de.diameter_meters/self.di.intern_diameter_meters))**-1
         self.Us = Us
     
     def excesso_area(self):
