@@ -17,6 +17,7 @@ class STHEProblem(ElementwiseProblem):
         self.initial_inputs = InputsShellAndTube.objects.get(id=inputs_shell_and_tube_id).__dict__
         self.save = save
         self.fator_area_proj = fator_area_proj
+        self.ind = 1
 
         tube_material_ids = tuple(TubeMaterial.objects.values_list('id', flat=True))
         ds_inch_options = tuple(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())

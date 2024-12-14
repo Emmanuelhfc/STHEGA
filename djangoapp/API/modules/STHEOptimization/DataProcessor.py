@@ -11,6 +11,8 @@ class DataProcessor:
         last_gen_number = self.df['gen'].max()
         self.last_gen_data = self.df[self.df['gen'] == last_gen_number]
 
+        self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
+
     def create_and_save_graph(self, x_column, y_column, title, model_field_name) -> File:
         plt.figure(figsize=(8, 6))
         plt.plot(self.df[x_column], self.df[y_column], marker='o', linestyle='-', color='blue')
@@ -31,6 +33,17 @@ class DataProcessor:
 
         return graph
     
+    def save_data_as_csv(self):
+        buffer = BytesIO()
+        self.df.to_csv(buffer, index=False)  
+        buffer.seek(0)  
+        csv = ContentFile(buffer.read(), name=f"data.csv")
+        file = File.objects.create(file=csv)
+        buffer.close()
+        
+        self.charts.csv = file
+        self.charts.save()
+    
     def pareto_front(self):
         plt.figure(figsize=(8, 6))
         plt.scatter(self.last_gen_data['objective_function_1'], self.last_gen_data['objective_function_2'], facecolor="none", edgecolor="red")
@@ -45,12 +58,12 @@ class DataProcessor:
         graph = File.objects.create(file=image_file)
         buffer.close()
 
-        return graph
+        self.charts.files.add(
+            graph
+        )
 
     def process_all_graphs(self):
-
-        charts = Charts.objects.create(calculation_id = self.calcultion_id)
-        charts.files.add(
-            self.pareto_front()
-        )
+        self.save_data_as_csv()
+        self.pareto_front()
+       
 

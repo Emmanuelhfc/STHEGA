@@ -13,7 +13,8 @@ def pareto_front(request, calculation_id):
     first = True
     while True:
         params = {
-            'calculation_id': calculation_id
+            'calculation_id': calculation_id,
+            'ordering': '-A_proj'
         }
         resp = requests.get(endpoint, params=params)
         

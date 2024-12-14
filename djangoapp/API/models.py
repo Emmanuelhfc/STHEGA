@@ -298,3 +298,4 @@ class File(models.Model):
 class Charts(models.Model):
     calculation_id = models.UUIDField(null=True, blank=True)
     files = models.ManyToManyField(File)
+    csv = models.ForeignKey(File, blank=True, null=True, on_delete=models.SET_NULL, related_name='chart_csv')

@@ -8,7 +8,6 @@ class MyCallback(Callback):
         super().__init__()
         self.isNSGA2 = isNSGA2
         self.generation = 0
-        self.ind = 0
         self.data = {
             'gen': [],
             'ind': [],
@@ -41,10 +40,10 @@ class MyCallback(Callback):
         self.generation += 1
 
         for ind in algorithm.pop.get("X"):
-            self.ind +=1
             results = ind['results']
+            self.data["ind"].append(ind['ind'])
             self.data["gen"].append(self.generation)
-            self.data["ind"].append(self.ind)
+            
 
             self.data["L"].append(results["L"])
             self.data["objective_function_1"].append(results["objective_function_1"])

@@ -56,6 +56,9 @@ class STHEProblemNSGAII(STHEProblem):
         
         X['results'] = sthe_calculate
         X['results']['L'] = sthe.L
+        X['ind'] = self.ind
 
+        self.ind += 1 
+        
         out["F"] = [f1, f2]
         out['G'] = g1
