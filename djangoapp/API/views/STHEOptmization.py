@@ -227,8 +227,11 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                save_history=True
                )
 
+
+
         # Results
-        data_processor = DataProcessor(callback.data, calculation_id)
+        pareto_front = [inp['ind'] for inp in res.X]
+        data_processor = DataProcessor(callback.data, calculation_id, pareto_front_ind=pareto_front)
         data_processor.process_all_graphs()
         
         

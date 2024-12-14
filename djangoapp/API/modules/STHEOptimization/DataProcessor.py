@@ -5,11 +5,15 @@ from django.core.files.base import ContentFile
 from API.models import File, Charts
 
 class DataProcessor:
-    def __init__(self, data, calcultion_id):
+    def __init__(self, data, calcultion_id, pareto_front_ind=[]):
         self.df = pd.DataFrame(data)
         self.calcultion_id = calcultion_id
+        
         last_gen_number = self.df['gen'].max()
         self.last_gen_data = self.df[self.df['gen'] == last_gen_number]
+        
+        self.pareto_front = self.df[self.df['ind'].isin(pareto_front_ind)]
+
 
         self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
 
@@ -44,9 +48,9 @@ class DataProcessor:
         self.charts.csv = file
         self.charts.save()
     
-    def pareto_front(self):
+    def pareto_front_chart(self):
         plt.figure(figsize=(8, 6))
-        plt.scatter(self.last_gen_data['objective_function_1'], self.last_gen_data['objective_function_2'], facecolor="none", edgecolor="red")
+        plt.scatter(self.pareto_front['objective_function_1'], self.pareto_front['objective_function_2'], facecolor="none", edgecolor="red")
         plt.xlabel("F1")
         plt.ylabel("F2")
         plt.grid(True)
@@ -64,6 +68,6 @@ class DataProcessor:
 
     def process_all_graphs(self):
         self.save_data_as_csv()
-        self.pareto_front()
+        self.pareto_front_chart()
        
 
