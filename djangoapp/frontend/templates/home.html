@@ -14,14 +14,14 @@
 {% block page_content %}
     <div class="h-100 w-100 d-flex flex-column">
         <div class="row flex-shrink-0 home-row-1">
-            <div class="col d-flex align-items-center justify-content-center" onclick='showPageDimensions()'>
+            <div class="col d-flex align-items-center justify-content-center" onclick=''>
                 <h2><b>Funcionalidades</b></h2>
             </div>
         </div>
         
         <div class="row flex-grow-1 home-row-2 h-auto pb-5">
             <div class="col-4  h-100">
-                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="window.location.href='{% url "frontend:avaliation_inputs" %}'">
                     <div class="feat-header d-flex align-items-center justify-content-center">
                         
                         <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="col-4 h-100">
-                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="window.location.href='{% url "frontend:ga_inputs" %}'">
                     <div class="feat-header d-flex align-items-center justify-content-center">
                         
                         <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="col-4 d-flex  h-100" >
-                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="window.location.href='{% url "frontend:nsga2_inputs" %}'">
                     <div class="feat-header d-flex align-items-center pe-3 justify-content-center">
                         
                         <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
