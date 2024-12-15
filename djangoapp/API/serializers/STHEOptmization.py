@@ -21,7 +21,8 @@ class CrossoverRealOption(models.TextChoices):
 class GAInputsSerializer(serializers.Serializer):
     inputs_shell_and_tube = serializers.IntegerField(help_text="ID do InputsShellAndTube")
     pop_size = serializers.IntegerField(help_text='Tamanho da população')
-    n_max_gen = serializers.IntegerField(default=1000)
+    n_max_gen = serializers.IntegerField()
+    fator_area_proj = serializers.FloatField()
 
 class NSGA2InputsSerializer(serializers.Serializer):
     inputs_shell_and_tube = serializers.IntegerField(help_text="ID do modelo InputsShellAndTube")

@@ -1,21 +1,20 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from pymoo.visualization.scatter import Scatter
 from io import BytesIO
 from django.core.files.base import ContentFile
 from API.models import File, Charts
 
 class DataProcessor:
-    def __init__(self, data, calcultion_id, pareto_front_ind=[]):
+    def __init__(self, data, calcultion_id, nsga2=True, pareto_front_ind=[]):
         self.df = pd.DataFrame(data)
         self.calcultion_id = calcultion_id
-        
         last_gen_number = self.df['gen'].max()
         self.last_gen_data = self.df[self.df['gen'] == last_gen_number]
-        
-        self.pareto_front = self.df[self.df['ind'].isin(pareto_front_ind)]
-
-
-        self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
+        self.nsga2 = nsga2
+        if nsga2:
+            self.pareto_front = self.df[self.df['ind'].isin(pareto_front_ind)]
+            self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
 
     def create_and_save_graph(self, x_column, y_column, title, model_field_name) -> File:
         plt.figure(figsize=(8, 6))
@@ -53,7 +52,8 @@ class DataProcessor:
         plt.scatter(self.pareto_front['objective_function_1'], self.pareto_front['objective_function_2'], facecolor="none", edgecolor="red")
         plt.xlabel("F1")
         plt.ylabel("F2")
-        plt.grid(True)
+        plt.title('Fronteira de Pareto')
+       
         buffer = BytesIO()
         plt.savefig(buffer, format='png')
         plt.close() 
@@ -68,6 +68,7 @@ class DataProcessor:
 
     def process_all_graphs(self):
         self.save_data_as_csv()
-        self.pareto_front_chart()
+        if self.nsga2:
+            self.pareto_front_chart()
        
 

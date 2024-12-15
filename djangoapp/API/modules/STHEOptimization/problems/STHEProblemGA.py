@@ -51,9 +51,14 @@ class STHEProblemGA(STHEProblem):
         f = sthe_calculate['objective_function_1']
         g1 = sthe_calculate['constraint_ea_min']
 
-        logger.debug(f)
-        
         X['results_id'] = sthe_calculate['id']
+        X['results'] = sthe_calculate
+        X['results']['L'] = sthe.L
+        X['ind'] = self.ind
+
+        self.ind += 1 
+        
+        
         out["F"] = f
         out['G'] = g1
 

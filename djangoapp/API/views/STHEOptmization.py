@@ -2,6 +2,7 @@ from API.serializers import*
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
+from pymoo.visualization.scatter import Scatter
 from pymoo.termination.default import DefaultSingleObjectiveTermination, DefaultMultiObjectiveTermination
 from drf_spectacular.utils import extend_schema
 import logging
@@ -139,26 +140,21 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
         input_id = serializer.validated_data.get('inputs_shell_and_tube')
         pop_size = serializer.validated_data.get('pop_size')
         n_max_gen = serializer.validated_data.get('n_max_gen')
-        n_max_evals = serializer.validated_data.get('n_max_evals')
-        save_results = serializer.validated_data.get('save_results')
+        n_max_evals = 10**6
         fator_area_proj = serializer.validated_data.get('fator_area_proj')
 
         termination = DefaultSingleObjectiveTermination(
-            xtol=1e-8,
-            cvtol=1e-6,
-            ftol=1e-6,
+            xtol=0,
+            cvtol=0,
+            ftol=0,
             period=20,
             n_max_gen=n_max_gen,
             n_max_evals=n_max_evals
         )
-
-
-        problem = STHEProblemNSGAII(input_id, save=save_results, fator_area_proj=fator_area_proj)
+        problem = STHEProblemGA(input_id, save=False, fator_area_proj=fator_area_proj)
         calculation_id = problem.calculation_id
         algorithm = CustomMixedVariableGA(pop_size=pop_size)
-
         callback = MyCallback()
-
         res = minimize(problem,
                algorithm,
                termination= termination,
@@ -166,13 +162,11 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                verbose=True,
                callback=callback,
                save_history=True
-               )
+        )
+        
+        data_processor = DataProcessor(callback.data, calculation_id, nsga2=False)
+        data_processor.process_all_graphs()
 
-
-
-        if save_results:    
-            results = Results.objects.get(id=res.X['results_id'])
-            return Response(ResultsSerializer(results).data)
 
         input_data = {
             'shell_thickness_meters': float(res.X['shell_thickness_meters']),

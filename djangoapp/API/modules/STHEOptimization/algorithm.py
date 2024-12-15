@@ -12,8 +12,8 @@ from pymoo.core.population import Population
 from pymoo.core.problem import Problem
 from pymoo.core.sampling import Sampling
 from pymoo.core.variable import Choice, Real, Integer, Binary, BoundedVariable
-from pymoo.operators.crossover.sbx import SBX
-from pymoo.operators.crossover.ux import UX
+from pymoo.operators.crossover.sbx import SBX, SimulatedBinaryCrossover
+from pymoo.operators.crossover.ux import UX, UniformCrossover
 from pymoo.operators.mutation.bitflip import BFM
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.mutation.rm import ChoiceRandomMutation
@@ -21,7 +21,6 @@ from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.selection.rnd import RandomSelection
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.algorithms.moo.nsga2 import RankAndCrowding
-
 
 class CustomMixedVariableMating(InfillCriterion):
 
@@ -39,9 +38,9 @@ class CustomMixedVariableMating(InfillCriterion):
         if crossover is None:
             crossover = {
                 Binary: UX(),
-                Real: SBX(),
+                Real: SBX(prob=1),
                 Integer: SBX(vtype=float, repair=RoundingRepair()),
-                Choice: UX(),
+                Choice: UX(prob=1),
             }
 
         if mutation is None:
