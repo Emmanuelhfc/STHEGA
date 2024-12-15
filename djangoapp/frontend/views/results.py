@@ -585,6 +585,12 @@ def item_inputs(input_data) -> dict:
             "description": "Condutividade Térmica (Quente)",
             "value": input_data['k_q'],
             "unity": "J/kg*K"
+        },
+        {
+            "var": r"\(R_{d,q}\)",
+            "description": "Fator de incrustação (Quente)",
+            "value": input_data['Rd_q'],
+            "unity": "m^2 K/W"
         }
 
     ]
@@ -631,6 +637,12 @@ def item_inputs(input_data) -> dict:
             "description": "Condutividade Térmica (Frio)",
             "value": input_data['k_f'],
             "unity": "J/kg*K"
+        },
+        {
+            "var": r"\(R_{d,f}\)",
+            "description": "Fator de incrustação (Quente)",
+            "value": input_data['Rd_f'],
+            "unity": "m^2 K/W"
         }
 
     ]
