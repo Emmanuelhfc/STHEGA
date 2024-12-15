@@ -1,0 +1,81 @@
+{% extends "partials/layout.html" %}
+{% load static %}
+
+{% block head_imports %}
+<!--Home - CSS-->
+<link rel="stylesheet" href="{% static "css/home.css" %}">
+
+{% endblock head_imports %}
+
+{% block btns_aside %}
+
+{% endblock btns_aside %}
+
+{% block page_content %}
+    <div class="h-100 w-100 d-flex flex-column">
+        <div class="row flex-shrink-0 home-row-1">
+            <div class="col d-flex align-items-center justify-content-center" onclick='showPageDimensions()'>
+                <h2><b>Otimização com GA</b></h2>
+               
+            </div>
+        </div>
+        
+        <div class="row flex-grow-1 home-row-2 h-auto pb-5">
+            <div class="col"></div>
+            <div class="col-3  h-100 me-5">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="open_modal('filter-input-form-modal')">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">                        
+                            <img src="{% static 'libs/google-material-icons/calculate.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>Otimizar</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify h-100 w-100">
+                            Otimização monoobjetivo com inputs já existentes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 h-100">
+                <div class="feature-card d-flex flex-column w-100 h-100" style="cursor: pointer;" onclick="open_modal('new-calculate-form-modal')">
+                    <div class="feat-header d-flex align-items-center justify-content-center">
+                        
+                        <span class="feat-icon material-symbols-outlined w-25 h-100 d-flex align-items-center justify-content-center">
+                            <img src="{% static 'libs/google-material-icons/genetic.svg' %}" class="material-icon">
+                        </span>
+                        <h2 class="feat-title flex-grow-1 h-100 d-flex align-items-center justify-content-start m-0"><b>Novo</b> </h2>
+                        
+                    </div>
+                    <hr class="ms-3 me-3">
+                    <div class="feat-des ms-3 me-3">
+                        <p class="text-justify">
+                            Criar novos inputs e realizar a otimização
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+            
+        </div>
+        <div class="row  flex-shrink-0 home-row-3 h-25 d-lg-flex d-md-none pb-5">
+           
+        </div> 
+        <div class="row flex-shrink-0 home-row-4">
+            <div class="col copyrigth d-flex align-items-center justify-content-center">
+                © STHEGA - Developed by Emmanuel Henrique de Faria Carvalho
+            </div>
+        </div>
+        
+        
+        
+    </div>
+    {% include "modals/new_calculate.html" %}
+    {% include "modals/filter_input.html" %}
+{% endblock page_content %} 
+{% block scripts %}   
+
+{% endblock scripts %} 

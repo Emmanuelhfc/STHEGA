@@ -33,7 +33,35 @@ class FilterInputNSGA2Form(forms.Form):
             'class': 'form-control',
         })
     )
-
+class FilterInputGAForm(forms.Form):
+    inputs_shell_and_tube = forms.IntegerField(
+        required=True,
+        label=r"ID do input do cálculo",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    pop_size = forms.IntegerField(
+        required=True,
+        label=r"Tamanho da populção",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    n_max_gen = forms.IntegerField(
+        required=True,
+        label=r"Número máximo de gerações",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    fator_area_proj = forms.IntegerField(
+        required=True,
+        label=r"Fator de peso para área de projeto",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
 
 class STHEForm(forms.Form):
     T1_hot = forms.FloatField(

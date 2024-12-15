@@ -12,9 +12,10 @@ class DataProcessor:
         last_gen_number = self.df['gen'].max()
         self.last_gen_data = self.df[self.df['gen'] == last_gen_number]
         self.nsga2 = nsga2
+        self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
         if nsga2:
             self.pareto_front = self.df[self.df['ind'].isin(pareto_front_ind)]
-            self.charts = Charts.objects.create(calculation_id = self.calcultion_id)
+            
 
     def create_and_save_graph(self, x_column, y_column, title, model_field_name) -> File:
         plt.figure(figsize=(8, 6))

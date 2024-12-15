@@ -49,6 +49,8 @@ class MyCallback(Callback):
             self.data["objective_function_1"].append(results["objective_function_1"])
             if self.isNSGA2:
                 self.data["objective_function_2"].append(results["objective_function_2"])
+            else: 
+                self.data["objective_function_2"].append(0)
             self.data["constraint_ea_min"].append(results["constraint_ea_min"])
             self.data["Ds"].append(results["Ds"])
             self.data["lc"].append(results["lc"])
