@@ -17,6 +17,18 @@ class InputsShellAndTubeViewSet(viewsets.ModelViewSet):
     serializer_class = InputsShellAndTubeSerializer
     parser_classes = [MultiPartParser, JSONParser, FormParser,]
     pagination_class = GenericPagination
+    
+    @extend_schema(
+        request=InputsShellAndTubeSerializerPost
+    )
+    def create(self, request, *args, **kwargs):
+        # Instanciando o serializer manualmente
+        serializer = InputsShellAndTubeSerializerPost(data=request.data)
+        if serializer.is_valid():
+            # Se os dados forem válidos, salvar
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
     # def pop_state_key(self, data:dict):
     #     list_models = [TubeCount, TubeDiameter, Pitch, DeltaSB, Pitch, LiLo, TubeInternDiameter, TubeMaterial, Layout, ConstantsA, ConstantsB, NozzleDiameter]

@@ -20,7 +20,7 @@
                                         <div class="form-group m-3 h-75 mh-75">
                                             <label for="{{ form.id_for_label }}">{{ field.label }}</label>
                                             {{ field }}
-                                            {{ field.errors }}
+                                            <div class="text-danger">{{ field.errors }}</div>
                                         </div>
                                     {% endfor %}
                                     

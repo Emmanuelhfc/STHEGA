@@ -109,7 +109,7 @@ class STHEForm(forms.Form):
     )
     rho_f = forms.FloatField(
         required=True,
-        label=r"\(\rho_{q}\) - Densidade (Frio) [kg/m^3]",
+        label=r"\(\rho_{f}\) - Densidade (Frio) [kg/m^3]",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         })
@@ -138,6 +138,20 @@ class STHEForm(forms.Form):
     k_f = forms.FloatField(
         required=True,
         label=r"\(k_{f}\) - Viscosidade dinâmica (Frio) [J/kg*K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    Rd_q = forms.FloatField(
+        required=False,
+        label=r"\(R_{d,q}\) - Fator de incrustação para o fluido quente [m^2 * K / W]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    Rd_f = forms.FloatField(
+        required=False,
+        label=r"\(R_{d,f}\) - Fator de incrustação para o fluido frion [m^2 * K / W]",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         })
@@ -185,8 +199,8 @@ class STHEForm(forms.Form):
             'class': 'form-control',
         })
     )
-    Ds_inch = forms.ModelChoiceField(
-        queryset = TubeCount.objects.values_list('Ds_inch', flat=True).distinct(),
+    Ds_inch = forms.ChoiceField(
+        choices= [(ds, ds) for ds in list(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())],
         required=False,
         label=r"\(D_{s}\) - Diâmetro Interno do Casco (Frio) [Pol]",
         widget=forms.Select(attrs={
@@ -217,7 +231,7 @@ class STHEForm(forms.Form):
     )
     lc_percent = forms.FloatField(
         required=True,
-        label=r"\(\frac{l_c}{D_s}\) - Corte do Defletor em porcentagem  [%]",
+        label=r"\(\frac{l_c}{D_s}\) - Corte do Defletor em porcentagem  [%] (0.15 à 0.4)",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         })
@@ -237,7 +251,7 @@ class STHEForm(forms.Form):
             'class': 'form-control',
         })
     )
-    tube_material = forms.ChoiceField(
+    pressure_class = forms.ChoiceField(
         choices=[(150.0, '150 Psi'), (600.0, "600 Psi")], 
         required=False,
         label=r"Classe de Pressão",
@@ -246,28 +260,20 @@ class STHEForm(forms.Form):
         })
     )
     perda_carga_admissivel_casco = forms.FloatField(
-        required=True,
+        required=False,
         label=r"Perda de Carga Adimissível no Casco",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         })
     )
     perda_carga_admissivel_tubo = forms.FloatField(
-        required=True,
+        required=False,
         label=r"Perda de Carga Adimissível no Tubo",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
         })
     )
-    
-    # pitch = forms.ModelChoiceField(
-    #     required=False,
-    #     label="Passo (Pitch)",
-    #     widget=forms.Select(attrs={
-    #         'class': 'form-control',
-    #     })
-    # )
-    
+
 
     def clean(self):
         cleaned_data = super().clean()

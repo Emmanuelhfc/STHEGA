@@ -27,6 +27,11 @@ class InputsShellAndTubeSerializer(serializers.ModelSerializer):
         model = InputsShellAndTube
         fields = '__all__'
 
+class InputsShellAndTubeSerializerPost(serializers.ModelSerializer):
+    class Meta:
+        model = InputsShellAndTube
+        fields = '__all__'
+
     
     
     
