@@ -19,13 +19,76 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.mutation.rm import ChoiceRandomMutation
 from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.selection.rnd import RandomSelection
+from pymoo.operators.selection.tournament import TournamentSelection
+from pymoo.operators.selection.tournament import compare, TournamentSelection
 from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.algorithms.moo.nsga2 import RankAndCrowding
+from pymoo.util.dominator import Dominator
+import logging
 
+
+
+logger = logging.getLogger('API')
+
+def custom_binary_tournament(pop, P, algorithm, **kwargs):
+    n_tournaments, n_parents = P.shape
+
+    if n_parents != 2:
+        raise ValueError("Only implemented for binary tournament!")
+
+    S = np.full(n_tournaments, np.nan)
+
+    for i in range(n_tournaments):
+
+        a, b = P[i, 0], P[i, 1]
+        a_cv, a_f, b_cv, b_f = pop[a].CV[0], pop[a].F, pop[b].CV[0], pop[b].F
+        rank_a, cd_a = pop[a].get("rank", "crowding")
+        rank_b, cd_b = pop[b].get("rank", "crowding")
+
+        # if at least one solution is infeasible
+        if a_cv > 0.0 or b_cv > 0.0:
+            S[i] = compare(a, a_cv, b, b_cv, method='smaller_is_better', return_random_if_equal=True)
+
+        # both solutions are feasible
+        else:
+            rel = Dominator.get_relation(a_f, b_f)
+            if rel == 1:
+                S[i] = a
+            elif rel == -1:
+                S[i] = b
+
+            # if rank or domination relation didn't make a decision compare by crowding
+            if np.isnan(S[i]):
+                S[i] = compare(a, cd_a, b, cd_b, method='larger_is_better', return_random_if_equal=True)
+
+    return S[:, None].astype(int, copy=False)
+
+
+def binary_tournament_mono(pop, P, **kwargs):
+    # The P input defines the tournaments and competitors
+    n_tournaments, n_competitors = P.shape
+
+    if n_competitors != 2:
+        raise Exception("Only pressure=2 allowed for binary tournament!")
+
+    # the result this function returns
+    import numpy as np
+    S = np.full(n_tournaments, -1, dtype=int)
+
+    # now do all the tournaments
+    for i in range(n_tournaments):
+        a, b = P[i]
+        
+        if pop[a].F < pop[b].F:
+            S[i] = a
+        else:
+            S[i] = b
+
+    return S
 class CustomMixedVariableMating(InfillCriterion):
 
     def __init__(self,
-                 selection=RandomSelection(),
+                 selection=TournamentSelection(func_comp=binary_tournament_mono),
                  crossover=None,
                  mutation=None,
                  repair=None,
@@ -156,7 +219,7 @@ class CustomMixedVariableGA(GeneticAlgorithm):
                  n_offsprings=None,
                  output=SingleObjectiveOutput(),
                  sampling=MixedVariableSampling(),
-                 mating=CustomMixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination()),
+                 mating=CustomMixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination(), selection=TournamentSelection(func_comp=binary_tournament_mono)),
                  eliminate_duplicates=MixedVariableDuplicateElimination(),
                  survival=FitnessSurvival(),
                  **kwargs):
@@ -170,7 +233,7 @@ class CustomMixedVariableNSGAII(GeneticAlgorithm):
                  n_offsprings=None,
                  output=SingleObjectiveOutput(),
                  sampling=MixedVariableSampling(),
-                 mating=CustomMixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination()),
+                 mating=CustomMixedVariableMating(eliminate_duplicates=MixedVariableDuplicateElimination(), selection=TournamentSelection(func_comp=custom_binary_tournament)),
                  eliminate_duplicates=MixedVariableDuplicateElimination(),
                  survival=RankAndCrowding(),
                  **kwargs):
