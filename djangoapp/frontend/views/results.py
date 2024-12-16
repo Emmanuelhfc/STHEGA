@@ -35,6 +35,15 @@ def results(request, pk):
     other_results = outros_resultados(result_data)
 
 
+    files = []
+    if result_data.get('calculation_id'):
+        endpoint_charts = api_endpoint(request, reverse('API:chart_list'))
+        resp_charts = requests.get(endpoint_charts, params={'calculation_id': result_data.get('calculation_id')})
+        if resp_charts.status_code == 200:
+            charts = resp_charts.json()
+            if len(charts) > 0:
+                files.extend(charts[0]['files'])
+
 
     context = {
         "input_casco": inputs['input_casco'],
@@ -47,6 +56,7 @@ def results(request, pk):
         "tans_cal_casco": r_trans_cal_casco,
         "perda_carga_casco": r_perda_carga_casco,
         "other_results": other_results,
+        'files': files
     }
 
     return render(request, 'results.html', context=context)
