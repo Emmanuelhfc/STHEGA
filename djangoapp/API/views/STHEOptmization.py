@@ -163,7 +163,6 @@ class STHEOptmizationViewSet(viewsets.ViewSet):
                callback=callback,
                save_history=True
         )
-        logger.debug(callback.data['L'])
         for key in callback.data:
             logger.debug(f'key={key} - length ={len(callback.data[key])}')
         

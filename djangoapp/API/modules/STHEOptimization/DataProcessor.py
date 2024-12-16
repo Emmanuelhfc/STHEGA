@@ -131,7 +131,7 @@ class DataProcessor:
         self.average_parameter_by_generation('A_proj', r'Média de $A_{proj}$')
 
         self.average_parameter_by_generation('hio', r'Média de $h_{io}$')
-        self.average_parameter_by_generation('hs', r'Média de $h_{c}}$')
+        self.average_parameter_by_generation('hs', r'Média de $h_{c}$')
         self.average_parameter_by_generation('A_proj', r'Média de $A_{proj}$')
 
         self.average_parameter_by_generation('objective_function_1', r'Média de $F_1$')
