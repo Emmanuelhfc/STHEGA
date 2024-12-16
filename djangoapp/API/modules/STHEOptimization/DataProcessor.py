@@ -74,7 +74,7 @@ class DataProcessor:
 
         # Plotando o gráfico
         plt.figure(figsize=(8, 6))
-        plt.plot(mean_by_gen['gen'], mean_by_gen[parameter], linestyle='-', color='red', label=parameter_name)
+        plt.plot(mean_by_gen['gen'], mean_by_gen[parameter], linestyle='-', color='blue', label=parameter_name)
         plt.xlabel('Geração')
         plt.ylabel(parameter_name)
         plt.title(f'{parameter_name} por Geração', fontweight="bold")
@@ -126,6 +126,14 @@ class DataProcessor:
             self.average_parameter_by_generation('objective_function_2', r'Média de $F_2$')
         
         self.media_fatores_correcao_por_geracao()
+        self.average_parameter_by_generation('delta_PT', r'Média de $\Delta P_t$')
+        self.average_parameter_by_generation('delta_Ps', r'Média de $\Delta P_c$')
+        self.average_parameter_by_generation('A_proj', r'Média de $A_{proj}$')
+
+        self.average_parameter_by_generation('hio', r'Média de $h_{io}$')
+        self.average_parameter_by_generation('hs', r'Média de $h_{c}}$')
+        self.average_parameter_by_generation('A_proj', r'Média de $A_{proj}$')
+
         self.average_parameter_by_generation('objective_function_1', r'Média de $F_1$')
         self.average_parameter_by_generation('L', 'Média de L')
         self.average_parameter_by_generation('lc', 'Média do $L_c$')
