@@ -25,6 +25,7 @@ from pymoo.util.display.single import SingleObjectiveOutput
 from pymoo.algorithms.moo.nsga2 import RankAndCrowding
 from pymoo.util.dominator import Dominator
 import logging
+import random
 
 
 
@@ -45,6 +46,11 @@ def custom_binary_tournament(pop, P, algorithm, **kwargs):
         rank_a, cd_a = pop[a].get("rank", "crowding")
         rank_b, cd_b = pop[b].get("rank", "crowding")
 
+        logger.debug(f'a_f={a_f}')
+        logger.debug(f'b_f={b_f}')
+        logger.debug(f'cd_a={cd_a}')
+        logger.debug(f'cd_b={cd_b}')
+
         # if at least one solution is infeasible
         if a_cv > 0.0 or b_cv > 0.0:
             S[i] = compare(a, a_cv, b, b_cv, method='smaller_is_better', return_random_if_equal=True)
@@ -58,8 +64,12 @@ def custom_binary_tournament(pop, P, algorithm, **kwargs):
                 S[i] = b
 
             # if rank or domination relation didn't make a decision compare by crowding
+            # if np.isnan(S[i]):
+            #     S[i] = compare(a, cd_a, b, cd_b, method='larger_is_better', return_random_if_equal=True)
+
             if np.isnan(S[i]):
-                S[i] = compare(a, cd_a, b, cd_b, method='larger_is_better', return_random_if_equal=True)
+                # Sorteia entre a e b
+                S[i] = random.choice([a, b])
 
     return S[:, None].astype(int, copy=False)
 

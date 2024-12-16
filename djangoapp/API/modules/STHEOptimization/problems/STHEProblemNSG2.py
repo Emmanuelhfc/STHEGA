@@ -25,10 +25,10 @@ class STHEProblemNSGAII(STHEProblem):
         except TubeCountError:
             logger.warning('Erro na contagem de tubos')
             results_args = {}
-            objective_function_1 = 10**6
-            objective_function_2 = 10**6
-            constraint_ea_max = 10**6
-            constraint_ea_min = 10**6
+            objective_function_1 = 10**5
+            objective_function_2 = 10**5
+            constraint_ea_max = 10**5
+            constraint_ea_min = 10**5
             error = True
 
         result = Results(
