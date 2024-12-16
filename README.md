@@ -1,28 +1,17 @@
-# HeatExGA
- Software desenvolvido como projeto de TCC sobre dimensionamento de Trocadores de Calor Casco e Tubo com o uso de GA's.
+# STHEGA
+ Aplicativo WEB (API/Frontend) desenvolvido como projeto de TCC sobre dimensionamento de Trocadores de Calor Casco e Tubo com o uso de Algoritmos Genéticos.
 
 
 
-## Comandos 
+## Instalação e Uso 
 
-```
-pyside6-uic interface/ui_MainWindow.ui -o interface/ui_mainwindow.py
+Primeiro é necessário ter instalado o [Docker](https://www.docker.com/products/docker-desktop/).
 
-```
-
-Como no projeto pode ser que eu fique alterando os models vou suar Alembic para fazer migrações
-ver mais em [Alembic Tutorial](https://simplyprashant.medium.com/how-to-use-alembic-for-your-database-migrations-d3e93cacf9e8)
+Após isso é necessário executar o comnando para subir o container:
 
 ```
-alembic init alembic
+docker compose up
+
 ```
 
-makemigration
-```
-alembic revision --autogenerate -m "upgrade"
-```
-
-migrate
-```
-alembic upgrade head
-```
+Por fim, a aplicação poderá ser acessda através da porta 8100 (http://localhost:8100/)
