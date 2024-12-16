@@ -11,7 +11,6 @@ Após isso é necessário executar o comnando para subir o container:
 
 ```
 docker compose up
-
 ```
 
-Por fim, a aplicação poderá ser acessda através da porta 8100 (http://localhost:8100/)
+Por fim, a aplicação poderá ser acessada através da porta 8100 (http://localhost:8100/)
