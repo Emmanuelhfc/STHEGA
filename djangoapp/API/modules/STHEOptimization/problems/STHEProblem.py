@@ -25,7 +25,7 @@ class STHEProblem(ElementwiseProblem):
         di_standard = tuple(TubeInternDiameter.objects.values_list('standard', flat=True).distinct())
 
         vars = {
-            "shell_thickness_meters": Real(bounds=(0, 0.50)),
+            "shell_thickness_meters": Real(bounds=(0.01, 0.076)),
             "ls_percent": Real(bounds=DISTANCIA_DEFLETOR_VALUES),
             "lc_percent": Real(bounds=CORTE_DEFLETOR_VALUES),
             "L_percent": Real(bounds=COMPRIMENTO_CASCO_POR_DIAMETRO_INTERNO),
