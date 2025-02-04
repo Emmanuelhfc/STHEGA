@@ -309,3 +309,190 @@ class STHEForm(forms.Form):
         return {key: value for key, value in cleaned_data.items() if value not in [None, '']}
     
 
+class STHEGAForm(forms.Form):
+    T1_hot = forms.FloatField(
+        required=True,
+        label=r"\(T_1\) - Temperatura Entrada (Quente) [K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 150.0",
+        })
+    )
+    T2_hot = forms.FloatField(
+        required=True,
+        label=r"\(T_2\) - Temperatura Saída (Quente) [K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 120.0",
+        })
+    )
+    t1_cold = forms.FloatField(
+        required=True,
+        label=r"\(t_1\) - Temperatura Entrada (Frio) [K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 25.0",
+        })
+    )
+    t2_cold = forms.FloatField(
+        required=True,
+        label=r"\(t_2\) - Temperatura Saída (Frio) [K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 40.0",
+        })
+    )
+    wq = forms.FloatField(
+        required=True,
+        label=r"\(w_q\) - Vazão mássica (Quente) [kg/s]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 0.5",
+        })
+    )
+    wf = forms.FloatField(
+        required=True,
+        label=r"\(w_f\) - Vazão mássica (Frio) [kg/s]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 0.7",
+        })
+    )
+    cp_quente = forms.FloatField(
+        required=True,
+        label=r"\(C_{p,q}\) - Calor Específico (Quente) [J/kg*K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 4.2",
+        })
+    )
+    cp_frio = forms.FloatField(
+        required=True,
+        label=r"\(C_{p,f}\) - Calor Específico (Frio) [J/kg*K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Ex: 4.2",
+        })
+    )
+    rho_q = forms.FloatField(
+        required=True,
+        label=r"\(\rho_{q}\) - Densidade (Quente) [kg/m^3]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    rho_f = forms.FloatField(
+        required=True,
+        label=r"\(\rho_{f}\) - Densidade (Frio) [kg/m^3]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    mi_q = forms.FloatField(
+        required=True,
+        label=r"\(\mu_{q}\) - Viscosidade dinâmica (Quente) [Pa*s]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    mi_f = forms.FloatField(
+        required=True,
+        label=r"\(\mu_{f}\) - Viscosidade dinâmica (Frion) [Pa*s]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    k_q = forms.FloatField(
+        required=True,
+        label=r"\(k_{q}\) - Condutividade Térmica (Quente) [J/kg*K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    k_f = forms.FloatField(
+        required=True,
+        label=r"\(k_{f}\) - Viscosidade dinâmica (Frio) [J/kg*K]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    Rd_q = forms.FloatField(
+        required=False,
+        label=r"\(R_{d,q}\) - Fator de incrustação para o fluido quente [m^2 * K / W]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    Rd_f = forms.FloatField(
+        required=False,
+        label=r"\(R_{d,f}\) - Fator de incrustação para o fluido frion [m^2 * K / W]",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    tipo_q = forms.CharField(
+        required=True,
+        label=r"Tipo do Fluido (Quente)",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    tipo_f = forms.CharField(
+        required=True,
+        label=r"Tipo do Fluido (Frio)",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+    pressure_class = forms.ChoiceField(
+        choices=[(150.0, '150 Psi'), (600.0, "600 Psi")], 
+        required=False,
+        label=r"Classe de Pressão",
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        })
+    )
+    perda_carga_admissivel_casco = forms.FloatField(
+        required=False,
+        label=r"Perda de Carga Adimissível no Casco",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    perda_carga_admissivel_tubo = forms.FloatField(
+        required=False,
+        label=r"Perda de Carga Adimissível no Tubo",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+    pop_size = forms.IntegerField(
+        required=True,
+        label=r"Tamanho da populção",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    n_max_gen = forms.IntegerField(
+        required=True,
+        label=r"Número máximo de gerações",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+    fator_area_proj = forms.IntegerField(
+        required=True,
+        label=r"Fator de peso para área de projeto",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Remove campos vazios
+        return {key: value for key, value in cleaned_data.items() if value not in [None, '']}
+    
+
