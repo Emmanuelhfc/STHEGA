@@ -1068,6 +1068,8 @@ class CascoTubo:
         aval_delta_Ps = math.fabs(self.delta_Ps - self.perda_carga_admissivel_casco)
 
         F = aval_delta_PT + aval_delta_Ps 
+
+        
     
         return F
     
