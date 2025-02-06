@@ -16,6 +16,6 @@ docker compose up
 
 6. Caso ocorra um erro nessa etapa, verificar se o arquivo commands.sh (./scripts/commands.sh) está como LF, caso não esteja alterar de CRLF para LF (ver imagem abaixo)
 
-![Alt ou título da imagem](data\web\media\lf_to_crlf.png)
+![Alt ou título da imagem](data/web/media/lf_to_crlf.png)
 
 7. Por fim, a aplicação poderá ser acessada através da porta 8100 (http://localhost:8100/)
