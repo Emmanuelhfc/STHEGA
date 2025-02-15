@@ -14,7 +14,7 @@ Aplicativo WEB (API/Frontend) desenvolvido como projeto de TCC sobre dimensionam
 docker compose up
 ```
 
-6. Caso ocorra um erro nessa etapa, verificar se o arquivo commands.sh (./scripts/commands.sh) está como LF, caso não esteja alterar de CRLF para LF (ver imagem abaixo)
+6. Caso ocorra um erro nessa etapa, verificar se o arquivo commands.sh (./scripts/commands.sh) está como LF, caso não esteja, alterar de CRLF para LF (ver imagem abaixo)
 
 ![Alt ou título da imagem](data/web/media/lf_to_crlf.png)
 
