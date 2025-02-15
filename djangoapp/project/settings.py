@@ -16,23 +16,21 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-print(os.getenv('POSTGRES_DB', 'change-me'))
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.getenv('DEBUG', 1)))
+PRD = bool(int(os.getenv('PRODUCTION', 0)))
+DEBUG = not PRD
 
-ALLOWED_HOSTS = ['http://172.26.144.1:8100', '172.26.144.1', 'localhost']
 
+ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS', '').split(','))
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -85,22 +83,26 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
+
+if PRD:
+    DATABASES = {
+        'default': {
+            'ENGINE': os.getenv('DB_ENGINE'),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
     }
-}
-# DATABASES = {
-#     'default': {
-#         'ENGINE': "django.db.backends.postgresql",
-#         'NAME': os.getenv('POSTGRES_DB', 'change-me'),
-#         'USER': os.getenv('POSTGRES_USER', 'change-me'),
-#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'change-me'),
-#         'HOST': os.getenv('POSTGRES_HOST', 'change-me'),
-#         'PORT': os.getenv('POSTGRES_PORT', 'change-me'),
-#     }
-# }
+else: 
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "db.sqlite3",
+        }
+    }
+
 
 
 
@@ -137,13 +139,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = 'static/'
 DATA_DIR = BASE_DIR.parent / 'data' / 'web'
 STATIC_ROOT = DATA_DIR / 'static'
 
 MEDIA_URL = 'media/'
-
 MEDIA_ROOT = DATA_DIR / 'media'
 
 

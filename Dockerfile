@@ -11,13 +11,17 @@ COPY scripts /scripts
 
 WORKDIR /djangoapp
 
-EXPOSE 8100
+RUN apk add --no-cache \
+  mariadb-dev \
+  gcc \
+  musl-dev \
+  pkgconf
 
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
   /venv/bin/pip install -r /djangoapp/requirements.txt
 
-
+EXPOSE 8100
 # RUN chmod +x /djangoapp/scripts/commands.sh
 ENV PATH="/scripts:/venv/bin:$PATH"
 
