@@ -228,7 +228,7 @@ class STHEForm(forms.Form):
         })
     )
     Ds_inch = forms.ChoiceField(
-        choices= [(ds, ds) for ds in list(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())],
+        # choices= [(ds, ds) for ds in list(TubeCount.objects.values_list('Ds_inch', flat=True).distinct())],
         required=False,
         label=r"\(D_{s}\) - Diâmetro Interno do Casco (Frio) [Pol]",
         widget=forms.Select(attrs={

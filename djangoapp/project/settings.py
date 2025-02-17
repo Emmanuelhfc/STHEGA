@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+from google.cloud import secretmanager
+import io
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +29,24 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
 PRD = bool(int(os.getenv('PRODUCTION', 0)))
 DEBUG = not PRD
 
+env = environ.Env(DEBUG=(bool, False))
+env_file = os.path.join(BASE_DIR, ".env")
+
+
+if os.path.isfile(env_file):
+    # Use a local secret file, if provided
+    env.read_env(env_file)
+
+elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    client = secretmanager.SecretManagerServiceClient()
+    settings_name = os.environ.get("SETTINGS_NAME", "django_settings")
+    name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
+    payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+
+    env.read_env(io.StringIO(payload))
+else:
+    raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
 ALLOWED_HOSTS = ['localhost']
 ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS', '').split(','))
@@ -44,10 +65,23 @@ INSTALLED_APPS = [
     'frontend',
 
     #Libs 
+    "storages",
     "rest_framework",
     'drf_spectacular',
 
 ]
+
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+#         "OPTIONS": {
+          
+#         },
+#     },
+# }
+
+# DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+# STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,16 +119,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 if PRD:
-    DATABASES = {
-        'default': {
-            'ENGINE': os.getenv('DB_ENGINE'),
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST'),
-            'PORT': os.getenv('DB_PORT'),
-        }
-    }
+    DATABASES = {"default": env.db()}
+
+    # If the flag as been set, configure to use proxy
+    DATABASES["default"]["HOST"] = "127.0.0.1"
+    DATABASES["default"]["PORT"] = 5432
 else: 
     DATABASES = {
         "default": {
@@ -102,6 +131,7 @@ else:
             "NAME": "db.sqlite3",
         }
     }
+
 
 
 
@@ -140,11 +170,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_URL = 'static/'
-DATA_DIR = BASE_DIR.parent / 'data' / 'web'
-STATIC_ROOT = DATA_DIR / 'static'
+STATIC_ROOT = 'static'
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT = DATA_DIR / 'media'
+MEDIA_URL =  'media/'
+MEDIA_ROOT = 'media'
 
 
 # Default primary key field type

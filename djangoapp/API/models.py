@@ -134,8 +134,9 @@ class ShellFluid(models.TextChoices):
 
 class InputsShellAndTube(models.Model):
     def get_ds_inch_choices():
-        choices = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
-        return choices
+        # choices = [(value, value) for value in TubeCount.objects.values_list('Ds_inch', flat=True).distinct()]
+        # return choices
+        return []
     
     calculation_id = models.UUIDField(null=True, blank=True)
     T1_hot = models.FloatField()
