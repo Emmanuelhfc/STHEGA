@@ -49,7 +49,7 @@ env_file = os.path.join(BASE_DIR, ".env")
 # else:
 #     raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '35.199.68.240']
 ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS', '').split(','))
 
 # Application definition
