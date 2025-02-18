@@ -12,7 +12,7 @@ services:
       - ./media:/media/
       - .env:/.env
     
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
     
   
