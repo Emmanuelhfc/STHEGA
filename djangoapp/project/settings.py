@@ -45,6 +45,7 @@ elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
     payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
 
     env.read_env(io.StringIO(payload))
+
 else:
     raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
@@ -80,8 +81,7 @@ INSTALLED_APPS = [
 #     },
 # }
 
-# DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-# STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -234,3 +234,7 @@ LOGGING = {
     },
 }
 
+GS_BUCKET_NAME = env("GS_BUCKET_NAME")
+GS_DEFAULT_ACL = "publicRead"
+DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"

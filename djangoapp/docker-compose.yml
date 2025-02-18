@@ -1,0 +1,17 @@
+services:      
+  sthega:
+    container_name: sthega
+    build:
+      context: .
+    ports:
+      - "8100:8100"
+    volumes:
+      - .:/djangoapp
+      - ./static:/static/
+      - ./media:/media/
+      - .env:/.env
+    
+    env_file:
+      - ./.env
+    
+  

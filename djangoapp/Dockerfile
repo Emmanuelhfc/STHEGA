@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 ENV PYTHONUNBUFFERED 1
 
-COPY djangoapp /djangoapp
+COPY . /djangoapp
 COPY scripts /scripts
 
 WORKDIR /djangoapp
@@ -24,6 +24,8 @@ RUN python -m venv /venv && \
 EXPOSE 8100
 # RUN chmod +x /djangoapp/scripts/commands.sh
 ENV PATH="/scripts:/venv/bin:$PATH"
-
+# RUN ["ls"]
 RUN ["chmod", "+x", "/scripts/commands.sh"]
 CMD ["commands.sh"]
+# CMD ["python", "manage.py", "runserver"]
+# CMD ["/scripts/commands.sh"]
