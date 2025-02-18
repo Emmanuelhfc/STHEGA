@@ -21,7 +21,7 @@ RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
   /venv/bin/pip install -r /djangoapp/requirements.txt
 
-EXPOSE 80
+EXPOSE 8000
 # RUN chmod +x /djangoapp/scripts/commands.sh
 ENV PATH="/scripts:/venv/bin:$PATH"
 # RUN ["ls"]
