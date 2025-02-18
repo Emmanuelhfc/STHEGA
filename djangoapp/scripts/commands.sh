@@ -13,7 +13,7 @@ if [ "$PRODUCTION" = "1" ]; then
     gunicorn project.wsgi:application --bind 0.0.0.0:8100 --workers 1 --threads 8 --timeout 0
 else
     echo 'Run Server'
-    python manage.py runserver 0.0.0.0:8100
+    python manage.py runserver 0.0.0.0:80
 fi
 
 # python manage.py runserver 0.0.0.0:8100PORT --workers 1 --threads 8 --timeout 0 tutorial.wsgi:application
