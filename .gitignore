@@ -3,4 +3,8 @@
 .venv
 rascunho.py
 .env
+/djangoapp/static
+/djangoapp/media
+
+
 
