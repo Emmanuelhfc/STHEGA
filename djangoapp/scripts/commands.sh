@@ -17,5 +17,3 @@ else
     echo 'Run Server'
     python manage.py runserver 0.0.0.0:8000
 fi
-
-# python manage.py runserver 0.0.0.0:8100PORT --workers 1 --threads 8 --timeout 0 tutorial.wsgi:application

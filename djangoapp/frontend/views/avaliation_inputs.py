@@ -28,12 +28,10 @@ def avaliation_inputs(request):
     sthe_form = STHEForm(request.POST or None)
     filter_input_form = FilterInputForm(request.POST or None)
     
-
     if filter_input_form.is_valid():
         id = filter_input_form.cleaned_data.get('id')
         return avaliation_by_id(request, id)
     
-    logger.debug(sthe_form.is_valid())
     if sthe_form.is_valid():
         data = sthe_form.cleaned_data
 

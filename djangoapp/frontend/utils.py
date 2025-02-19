@@ -1,3 +1,4 @@
+import os
 def get_server_url(request) -> str:
     """ Não tem última barra
 
@@ -13,6 +14,8 @@ def get_server_url(request) -> str:
     if server_url.endswith('/'):
         server_url = server_url[:-1]
     
+    if os.getenv('NGINX_DOCKER') == "1":
+        return 'http://nginx'
     return server_url
 
 def get_server_url_and_current_url(request):

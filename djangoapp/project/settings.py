@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
 PRD = bool(int(os.getenv('PRODUCTION', 0)))
 DEBUG = not PRD
 
-ALLOWED_HOSTS = ['localhost', '35.199.68.240']
+ALLOWED_HOSTS = ['localhost', '35.199.68.240', 'nginx']
 ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS', '').split(','))
 
 # Application definition
