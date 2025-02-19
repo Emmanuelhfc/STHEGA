@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import environ
-from google.cloud import secretmanager
-import io
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,26 +25,6 @@ SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
 # SECURITY WARNING: don't run with debug turned on in production!
 PRD = bool(int(os.getenv('PRODUCTION', 0)))
 DEBUG = not PRD
-
-env = environ.Env(DEBUG=(bool, False))
-env_file = os.path.join(BASE_DIR, ".env")
-
-
-# if os.path.isfile(env_file):
-#     # Use a local secret file, if provided
-#     env.read_env(env_file)
-
-# elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
-#     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
-#     client = secretmanager.SecretManagerServiceClient()
-#     settings_name = os.environ.get("SETTINGS_NAME", "django_settings")
-#     name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
-#     payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
-
-#     env.read_env(io.StringIO(payload))
-
-# else:
-#     raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
 ALLOWED_HOSTS = ['localhost', '35.199.68.240']
 ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS', '').split(','))
@@ -71,17 +48,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
 
 ]
-
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-#         "OPTIONS": {
-          
-#         },
-#     },
-# }
-
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -119,11 +85,17 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 if PRD:
-    DATABASES = {"default": env.db()}
-
-    # If the flag as been set, configure to use proxy
-    DATABASES["default"]["HOST"] = "127.0.0.1"
-    DATABASES["default"]["PORT"] = 5432
+    # Alterar caso não for usar o container com Postgres
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'sthega_db', 
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': 'sthega_db',  
+            'PORT': '5432',  
+        }
+    }
 else: 
     DATABASES = {
         "default": {
@@ -131,17 +103,6 @@ else:
             "NAME": "db.sqlite3",
         }
     }
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
-    }
-}
-
-
-
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -239,8 +200,3 @@ LOGGING = {
         },
     },
 }
-
-# GS_BUCKET_NAME = env("GS_BUCKET_NAME")
-# GS_DEFAULT_ACL = "publicRead"
-# DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-# STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"

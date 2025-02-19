@@ -2,8 +2,10 @@
 set -e
 python manage.py collectstatic --noinput
 
-echo 'Executando makemigrations'
-python manage.py makemigrations --noinput
+if [ "$PRODUCTION" = "0" ]; then
+    echo 'Executando makemigrations'
+    python manage.py makemigrations --noinput
+fi
 
 echo 'Executando migrate'
 python manage.py migrate --noinput
