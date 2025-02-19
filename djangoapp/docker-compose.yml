@@ -40,6 +40,8 @@ services:
       POSTGRES_DB: sthega_db
     volumes:
       - ${PG_DATA}:/var/lib/postgresql/data 
+volumes:
+  PG_DATA:  # Aqui você define o volume nomeado
 
 
   
