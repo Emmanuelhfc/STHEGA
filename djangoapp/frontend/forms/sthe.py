@@ -5,18 +5,20 @@ from API.models import TubePasses, TubeInternDiameter, Pitch, TubeCount, ShellFl
 class FilterInputForm(forms.Form):
     id = forms.IntegerField(
         required=True,
-        label=r"ID do input do cálculo",
+        label=r"Input ID",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
+            'placeholder': "Ex: 3"
         })
     )
 
 class FilterInputNSGA2Form(forms.Form):
     inputs_shell_and_tube = forms.IntegerField(
         required=True,
-        label=r"ID do input do cálculo",
+        label=r"Input ID",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
+            'placeholder': "Ex: 3"
         })
     )
     pop_size = forms.IntegerField(
@@ -36,9 +38,10 @@ class FilterInputNSGA2Form(forms.Form):
 class FilterInputGAForm(forms.Form):
     inputs_shell_and_tube = forms.IntegerField(
         required=True,
-        label=r"ID do input do cálculo",
+        label=r"Input ID",
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
+            'placeholder': "Ex: 3"
         })
     )
     pop_size = forms.IntegerField(

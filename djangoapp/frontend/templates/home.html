@@ -9,6 +9,18 @@
 
 {% block btns_aside %}
 
+    <button
+        class="btn-default-ligth w-100 border-0"
+        onclick='window.location.href = "/api"' 
+        data-bs-toggle="tooltip" 
+        data-bs-placement="right" 
+        title="Swagger" 
+    >
+        <span class="btn-symbol material-symbols-outlined h-100 d-flex align-items-center justify-content-center">
+            <img src="{% static 'libs/google-material-icons/api.svg' %}" alt="home icon" class="material-icon">
+        </span>
+    </button>
+
 {% endblock btns_aside %}
 
 {% block page_content %}
@@ -69,7 +81,7 @@
                     <hr class="ms-3 me-3">
                     <div class="feat-des ms-3 me-3">
                         <p class="text-justify">
-                            Otmização multiobjetivo do trocador de calor casco e tubo  utilizando o algoritmos NSGA-II
+                            Otmização multiobjetivo do trocador de calor casco e tubo  utilizando o algoritmo NSGA-II
                         </p>
                     </div>
                 </div>

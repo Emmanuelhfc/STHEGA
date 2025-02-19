@@ -46,6 +46,7 @@ def results(request, pk):
 
 
     context = {
+        'input_id': str(input_id).strip(),
         "input_casco": inputs['input_casco'],
         "input_tubos": inputs['input_tubos'],
         "other_inputs": inputs['other_inputs'],
